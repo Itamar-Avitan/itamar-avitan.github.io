@@ -5,8 +5,8 @@
 Prints one line per address, "status url", and exits with 1 when an address is broken (no answer, or a status
 other than 2xx). Some hosts turn away every client that is not a browser although the page exists; their known
 answers are printed as "blocked" and do not fail the run. A blocked address is unverified, not verified: open it
-in a browser. The site's own address is reported but cannot fail the run, because it answers 404 until the site
-is published. An address that carries an email address or a phone number is never requested.
+in a browser. The site's own address counts like every other: until the site is published it answers 404 and
+the run exits with 1. An address that carries an email address or a phone number is never requested.
 """
 from __future__ import annotations
 
@@ -94,7 +94,7 @@ def fetch(url: str) -> tuple[int | None, str, str]:
         return None, url, str(getattr(e, "reason", "") or e) or type(e).__name__
 
 
-def check(urls: list[str], own: str | None = None) -> int:
+def check(urls: list[str]) -> int:
     """Request every address and print a line for each. Returns the exit status: 1 if any is broken, else 0."""
     counts = {"ok": 0, "blocked": 0, "broken": 0}
     for url in urls:
@@ -105,9 +105,6 @@ def check(urls: list[str], own: str | None = None) -> int:
         status, final, error = fetch(url)
         result = verdict(status, url, final)
         code = "error" if status is None else str(status)
-        if url == own and result == "broken":
-            print(f"{code:<8} {url}  (the site's own address: not published yet? not counted)")
-            continue
         counts[result] += 1
         if result == "blocked":
             print(f"{'blocked':<8} {url}  ({code}: this host turns away clients that are not browsers; open it in a browser)")
@@ -119,7 +116,7 @@ def check(urls: list[str], own: str | None = None) -> int:
 
 def main() -> int:
     site = yaml.safe_load((ROOT / "site.yaml").read_text(encoding="utf-8"))
-    return check(collect_urls(site), site.get("site_url"))
+    return check(collect_urls(site))
 
 
 if __name__ == "__main__":

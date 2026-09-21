@@ -58,7 +58,7 @@ def test_verdicts(status, urls, expected):
     assert check_links.verdict(status, *urls) == expected
 
 
-def _run(monkeypatch, capsys, answers, own=OWN):
+def _run(monkeypatch, capsys, answers):
     asked = []
 
     def fake_fetch(url):
@@ -66,7 +66,7 @@ def _run(monkeypatch, capsys, answers, own=OWN):
         return answers[url]
 
     monkeypatch.setattr(check_links, "fetch", fake_fetch)
-    code = check_links.check(list(answers), own)
+    code = check_links.check(list(answers))
     return code, asked, capsys.readouterr().out
 
 
@@ -85,16 +85,30 @@ def test_run_fails_on_a_broken_link_and_on_no_answer(monkeypatch, capsys):
     assert code == 1 and "timed out" in out
 
 
-def test_the_sites_own_address_is_reported_but_cannot_fail_the_run(monkeypatch, capsys):
-    code, asked, out = _run(monkeypatch, capsys, {OWN: (404, OWN, "")})
-    assert code == 0 and asked == [OWN] and "404" in out
+@pytest.mark.parametrize("answer, shown", [((404, OWN, ""), "404"), ((500, OWN, ""), "500"), ((None, OWN, "timed out"), "error")])
+def test_the_sites_own_address_counts_like_every_other(monkeypatch, capsys, answer, shown):
+    """Through main(), where site_url comes in: when the site itself is not served, the run fails and says so."""
+    urls = check_links.collect_urls(SITE)
+    assert SITE["site_url"] == OWN and OWN in urls
+    monkeypatch.setattr(check_links, "fetch", lambda url: answer if url == OWN else (200, url, ""))
+    assert check_links.main() == 1
+    out = capsys.readouterr().out
+    assert f"{shown:<8} {OWN}  BROKEN" in out
+    assert f"{len(urls)} addresses: {len(urls) - 1} ok, 0 blocked, 1 broken" in out     # every address asked for is counted
+
+
+def test_main_passes_when_every_address_answers_the_sites_own_included(monkeypatch, capsys):
+    urls = check_links.collect_urls(SITE)
+    monkeypatch.setattr(check_links, "fetch", lambda url: (200, url, ""))
+    assert check_links.main() == 0
+    assert f"{len(urls)} addresses: {len(urls)} ok, 0 blocked, 0 broken" in capsys.readouterr().out
 
 
 def test_no_request_is_made_for_an_address_with_private_data(monkeypatch, capsys):
     bad = "https://example.org/?to=someone@example.org"
     asked = []
     monkeypatch.setattr(check_links, "fetch", lambda url: asked.append(url) or (200, url, ""))
-    assert check_links.check([bad, "https://example.org/fine"], OWN) == 1
+    assert check_links.check([bad, "https://example.org/fine"]) == 1
     assert asked == ["https://example.org/fine"]
     assert "someone@example.org" not in capsys.readouterr().out     # and the private part is not echoed either
 
