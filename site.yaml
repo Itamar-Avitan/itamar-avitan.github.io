@@ -501,7 +501,7 @@ accessibility:
   - This site has not been audited by anyone else, and it has not been tested with a screen reader, with voice control or with a magnifier. The checks above are automated ones and my own reading, and neither can tell you how a page actually sounds.
   - 'The CV is a PDF, and it is the weakest thing here: it is built so that its text comes out in order and every address in it is real text, but it is not a tagged PDF.'
   - This is a personal site. One person writes it and keeps it working, in the time he has, so a fix may not be quick.
-  report: 'If something here is hard to use, or does not work with whatever you use to read the web, please tell me — that is the fastest way for it to get fixed. My address is in the footer of this page and of every other page. What helps most: which page you were on, what you were using, and what happened.'
+  report: 'If something here is hard to use, or does not work with whatever you use to read the web, please tell me — that is the fastest way for it to get fixed. My address is on every page of this site: at the top of the home page, and at the foot of the others. What helps most: which page you were on, what you were using, and what happened.'
 
 footer:
   updated: September 2026

@@ -501,7 +501,7 @@ def test_the_statement_says_the_aim_the_checks_the_limits_and_how_to_report(brow
     assert "not a certificate" in text and "nobody but me has audited" in text
     assert "One person writes it" in text                      # a personal site, maintained by one person
     assert "has not been tested with a screen reader" in text  # and what is therefore not claimed
-    assert "footer of this page" in text                       # how to report, without printing an address
+    assert "at the top of the home page" in text                       # how to report, without printing an address
     # the statement itself carries no address; the colophon below it does, as it does on every page
     main_html = page.eval_on_selector("main", "el => el.outerHTML")
     assert "@" not in text and "mailto:" not in main_html

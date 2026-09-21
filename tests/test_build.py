@@ -1010,3 +1010,22 @@ def test_the_published_cv_carries_the_wording_the_site_carries():
     assert "Embodied Brain Technology Practicum" in text and "EarBetter" in text
     assert "biosignal-driven add-on for any headphones" in text
     assert not re.search(r"(?:\+?972|\b0)[\s\-.]?5\d(?:[\s\-.]?\d){7}\b", text)   # the public build
+
+def test_the_accessibility_page_tells_the_truth_about_where_the_address_is():
+    """The statement's job is to be accurate, and the sentence a reporter acts on named the wrong place: it
+    said the address is in the footer of every page, but the home page carries it in the header. Every bullet
+    on that page names a check that runs, so this one gets a check too: the claim is asserted against the
+    rendered markup of every page, and it fails if either the sentence or the layout moves."""
+    placement = {}
+    for page in SITE["pages"]:
+        html = build.render(SITE, page)
+        head = html.partition("</header>")[0]
+        slug = page["slug"].strip("/") or "home"
+        placement[slug] = "header" if 'id="email"' in head else ("footer" if 'id="email"' in html else "absent")
+        if slug == "accessibility":
+            claim = ("My address is on every page of this site: at the top of the home page, "
+                     "and at the foot of the others.")
+            assert claim in _visible_text(html), "the statement no longer matches the markup"
+    assert "absent" not in placement.values(), placement          # reachable from every page
+    assert placement["home"] == "header", placement               # the home page puts it under the name
+    assert {v for k, v in placement.items() if k != "home"} == {"footer"}, placement
