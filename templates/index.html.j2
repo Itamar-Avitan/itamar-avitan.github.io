@@ -220,7 +220,7 @@
       <nav class="links-nav" aria-label="Contact and profiles">
         <ul class="links links--reach" role="list">
 {# The CV button leads the row and is its only filled element; it appears once show_cv is switched on. #}
-{% for link in site.links if link.label == "CV" and site.show_cv %}
+{% for link in site.links if link.label == "CV" and site.show_cv and link.get("url") %}
           <li><a class="btn btn--primary" href="{{ link.url }}">{{ link.label }}</a></li>
 {% endfor %}
 {% for link in site.links if link.label == "Email" and link.get("text") %}

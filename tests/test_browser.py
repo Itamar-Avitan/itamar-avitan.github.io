@@ -104,7 +104,7 @@ def test_every_profile_link_is_at_least_a_24px_target(browser, width):
       return {label: a.textContent.trim(), width: +r.width.toFixed(1), height: +r.height.toFixed(1),
               covered: [[-11.5, -11.5], [11.5, -11.5], [-11.5, 11.5], [11.5, 11.5]].every(c => hit(...c))};
     })""")
-    assert [l["label"] for l in links] == ["avitanit [at] post.bgu.ac.il", "GitHub", "Bluesky",
+    assert [l["label"] for l in links] == ["CV", "avitanit [at] post.bgu.ac.il", "GitHub", "Bluesky",
                                            "Google Scholar", "LinkedIn", "X", "ORCID"]
     assert [l for l in links if l["height"] < 24 or not l["covered"]] == []
 

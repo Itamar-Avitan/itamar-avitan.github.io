@@ -101,6 +101,7 @@ def test_jsonld_cannot_break_out_of_its_script_element():
 
 def test_render_escapes_html_and_hides_cv_when_flag_off():
     site = copy.deepcopy(SITE)
+    site["show_cv"] = False                 # the site ships with the CV published; prove the switch still works
     site["news"][0]["text"] = "5 < 6 & <script>x</script>"
     html = build.render(site)
     assert "<script>x</script>" not in html and "5 &lt; 6 &amp;" in html
@@ -203,7 +204,7 @@ def test_research_card_shows_every_field():
     assert all(f'href="{b["url"]}"' in unescape(html) for b in card["buttons"])
     assert f'<img src="{card["figure"]["src"]}" alt="{card["figure"]["alt"]}"' in html
     assert '<span class="me">Itamar Avitan</span>, Tal Golan' in html
-    assert html.count("btn btn--primary") == 1              # Paper; the CV button is hidden for now
+    assert html.count("btn btn--primary") == 2              # the paper's Paper button, and the CV button
     assert '<span class="tag tag--venue">NeurIPS 2025</span>' in html and '<span class="tag">CCN 2025 · Talk</span>' in html
 
 
