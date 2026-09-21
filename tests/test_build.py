@@ -2,6 +2,7 @@ import copy
 import json
 import re
 import shutil
+import subprocess
 from html import unescape
 from pathlib import Path
 from urllib.parse import unquote
@@ -14,6 +15,10 @@ import build
 SITE = build.load_site(build.ROOT / "site.yaml")
 PAGES = {page["slug"]: page for page in SITE["pages"]}
 SLUGS = list(PAGES)
+# The pages the navigation strip carries, and the ones only the colophon row does. A page is in exactly one of
+# these lists (build.validate holds that), and SLUGS is still every page the site builds and sitemaps.
+NAV_SLUGS = [page["slug"] for page in SITE["pages"] if page.get("nav")]
+COLOPHON_SLUGS = [page["slug"] for page in SITE["pages"] if page.get("colophon")]
 
 
 def page(slug: str, site: dict | None = None) -> dict:
@@ -152,11 +157,26 @@ def test_main_builds_every_page_and_the_two_robot_files(tmp_path, monkeypatch):
 
 def test_the_site_is_the_four_pages_the_owner_asked_for():
     """He chose separate pages over one scroll on 2026-09-21. Home is the front door; the talks sit with the
-    paper they carried, on Research; the commonplace has the page of its own he asked for."""
-    assert SLUGS == ["", "research/", "teaching/", "commonplace/"]
-    assert [p["nav"] for p in SITE["pages"]] == ["Home", "Research", "Teaching", "Commonplace"]
+    paper they carried, on Research; the commonplace has the page of its own he asked for. The strip carries
+    those four and only those four: the accessibility statement is a fifth page, linked from the colophon."""
+    assert NAV_SLUGS == ["", "research/", "teaching/", "commonplace/"]
+    assert [p["nav"] for p in SITE["pages"] if p.get("nav")] == ["Home", "Research", "Teaching", "Commonplace"]
     assert not page("").get("heading")                     # the home page's h1 is the name in the masthead
     assert all(page(s)["heading"] for s in SLUGS[1:])
+
+
+def test_a_page_is_linked_from_the_strip_or_the_colophon_and_never_from_both():
+    """Every page the site builds has exactly one label: `nav` puts it in the strip, `colophon` in the small
+    row at the foot. Both would print the same address twice on every page; neither would publish a page
+    nothing on the site leads to -- the failure a reader cannot see, so the build refuses it."""
+    assert COLOPHON_SLUGS == ["accessibility/"]
+    assert set(NAV_SLUGS) & set(COLOPHON_SLUGS) == set()
+    assert set(NAV_SLUGS) | set(COLOPHON_SLUGS) == set(SLUGS)
+    for labels, wanted in (({"nav": "X", "colophon": "X"}, "both"), ({}, "neither")):
+        site = copy.deepcopy(SITE)
+        entry = {k: v for k, v in page("research/", site).items() if k not in ("nav", "colophon")}
+        site["pages"] = [{**entry, **labels}]
+        assert any("research/" in p and wanted in p for p in build.validate(site)), wanted
 
 
 def test_each_page_has_its_own_address_title_and_canonical():
@@ -185,8 +205,9 @@ def test_the_navigation_is_ordinary_links_that_mark_the_page_you_are_on():
         labels = re.findall(r'<a [^>]*href="([^"]*)"([^>]*)>([^<]+)</a>', strip)
         assert [label for _, _, label in labels] == ["Home", "Research", "Teaching", "Commonplace", "CV"], slug
         current = [label for _, attrs, label in labels if 'aria-current="page"' in attrs]
-        assert current == [page(slug)["nav"]], slug
-        assert strip.count('aria-current="page"') == 1, slug
+        # a page the strip does not carry marks nothing in it: the colophon row below marks itself instead
+        assert current == ([page(slug)["nav"]] if slug in NAV_SLUGS else []), slug
+        assert strip.count('aria-current="page"') == (1 if slug in NAV_SLUGS else 0), slug
         assert "onclick" not in strip and "<button" not in strip, slug
 
 
@@ -197,7 +218,7 @@ def test_every_link_between_pages_climbs_back_to_the_root_first():
         base = "../" if slug else ""
         strip = html.partition('<nav class="sitenav"')[2].partition("</nav>")[0]
         hrefs = re.findall(r'<a [^>]*href="([^"]*)"', strip)
-        assert hrefs == [(base + s) or "./" for s in SLUGS] + [base + "cv.pdf"], slug
+        assert hrefs == [(base + s) or "./" for s in NAV_SLUGS] + [base + "cv.pdf"], slug
         assert "" not in hrefs and all(not h.startswith("/") for h in hrefs), slug
         for asset in ("style.css", SITE["portrait"]["jpg"], SITE["portrait"]["webp"]):
             assert f'"{base}{asset}"' in html, (slug, asset)
@@ -234,7 +255,7 @@ def test_home_hands_the_visitor_on_to_every_other_page():
     navigation strip was the only way in. One row per other page, each carrying a real thing from it."""
     html = html_of("")
     section = html.partition('<section id="elsewhere"')[2].partition("</section>")[0]
-    assert [row["page"] for row in SITE["elsewhere"]] == [p["nav"] for p in SITE["pages"][1:]]
+    assert [row["page"] for row in SITE["elsewhere"]] == [page(s)["nav"] for s in NAV_SLUGS[1:]]
     assert section.count('<li class="row">') == 3
     for row in SITE["elsewhere"]:
         assert f'<span class="tag">{row["page"]}</span>' in section, row["page"]   # a label, never a link
@@ -312,7 +333,7 @@ def _values(node):
 def test_every_content_string_is_rendered_on_one_page_or_another():
     text = " ||| ".join(_visible_text(h) for h in every_page().values())
     wanted = {k: SITE[k] for k in ("identity_line", "about", "now", "elsewhere", "news", "talks", "projects",
-                                   "teaching")}
+                                   "teaching", "accessibility")}
     wanted["intros"] = [p.get("intro") for p in SITE["pages"] if p.get("intro")]
     # an address is not text: full ones start with http, and the "elsewhere" rows point at this site's own
     # slugs, which the template turns into a relative link rather than printing
@@ -354,7 +375,8 @@ def test_open_graph_points_at_the_site_and_its_card():
 def test_section_ids_and_script_hooks():
     where = {"": ["about", "elsewhere", "now", "news"],
              "research/": ["research", "papers", "talks", "projects"],
-             "teaching/": ["teaching", "courses", "students"], "commonplace/": ["quotes"]}
+             "teaching/": ["teaching", "courses", "students"], "commonplace/": ["quotes"],
+             "accessibility/": ["accessibility", "aim", "done", "limits", "report"]}
     for slug, html in every_page().items():
         for sec in where[slug]:
             assert html.count(f'<section id="{sec}"') == 1, (slug, sec)
@@ -451,30 +473,63 @@ def test_talks_link_the_venue_and_show_the_note():
 
 def test_project_titles_link_only_when_a_url_is_given():
     html = html_of("research/")
-    assert '<h3><a href="https://github.com/Itamar-Avitan/earbetter-ebt-practicum">EarBetter</a></h3>' in html
+    assert ('<h3><a href="https://github.com/Itamar-Avitan/earbetter-ebt-practicum">'
+            'Embodied Brain Technology Practicum</a></h3>') in html
     assert "<h3>BCI4ALS</h3>" in html
 
 
-def test_the_practicum_is_told_as_the_product_story_it_was():
-    """The owner's correction of 2026-09-21, in his own words: the course was an internship, the team did not
-    explore anything, they designed a product -- an add-on for any headphones that reads biosignals, processes
-    on the phone and filters the sounds that trigger anxiety -- built a working version, did the go-to-market
-    work, wrote a business plan and pitched it. The earlier wording was paper language and must not come back;
-    the same correction is on the Aug 2026 news entry. See the note above `projects` in site.yaml."""
-    earbetter = next(p for p in SITE["projects"] if p["title"] == "EarBetter")
+def test_the_practicum_leads_with_the_programme_and_says_nothing_about_who_did_what():
+    """The owner's ruling of 2026-09-21, which supersedes every earlier framing of this entry -- his own
+    product-story correction of the same day included. His words: "i think its need to be more of a
+    description of an neurotechnology internship practicum for grad students collaborate with brown
+    university at providence blah blah, like more about the environment less on what i did, if they want to
+    know they can ask. (also on the website btw i think)". He chose "One entry, programme-first": the
+    PROGRAMME leads, EarBetter is named in a clause, and nothing says who did what. See the long note over
+    `projects` in site.yaml, and shared/projects.tex in the CV repository, which carries the same reframe."""
+    entry = next(p for p in SITE["projects"] if "Practicum" in p["title"])
     news = next(n for n in SITE["news"] if "Practicum" in n["text"])
-    both = earbetter["blurb"] + " " + news["text"]
+    html = html_of("research/")
+
+    # the programme leads: it is the entry's own title, and the first sentence of the blurb is about it
+    assert entry["title"] == "Embodied Brain Technology Practicum"
+    assert "EarBetter" not in entry["blurb"].split(".")[0]
+    assert entry["blurb"].index("Brown University") < entry["blurb"].index("EarBetter")
+    assert news["text"].index("Practicum") < news["text"].index("EarBetter")
+
+    # EarBetter is named, in a clause, and briefly
+    for phrase in ("EarBetter", "add-on", "any headphones", "biosignals", "anxiety"):
+        assert phrase in entry["blurb"], phrase
+    assert "headphone add-on" in news["text"] and "designed, built and pitched" in news["text"]
+
+    # DELETED AT HIS REQUEST, from the whole site: his own part, the sensors, the business-plan detail
+    everywhere = " ".join(_visible_text(h) for h in every_page().values())
+    for gone in ("control software", "put the system together", "system integration",
+                 "Muse", "heart-rate variability", "skin conductance",
+                 "go-to-market", "business plan"):
+        assert gone not in everywhere, gone
+    # and no personal-contribution wording put back in its place: nothing in the entry is in the first person
+    for first_person in ("I ", "I'", "my ", "myself"):
+        assert first_person not in entry["blurb"], first_person
+    assert "pitched" in entry["blurb"]              # the single word that survives of the pitch and the plan
+
+    # the older paper-language framing stays gone too
     for phrase in ("explores whether", "physiological signals", "selective audio attenuation",
                    "remain experimental", "clinically evaluated"):
-        assert phrase not in both, phrase
-    for phrase in ("add-on", "any headphones", "biosignals", "on your phone", "go-to-market",
-                   "business plan", "pitched it", "control software"):
-        assert phrase in earbetter["blurb"], phrase
-    assert "headphone add-on" in news["text"] and "designed, built and pitched" in news["text"]
+        assert phrase not in entry["blurb"] + " " + news["text"], phrase
+
+    # the facts it may state, and the two it may not
+    assert entry["period"] == "24 Jul–6 Aug 2026" and "Two weeks" in entry["blurb"]   # derived, not asserted
+    assert "competitive" in entry["blurb"] and "five-person" in entry["blurb"]
+    assert "12" not in _visible_text(html)          # "1 of 12" is on his list of private numbers
+    assert "award" not in everywhere.lower()
+
+    # the ruling is recorded where the next editor will see it, with the superseded wording kept as evidence
     yaml_text = (build.ROOT / "site.yaml").read_text(encoding="utf-8")
-    assert "the owner, directly, 2026-09-21" in yaml_text and "not headphones" not in earbetter["blurb"]
-    assert "Do not restore" in yaml_text or "must not be restored" in yaml_text
-    assert "five-person" in earbetter["blurb"] and "team of five" in news["text"]
+    assert "more about the environment less on what i did" in yaml_text
+    assert "One entry, programme-first" in yaml_text
+    assert "MUST NOT COME BACK" in yaml_text and "SUPERSEDED, kept as evidence" in yaml_text
+    assert "I wrote the control software and put the system together." in yaml_text   # only as the old text
+
 
 
 def test_optional_keys_may_be_absent():
@@ -493,7 +548,7 @@ def test_optional_keys_may_be_absent():
                      'class="nb"', 'rel="me"', 'id="email"', 'class="tag tag--venue"', 'class="btn',
                      'class="page-intro'):
             assert gone not in html, (slug, gone)
-    assert "<h3>EarBetter</h3>" in pages["research/"]
+    assert "<h3>Embodied Brain Technology Practicum</h3>" in pages["research/"]
     assert "Cognitive Computational Neuroscience (CCN) 2025" in pages["research/"]
 
 
@@ -759,7 +814,7 @@ def test_a_page_says_why_it_is_there_under_its_title():
     site = copy.deepcopy(SITE)
     del site["quotes_intro"]
     assert "page-intro" not in html_of("commonplace/", site)
-    for slug in ("research/", "teaching/"):
+    for slug in ("research/", "teaching/", "accessibility/"):
         assert f'<p class="page-intro inset">' in html_of(slug), slug
 
 
@@ -774,7 +829,11 @@ def test_the_quotes_section_is_empty_when_there_are_no_quotes():
 def test_terms_of_art_do_not_break_and_stay_escaped():
     pages = every_page()
     assert all(f'<span class="nb">{term}</span>' in pages[""] for term in ("Ben-Gurion", "(NeurIPS) 2025"))
-    assert all(f'<span class="nb">{term}</span>' in pages["research/"] for term in ("Best-Fitting", "go-to-market"))
+    assert all(f'<span class="nb">{term}</span>' in pages["research/"] for term in ("Best-Fitting", "five-person"))
+    # a nobreak term that matches nothing is dead configuration: "go-to-market" went with the phrase itself
+    assert "go-to-market" not in SITE["nobreak"]
+    for term in SITE["nobreak"]:
+        assert any(term in _visible_text(h) for h in pages.values()), term
     site = copy.deepcopy(SITE)
     site["about"][0] = "Ben-Gurion <b>& co</b>"
     assert '<p><span class="nb">Ben-Gurion</span> &lt;b&gt;&amp; co&lt;/b&gt;</p>' in html_of("", site)
@@ -887,3 +946,67 @@ def test_images_carry_no_metadata_and_the_social_card_is_1200x630():
             assert im.size == (544, 544), name
     with Image.open(build.ROOT / "img" / "og.png") as im:
         assert im.size == (1200, 630)
+
+
+# --- The accessibility statement: every line of it is a claim about this site ------------------------------
+
+def test_the_statement_claims_only_what_something_actually_checks():
+    """The page says the site aims at WCAG 2.1 AA and lists what was done. Each bullet has to be backed by a
+    check that runs, or it is marketing. This test pins the three that had no guard of their own: reduced
+    motion, the document language, and the fact that nothing on any page loads from a third party."""
+    css = _css()
+    motion = re.search(r"@media \(prefers-reduced-motion: reduce\) \{[^@]*\}\s*\}", css)
+    assert motion and "transition: none !important" in motion.group(0)
+    assert "scroll-behavior: auto" in motion.group(0)
+    assert "@keyframes" not in css and not re.search(r"^\s*animation:", css, re.M)   # nothing moves on its own
+    for slug, html in every_page().items():
+        assert '<html lang="en">' in html, slug                                       # a language on the document
+        assert '<nav class="sitenav" aria-label="Pages">' in html, slug               # a named landmark
+        # nothing is LOADED from anyone else. Links that lead elsewhere are fine and are not requests: what
+        # must never be off-site is anything the browser fetches to render the page -- an image, a script, a
+        # stylesheet, a font. tests/test_browser.py watches the actual request list as well.
+        loaded = re.findall(r'<(?:img|script|source|iframe|embed)\b[^>]*\ssrc(?:set)?="([^"]+)"', html)
+        # only the <link> kinds the browser actually fetches; rel="canonical" is a statement, not a request
+        loaded += re.findall(r'<link\b[^>]*\srel="(?:stylesheet|icon|preload|preconnect)"[^>]*\shref="([^"]+)"', html)
+        loaded += re.findall(r'<link\b[^>]*\shref="([^"]+)"[^>]*\srel="(?:stylesheet|icon|preload|preconnect)"', html)
+        assert [u for u in loaded if u.startswith(("http://", "https://", "//"))] == [], slug
+        assert "@font-face" not in html and "fonts.googleapis" not in html, slug
+
+
+def test_the_statement_does_not_overclaim_the_tap_target_rule():
+    """Measured, not assumed: a link inside running text is 18 to 22 CSS px tall on this site -- the role
+    line's lab link, a talk's venue, a hand-off row. Only the strip, the profile row and the colophon row are
+    held to 24 by 24 (tests/test_browser.py measures all three), so that is exactly what the page may say."""
+    done = " ".join(SITE["accessibility"]["done"])
+    assert "navigation strip" in done and "row of profiles" in done and "footer" in done
+    assert "A link set inside a sentence is left at the size of the words around it." in done
+    assert "Links and buttons are at least 24" not in done          # the sentence this replaced, which was false
+
+
+def test_the_statement_neither_claims_conformance_nor_cites_a_law():
+    """The two things such a page must never do. It says what it AIMS at and who checked it (nobody but him),
+    and it names no legal duty -- which rules bind a personal site is not a question this page can answer."""
+    text = " ".join(_values({k: SITE["accessibility"][k] for k in SITE["accessibility"]}))
+    assert "aims at WCAG 2.1 Level AA" in text
+    assert "not a certificate" in text and "nobody but me has audited this site" in text
+    for word in ("conforms", "conformant", "compliant", "compliance", "law", "legal", "required by",
+                 "Section 508", "directive", "accessible to everyone"):
+        assert word.lower() not in text.lower(), word
+
+
+def test_the_published_cv_carries_the_wording_the_site_carries():
+    """cv.pdf is linked from the strip of every page, so it is part of what this site says. The owner's
+    programme-first ruling deleted his personal contribution, the sensor inventory and the business-plan
+    detail from the CVs; if the published PDF still held them, the site would contradict its own project
+    entry from its own navigation bar. It is the public build (no phone number) of the cv repository."""
+    pdf = build.ROOT / "cv.pdf"
+    assert pdf.exists()
+    out = subprocess.run(["pdftotext", str(pdf), "-"], capture_output=True, text=True)
+    assert out.returncode == 0, "pdftotext is needed to check the published CV; install poppler"
+    text = " ".join(out.stdout.split())
+    for gone in ("control software", "system integration", "Muse headband", "heart-rate variability",
+                 "skin conductance", "go-to-market", "business plan", "selective audio attenuation"):
+        assert gone not in text, gone
+    assert "Embodied Brain Technology Practicum" in text and "EarBetter" in text
+    assert "biosignal-driven add-on for any headphones" in text
+    assert not re.search(r"(?:\+?972|\b0)[\s\-.]?5\d(?:[\s\-.]?\d){7}\b", text)   # the public build

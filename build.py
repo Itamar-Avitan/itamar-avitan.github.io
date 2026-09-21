@@ -16,7 +16,7 @@ from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoes
 
 ROOT = Path(__file__).resolve().parent
 REQUIRED = ["site_url", "name", "alternate_name", "identity_line", "pages", "about", "now", "links", "news",
-            "research", "talks", "projects", "teaching", "footer", "portrait"]
+            "research", "talks", "projects", "teaching", "accessibility", "footer", "portrait"]
 PHONE = re.compile(r"(?:\+?972|\b0)[\s\-.]?5\d(?:[\s\-.]?\d){7}\b")
 EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
 UNPUBLISHED = re.compile(r"\b(in[\s-]prep(?:aration)?|under[\s-]review|submitted to)\b", re.I)
@@ -51,6 +51,12 @@ def validate(site: dict) -> list[str]:
     for page in site.get("pages") or []:
         if not template_path(page).exists():
             problems.append(f"page {page['slug']!r} has no template at {template_path(page).relative_to(ROOT)}")
+        # A page is linked from the navigation strip or from the colophon row, and never from both: with both
+        # labels every page would print the same address twice. With neither, the page is built and published
+        # and nothing on the site leads to it, which is the failure a reader cannot see.
+        if bool(page.get("nav")) == bool(page.get("colophon")):
+            both = "both a nav and a colophon label" if page.get("nav") else "neither a nav nor a colophon label"
+            problems.append(f"page {page['slug']!r} has {both}: it needs exactly one")
     return problems
 
 
@@ -115,15 +121,26 @@ def environment() -> Environment:
     return env
 
 
+def links_to(site: dict, page: dict, base: str, label_key: str) -> list[dict]:
+    """The rows of one link list: the strip (`nav`) or the colophon row (`colophon`).
+
+    Two lists, one shape, because they are the same thing at two volumes: the strip carries the pages a
+    visitor came for, the colophon the page about the site itself. A page carries one label or the other
+    (validate() holds that), so neither list can say an address the other already says.
+    """
+    return [{"label": p[label_key], "href": local(p["slug"], base) or "./", "current": p is page}
+            for p in site["pages"] if p.get(label_key)]
+
+
 def render(site: dict, page: dict | None = None) -> str:
     """One page of the site. Without an argument: the home page, which is the first entry under `pages`."""
     page = page or site["pages"][0]
     base = base_of(page)
     shown, older = split_news(site["news"], site.get("news_visible", 5))
-    nav = [{"label": p["nav"], "href": local(p["slug"], base) or "./", "current": p is page}
-           for p in site["pages"]]
+    nav = links_to(site, page, base, "nav")
+    colophon_nav = links_to(site, page, base, "colophon")
     return environment().get_template(template_name(page)).render(
-        site=site, page=page, base=base, nav=nav,
+        site=site, page=page, base=base, nav=nav, colophon_nav=colophon_nav,
         page_url=page_url(site, page), page_title=page_title(site, page),
         page_description=page_description(site, page),
         news_shown=shown, news_older=older,

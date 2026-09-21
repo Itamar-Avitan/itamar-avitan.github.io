@@ -16,10 +16,14 @@ portrait: {webp: img/portrait-400.webp, jpg: img/portrait-800.jpg, alt: Itamar A
 # page is still here, on the page where a reader would look for it.
 #   slug        the address under site_url, and the folder the page is written into. '' is the home page.
 #               It also names the template: templates/pages/<slug or "home">.html.j2.
-#   nav         the label in the navigation strip, on every page.
+#   nav         the label in the navigation strip, on every page. A page without it is not in the strip.
+#   colophon    the label in the small link row at the foot of every page. A page without it is not there.
+#               A page needs one of `nav` and `colophon`, or nothing links to it; it may not have both, which
+#               would say the same address twice on every page. build.py checks all three of those.
 #   heading     the page's <h1>. The home page has none here: its <h1> is the name in the masthead.
 #   intro       one line of framing under the heading (optional).
 #   description the page's meta description; the home page falls back to identity_line.
+# Every page listed here is written into sitemap.xml, strip or colophon alike.
 pages:
 - slug: ''
   nav: Home
@@ -37,8 +41,26 @@ pages:
   nav: Commonplace
   heading: Commonplace
   description: 'A commonplace book: lines about memory and mind that Itamar Avitan keeps coming back to.'
+# The accessibility statement, added 2026-09-21 at the owner's request.
+# A PAGE OF ITS OWN, NOT A SECTION, and NOT IN THE NAVIGATION STRIP. Three decisions, each with its reason:
+#   * its own page, because it is about the site rather than about him. Folded into Home it would sit under
+#     "About" as a paragraph about focus rings; folded into any other page it would be filed under a heading
+#     that does not lead to it. It also has to be reachable from every page, and only a page can be.
+#   * not in the strip, because the strip carries the four pages a visitor came for, and a fifth item there
+#     would rank a utility page level with the work. It is also the one rule the strip has: four pages.
+#   * a small link in the colophon of every page, which is where the web puts this and where a reader who
+#     needs it will look for it. build.py writes it into sitemap.xml with the other four.
+- slug: accessibility/
+  colophon: Accessibility
+  heading: Accessibility
+  intro: What this site aims at, what was actually done about it, what is not claimed, and how to tell me when it falls short.
+  description: 'The accessibility statement for the personal site of Itamar Avitan: what it aims at, what was actually done and checked, and how to report a problem.'
 
 # Proper nouns and terms of art that must never break across two lines, wherever they occur in the text.
+# A term here must actually occur in the content: a rule that matches nothing is dead configuration, and the
+# next reader cannot tell it from a rule that stopped matching by accident. "go-to-market" was removed on
+# 2026-09-21 with the phrase itself, when the owner's programme-first ruling took the business-plan detail
+# out of the practicum entry (see the note over `projects`).
 nobreak:
 - Ben-Gurion
 - Best-Fitting
@@ -51,7 +73,6 @@ nobreak:
 - model-recovery
 - odd-one-out
 - five-person
-- go-to-market
 - add-on
 - 1733-34
 
@@ -79,6 +100,14 @@ identity_line: I study how to tell which neural network models of human vision a
 # lede's question again in the lede's words, 300px below it, so that at 1440 a reader met the same sentence
 # twice on one screen; it carries the question forward instead -- what the measure costs, and what a wrong
 # answer looks like. Do not put the degree list back, and do not let this paragraph restate identity_line.
+#
+# The practicum clause in the third paragraph -- "a headphone add-on for the noises that set anxiety off" --
+# was re-read on 2026-09-21 against the owner's programme-first ruling (see the note over `projects`) and
+# KEPT unchanged. It survives that ruling on its own terms: it is a passing mention in a list of two things
+# he built with other people, it names no personal contribution, no sensor and no business step, and it is in
+# his voice, which he asked for. Naming the programme here instead would make the third paragraph of an
+# "about me" carry a programme's name for no reader's benefit -- the Research page says all that, once.
+# The rule the ruling sets for this paragraph is narrow and should be kept: do not add to this clause.
 about:
 - I am a PhD candidate in the Brains and Machines Lab at Ben-Gurion University of the Negev, advised by Dr. Tal Golan, and I came to it from cognitive and brain sciences and from psychology — the degrees and the dates are in the CV.
 - The measure is the hard part. To say a network sees the way people do, you fit a mapping from its features to human judgments and check how well it predicts — and a mapping flexible enough to fit anything can make the wrong network look like the winner. In our simulations that comparison recovered the model that had generated the data less than 80% of the time.
@@ -159,9 +188,12 @@ links:
 news:
 - date: Sep 2026
   text: Gave a flash talk, “System identification perspective on representational alignment” (with Maya Zach and Tal Golan), at Neuro-AI-Talks (NEAT) 2026 in Osnabrück, Germany.
-# Rewritten 2026-09-21 with the EarBetter entry under "projects"; the note there records why.
+# Checked against the owner's programme-first ruling of 2026-09-21 (the long note over `projects` has it in
+# full) and kept, because it already obeyed it: the programme leads the sentence, EarBetter is named in a
+# clause, and nothing here says who did what. One word of repetition went -- the line named Brown University
+# twice in twenty words, once in the programme's name and once as the place -- and nothing else changed.
 - date: Aug 2026
-  text: Completed the Brown University–Ben-Gurion University Embodied Brain Technology Practicum at Brown University, where our team of five designed, built and pitched EarBetter, a headphone add-on that filters the sounds that set a person’s anxiety off.
+  text: Completed the Embodied Brain Technology Practicum, a joint Brown University–Ben-Gurion University programme held at Brown, where our team of five designed, built and pitched EarBetter, a headphone add-on that filters the sounds that set a person’s anxiety off.
 - date: Dec 2025
   text: 'Presented our paper with Tal Golan, “Model–Behavior Alignment under Flexible Evaluation: When the Best-Fitting Model Isn’t the Right One”, as a poster at the Conference on Neural Information Processing Systems (NeurIPS) 2025 in San Diego.'
 - date: Nov 2025
@@ -246,28 +278,57 @@ talks:
   - Tal Golan
   note: Preliminary version of the NeurIPS 2025 paper.
   url: https://2025.ccneuro.org/contributed-talk/?id=65
-# EarBetter, rewritten on 2026-09-21 from the owner's own account, which supersedes the earlier framing and
-# must not be restored: it read "It explores whether physiological signals can drive selective audio
-# attenuation ... parts of it remain experimental, and it has not been clinically evaluated" -- paper language
-# for what was an entrepreneurship internship, not a study. His words, verbatim: "the idea of the course is
-# internship and we didn't explore, we came out with an idea of having a product that works with any
-# headphones that record biosignals and selectively reduce certain noises to reduce noise-induced anxiety
-# through filtering triggering noises, then we implemented a version of it and we also did the all
-# go-to-market stuff and built a business plan and pitched it"; and, correcting the hardware, "it's an add-on
-# that will process through your phone and get biosignals and stuff" -- so the team did not build headphones.
-# Source: the owner, directly, 2026-09-21. The Aug 2026 news entry carries the same correction.
+# THE PRACTICUM ENTRY. The owner ruled on this twice on 2026-09-21, and the SECOND ruling is the one in force.
+#
+# RULING IN FORCE (source O, 2026-09-21), his words verbatim: "i think its need to be more of a description of
+# an neurotechnology internship practicum for grad students collaborate with brown university at providence
+# blah blah, like more about the environment less on what i did, if they want to know they can ask. (also on
+# the website btw i think)". Shown the options, he chose "Joint BGU-Brown neurotech practicum for grad
+# students" and "One entry, programme-first": keep the entry where it is, on the site and on the CVs, but let
+# the PROGRAMME lead, name EarBetter in a clause, and say nothing about who did what.
+# So the entry is titled by the programme and the blurb describes it; EarBetter is the second sentence. The
+# same reframe is in the CV repository, shared/projects.tex, with the same ruling recorded beside it.
+#
+# THREE THINGS WERE DELETED AT HIS REQUEST AND MUST NOT COME BACK, here or in the news entry or in About:
+#   * the personal-contribution clause -- "I wrote the control software and put the system together";
+#   * the sensor inventory -- Muse headband, heart-rate variability, skin conductance (it was never on the
+#     site, but it was on the CVs, and it must not migrate here);
+#   * the go-to-market and business-plan detail -- "did the go-to-market work, wrote a business plan" -- of
+#     which the single word "pitched" is all that survives.
+# Do not replace them with different personal-contribution wording: he asked for less about what he did, not
+# for it said another way. "if they want to know they can ask" is the whole point of the entry's brevity.
+#
+# SUPERSEDED, kept as evidence of what was printed and why. Until this ruling the entry was titled "EarBetter"
+# and read: "Our five-person team's product from the Embodied Brain Technology Practicum at Brown University:
+# an add-on that works with any headphones, reads your biosignals, processes on your phone, and filters out
+# the sounds that set a person's anxiety off. We built a working version, did the go-to-market work, wrote a
+# business plan and pitched it. I wrote the control software and put the system together." That itself
+# replaced an earlier paper-language framing ("It explores whether physiological signals can drive selective
+# audio attenuation ... has not been clinically evaluated"), on his account of 2026-09-21: "the idea of the
+# course is internship and we didn't explore, we came out with an idea of having a product that works with
+# any headphones that record biosignals and selectively reduce certain noises ... then we implemented a
+# version of it and we also did the all go-to-market stuff and built a business plan and pitched it", and
+# "it's an add-on that will process through your phone and get biosignals and stuff" -- so the team did not
+# build headphones, and the add-on wording below is still his. Neither superseded form is to be restored.
+#
+# FACTS THE ENTRY MAY STATE, all established: the practicum is the Embodied Brain Technology Practicum, run
+# jointly by Ben-Gurion University and Brown University; it ran at Brown, in Providence, USA, from 24 July to
+# 6 August 2026; entry was competitive; his team of five designed, built and pitched EarBetter. "Two weeks" is
+# derived from the dates in `period`, not asserted. NOT stated, because no source gives them: a course code,
+# the size of the Brown cohort, and any award. The number of BGU participants he was one of is NOT printed
+# either -- it is on his own list of private numbers (the CV register records that ruling), and the entry says
+# the entry was competitive and stops.
 projects:
-- title: EarBetter
+# Titled by the programme, not by the product: under a heading a reader's eye reaches first, "EarBetter" would
+# have led and the practicum would have been the clause, which is the ruling upside down. The link stays on
+# this row -- it is the entry's own repository, and its README opens "A 2026 Brown University-Ben-Gurion
+# University Embodied Brain Technology Practicum project" -- and it is the same address the CVs print under
+# the same entry head. The CV entry is laid out the same way: practicum in the head, EarBetter in the bullet.
+- title: Embodied Brain Technology Practicum
   period: 24 Jul–6 Aug 2026
-  # Shortened on 2026-09-21 from 80 words to 64: at its old length a two-week practicum ran longer on the
-  # Research page than the peer-reviewed paper's own summary above it, which said the wrong thing about what
-  # weighs what. Only length changed. Every clause of his account is still here, in his words -- add-on, any
-  # headphones, biosignals, processing on the phone, the sounds that set anxiety off, the working version, the
-  # go-to-market work, the business plan, the pitch, and what he himself did. What went is the sentence that
-  # restated the aim ("less anxiety from noise", already said by "anxiety off"), the year (the row carries the
-  # dates), and the second "Brown University". It is mentioned three times on this site at three different
-  # lengths -- a news line, a clause in About, this row -- which is right; three at this length would not be.
-  blurb: 'Our five-person team’s product from the Embodied Brain Technology Practicum at Brown University: an add-on that works with any headphones, reads your biosignals, processes on your phone, and filters out the sounds that set a person’s anxiety off. We built a working version, did the go-to-market work, wrote a business plan and pitched it. I wrote the control software and put the system together.'
+  # 63 words against the 64 of the wording it replaces, so the reframe costs the Research page nothing: this
+  # row still sits below the peer-reviewed paper's own summary and still weighs less than it, which is right.
+  blurb: 'Two weeks at Brown University in Providence, on a programme run jointly with Ben-Gurion University: graduate students from the two universities, admitted by competitive selection, work in small teams, each building a piece of neurotechnology and pitching it. Our five-person team built and pitched EarBetter, an add-on that works with any headphones, reads biosignals and filters out the sounds that set a person’s anxiety off.'
   url: https://github.com/Itamar-Avitan/earbetter-ebt-practicum
 - title: BCI4ALS
   period: 2022–2023
@@ -406,5 +467,41 @@ teaching:
   - title: Algebra and calculus, Dean of Students Office
     kind: Tutor
     when: 2021–2023
+
+# The accessibility statement. Every line below is a claim about this site, so the rule for editing it is
+# stricter than for anything else in this file: it may only say what is true and what is checked.
+#   * Each bullet under `done` names something a test actually asserts (tests/test_build.py,
+#     tests/test_browser.py) or a plain fact of the build. If you change the site so that one of them stops
+#     being true, change the bullet in the same commit -- a stale accessibility statement is worse than none.
+#   * `aim` says what the site AIMS at. Do not turn it into a conformance claim: nothing here has been
+#     audited, and an untested claim of conformance is the one thing such a page must never make.
+#   * `limits` is not an apology, it is the other half of the statement. Keep it.
+#   * NO LEGAL CLAIM OF ANY KIND. No law is cited here and none should be: this is a personal site, the
+#     question of which rules bind it is not one this page can answer, and saying otherwise would be a claim
+#     about his obligations that nobody has checked.
+#   * The address is NOT repeated here. `report` points at the colophon, which carries it on every page,
+#     written as "name [at] host" and turned into a link in the browser. Two reasons, both load-bearing: the
+#     build refuses a plain address anywhere in this file, and exactly one element per page may carry
+#     id="email" -- that is the hook the script in base.html.j2 uses.
+accessibility:
+  aim: 'This site aims at WCAG 2.1 Level AA — the Web Content Accessibility Guidelines, level AA. That is the standard I hold it to. It is not a certificate: nobody but me has audited this site, and the list below is what was actually done, not a claim that the whole of AA has been met.'
+  done_intro: 'What that has meant in practice. Each of these is checked automatically before the site is built, so it stays true:'
+  done:
+  - 'Nothing loads from anyone else. The fonts are served from this site, and no page asks any other host for anything — no analytics, no trackers, no embedded players, no hosted fonts — so the pages work on a slow or filtered connection, and reading them tells nobody else that you were here.'
+  - 'Contrast is measured, not judged by eye. Every piece of text painted on every page is sampled in a real browser and checked against the WCAG contrast formula — 4.5 to 1 for ordinary text, 3 to 1 for large text — in the light theme and in the dark one, and in each of them reached both from your system setting and from the theme button.'
+  - 'Everything you can use, you can reach from a keyboard, and you can see where you are: every link and the theme button draws the same two-pixel ring when it takes focus.'
+  - 'The controls are big enough to hit: every link in the navigation strip, in the row of profiles and in the footer is at least 24 by 24 pixels to point at, at every width down to a 320-pixel screen. A link set inside a sentence is left at the size of the words around it.'
+  - 'Nothing moves on its own. The only motion is a short colour fade and smooth scrolling, and both are switched off for a visitor whose system asks for reduced motion.'
+  - 'The markup says what things are: one first-level heading per page, headings that never skip a level, lists marked up as lists, the navigation in a named landmark with the current page marked, and a language set on the document.'
+  - 'Every image carries a description of what it shows, written for a reader who cannot see it.'
+  - 'The site works with JavaScript switched off: the pages are ordinary links. Two things need it, and both fail quietly — the theme button, which stays hidden until the script has run rather than sitting there doing nothing, and my e-mail address, which is written as text and made into a link in your browser so that it is harder to harvest.'
+  - 'Body text is set at 16 pixels or larger, the layout reflows into one column on a phone, and no page scrolls sideways at any width down to 320 pixels.'
+  limits_intro: 'The gaps I know about, so that the list above is not read for more than it says:'
+  limits:
+  - This site has not been audited by anyone else, and it has not been tested with a screen reader, with voice control or with a magnifier. The checks above are automated ones and my own reading, and neither can tell you how a page actually sounds.
+  - 'The CV is a PDF, and it is the weakest thing here: it is built so that its text comes out in order and every address in it is real text, but it is not a tagged PDF.'
+  - This is a personal site. One person writes it and keeps it working, in the time he has, so a fix may not be quick.
+  report: 'If something here is hard to use, or does not work with whatever you use to read the web, please tell me — that is the fastest way for it to get fixed. My address is in the footer of this page and of every other page. What helps most: which page you were on, what you were using, and what happened.'
+
 footer:
   updated: September 2026

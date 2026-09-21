@@ -394,6 +394,24 @@ a:focus-visible > .ico { color: var(--accent-strong); }
 
 .prose p + p { margin-top: 0.875rem; }
 
+/* ---------- Statement lists: the accessibility page ----------
+   Sentences, not log rows. Each one is a thing that was done or a thing that is not claimed, and none of them
+   is an event, so none takes the gutter or a tick on the margin rule. They borrow the "Now" list's mark -- the
+   minor tick lying down -- because that is this site's shape for "a list of lines under one heading"; the step
+   between two of them is wider than "Now" gives, since each here runs to two or three lines of prose. */
+.prose > .statement { margin-top: 0.875rem; }
+.statement li { position: relative; padding-left: 1.125rem; }
+.statement li + li { margin-top: 0.75rem; }
+.statement li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: calc(0.5lh - 1px);
+  width: 0.5rem;
+  height: 1px;
+  background: var(--accent);
+}
+
 /* ---------- Tags: outlined, mono, never clickable ---------- */
 .tag {
   display: inline-block;
@@ -640,6 +658,25 @@ main.opens-with-h1 { margin-top: 2.25rem; }
 .colophon .row { font: 400 0.8125rem/1.6 var(--mono); color: var(--muted); }
 .colophon .when { display: inline; margin: 0; }
 .colophon .what { color: var(--ink-2); }
+/* The pages about the site itself, in the same mono register as "Last updated" and under it, so the row reads
+   as part of the colophon's small print rather than as a second navigation. It takes no tick: the margin rule
+   ends on "Last updated", and a tick below it would claim another section that is not there.
+   The links get the tap-target overlay the profile row gets (WCAG 2.2 SC 2.5.8): "Accessibility" is wide
+   enough already, but the box is only 21px tall at this size, and a later label here could be one short word. */
+.colophon-nav { margin-top: 0.625rem; font: 400 0.8125rem/1.6 var(--mono); }
+.colophon-nav ul { display: flex; flex-wrap: wrap; gap: 0 1.25rem; }
+.colophon-nav a { position: relative; display: inline-flex; align-items: center; padding-block: 0.25rem; }
+.colophon-nav a::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: 50%;
+  width: 1.5rem;
+  min-width: 100%;
+  transform: translateX(-50%);
+}
+/* the page you are on, when it is one of these: ink rather than accent, the strip's rule one floor down */
+.colophon-nav a[aria-current="page"] { color: var(--ink); text-decoration-color: var(--rule-strong); }
 /* the mark: two of a kind and the odd one out, the task behind the paper above */
 .mark { display: block; margin-top: 1.5rem; fill: var(--ink); }
 .mark rect { fill: var(--accent); }
@@ -774,7 +811,7 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   }
 
   .inset { margin-left: calc(var(--gutter) + var(--gap)); }
-  .colophon .links-nav { margin-left: calc(var(--gutter) + var(--gap)); }
+  .colophon .links-nav, .colophon-nav { margin-left: calc(var(--gutter) + var(--gap)); }
 
   /* major tick: 2px ink, one per section -- and one for the page's own title, which opens its first section */
   h1.inset, h2.inset { position: relative; }
@@ -928,7 +965,7 @@ main.opens-with-h1 { margin-top: 2.25rem; }
      the one thing here that does NOT move: the tick that marks the current page is placed by the strip's own
      padding and lands on its hairline, and changing the height of a strip link moves the tick off the rule.
      It is a utility strip one floor above the page, and it is allowed to keep its own scale. */
-  .when, .colophon .row { font-size: 0.875rem; }
+  .when, .colophon .row, .colophon-nav { font-size: 0.875rem; }
   .buttons .btn, .older > summary { font-size: 0.875rem; }
   .tag { font-size: 0.8125rem; }
   .authors, .venue, .note, .role, .links { font-size: 1.0625rem; }

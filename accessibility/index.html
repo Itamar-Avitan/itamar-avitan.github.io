@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Commonplace — Itamar Avitan</title>
-<meta name="description" content="A commonplace book: lines about memory and mind that Itamar Avitan keeps coming back to.">
-<link rel="canonical" href="https://itamar-avitan.github.io/commonplace/">
-<meta property="og:title" content="Commonplace — Itamar Avitan">
-<meta property="og:description" content="A commonplace book: lines about memory and mind that Itamar Avitan keeps coming back to.">
+<title>Accessibility — Itamar Avitan</title>
+<meta name="description" content="The accessibility statement for the personal site of Itamar Avitan: what it aims at, what was actually done and checked, and how to report a problem.">
+<link rel="canonical" href="https://itamar-avitan.github.io/accessibility/">
+<meta property="og:title" content="Accessibility — Itamar Avitan">
+<meta property="og:description" content="The accessibility statement for the personal site of Itamar Avitan: what it aims at, what was actually done and checked, and how to report a problem.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://itamar-avitan.github.io/commonplace/">
+<meta property="og:url" content="https://itamar-avitan.github.io/accessibility/">
 <meta property="og:image" content="https://itamar-avitan.github.io/img/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -88,7 +88,7 @@
           <li><a href="../">Home</a></li>
           <li><a href="../research/">Research</a></li>
           <li><a href="../teaching/">Teaching</a></li>
-          <li><a href="../commonplace/" aria-current="page">Commonplace</a></li>
+          <li><a href="../commonplace/">Commonplace</a></li>
           <li class="sitenav__cv"><a class="btn btn--primary" href="../cv.pdf">CV</a></li>
         </ul>
       </nav>
@@ -113,43 +113,53 @@
 
   <main class="opens-with-h1">
 
-    <section id="quotes" aria-labelledby="quotes-h">
-      <h1 id="quotes-h" class="inset">Commonplace</h1>
-      <p class="page-intro inset">Lines about memory and mind I keep coming back to.</p>
-      <ul class="log log--quotes" role="list">
-        <li class="row">
-          <time class="when" datetime="2003">2003</time>
-          <div class="what quote">
-            <blockquote><p>“Only Muggles talk of ‘mind reading.’ The mind is not a book, to be opened at will and examined at leisure. Thoughts are not etched on the inside of skulls, to be perused by any invader. The mind is a complex and many-layered thing, Potter—or at least, most minds are.”</p></blockquote>
-            <p class="quote__by">Severus Snape, in J.K. Rowling, Harry Potter and the Order of the Phoenix (2003), Chapter 24, “Occlumency”</p>
-            <p class="quote__note">Snape’s retort in Harry’s first Occlumency lesson, after Harry gives Legilimency that name.</p>
-          </div>
-        </li>
-        <li class="row">
-          <time class="when" datetime="1887">1887</time>
-          <div class="what quote">
-            <blockquote><p>“I consider that a man’s brain originally is like a little empty attic, and you have to stock it with such furniture as you choose.”</p></blockquote>
-            <p class="quote__by">Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter II, “The Science of Deduction”</p>
-            <p class="quote__note">Holmes says this immediately after learning the earth goes round the sun and replying, “Now that I do know it I shall do my best to forget it.”</p>
-          </div>
-        </li>
-        <li class="row">
-          <time class="when" datetime="1887">1887</time>
-          <div class="what quote">
-            <blockquote><p>“The proper study of mankind is man.”</p></blockquote>
-            <p class="quote__by">Dr John Watson, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter I, “Mr. Sherlock Holmes” — quoting Alexander Pope, An Essay on Man, Epistle II (<span class="nb">1733-34</span>)</p>
-            <p class="quote__note">Doyle prints it in single quotation marks because Watson is himself quoting Pope; Stamford’s reply is “You must study him, then… You’ll find him a knotty problem.”</p>
-          </div>
-        </li>
-        <li class="row">
-          <time class="when" datetime="1887">1887</time>
-          <div class="what quote">
-            <blockquote><p>“There is a strong family resemblance about misdeeds, and if you have all the details of a thousand at your finger ends, it is odd if you can’t unravel the thousand and first.”</p></blockquote>
-            <p class="quote__by">Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter II, “The Science of Deduction”</p>
-            <p class="quote__note">From the speech in which Holmes first explains his trade — “I suppose I am the only one in the world. I’m a consulting detective” — moments after admitting to Watson that he himself wrote the magazine article on deduction Watson had just ridiculed.</p>
-          </div>
-        </li>
-      </ul>
+    <section id="accessibility" aria-labelledby="accessibility-h">
+      <h1 id="accessibility-h" class="inset">Accessibility</h1>
+      <p class="page-intro inset">What this site aims at, what was actually done about it, what is not claimed, and how to tell me when it falls short.</p>
+    </section>
+
+    <section id="aim" aria-labelledby="aim-h">
+      <h2 id="aim-h" class="inset">The aim</h2>
+      <div class="prose inset">
+        <p>This site aims at WCAG 2.1 Level AA — the Web Content Accessibility Guidelines, level AA. That is the standard I hold it to. It is not a certificate: nobody but me has audited this site, and the list below is what was actually done, not a claim that the whole of AA has been met.</p>
+      </div>
+    </section>
+
+    <section id="done" aria-labelledby="done-h">
+      <h2 id="done-h" class="inset">What was done</h2>
+      <div class="prose inset">
+        <p>What that has meant in practice. Each of these is checked automatically before the site is built, so it stays true:</p>
+        <ul class="statement" role="list">
+          <li>Nothing loads from anyone else. The fonts are served from this site, and no page asks any other host for anything — no analytics, no trackers, no embedded players, no hosted fonts — so the pages work on a slow or filtered connection, and reading them tells nobody else that you were here.</li>
+          <li>Contrast is measured, not judged by eye. Every piece of text painted on every page is sampled in a real browser and checked against the WCAG contrast formula — 4.5 to 1 for ordinary text, 3 to 1 for large text — in the light theme and in the dark one, and in each of them reached both from your system setting and from the theme button.</li>
+          <li>Everything you can use, you can reach from a keyboard, and you can see where you are: every link and the theme button draws the same two-pixel ring when it takes focus.</li>
+          <li>The controls are big enough to hit: every link in the navigation strip, in the row of profiles and in the footer is at least 24 by 24 pixels to point at, at every width down to a 320-pixel screen. A link set inside a sentence is left at the size of the words around it.</li>
+          <li>Nothing moves on its own. The only motion is a short colour fade and smooth scrolling, and both are switched off for a visitor whose system asks for reduced motion.</li>
+          <li>The markup says what things are: one first-level heading per page, headings that never skip a level, lists marked up as lists, the navigation in a named landmark with the current page marked, and a language set on the document.</li>
+          <li>Every image carries a description of what it shows, written for a reader who cannot see it.</li>
+          <li>The site works with JavaScript switched off: the pages are ordinary links. Two things need it, and both fail quietly — the theme button, which stays hidden until the script has run rather than sitting there doing nothing, and my e-mail address, which is written as text and made into a link in your browser so that it is harder to harvest.</li>
+          <li>Body text is set at 16 pixels or larger, the layout reflows into one column on a phone, and no page scrolls sideways at any width down to 320 pixels.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="limits" aria-labelledby="limits-h">
+      <h2 id="limits-h" class="inset">What is not claimed</h2>
+      <div class="prose inset">
+        <p>The gaps I know about, so that the list above is not read for more than it says:</p>
+        <ul class="statement" role="list">
+          <li>This site has not been audited by anyone else, and it has not been tested with a screen reader, with voice control or with a magnifier. The checks above are automated ones and my own reading, and neither can tell you how a page actually sounds.</li>
+          <li>The CV is a PDF, and it is the weakest thing here: it is built so that its text comes out in order and every address in it is real text, but it is not a tagged PDF.</li>
+          <li>This is a personal site. One person writes it and keeps it working, in the time he has, so a fix may not be quick.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="report" aria-labelledby="report-h">
+      <h2 id="report-h" class="inset">Reporting a problem</h2>
+      <div class="prose inset">
+        <p>If something here is hard to use, or does not work with whatever you use to read the web, please tell me — that is the fastest way for it to get fixed. My address is in the footer of this page and of every other page. What helps most: which page you were on, what you were using, and what happened.</p>
+      </div>
     </section>
 
   </main>
@@ -175,7 +185,7 @@
     <p class="row"><span class="when">Last updated</span> <time class="what" datetime="2026-09">September 2026</time></p>
     <nav class="colophon-nav" aria-label="About this site">
       <ul role="list">
-        <li><a href="../accessibility/">Accessibility</a></li>
+        <li><a href="../accessibility/" aria-current="page">Accessibility</a></li>
       </ul>
     </nav>
     <svg class="mark inset" aria-hidden="true" viewBox="0 0 42 10" width="42" height="10"><circle cx="5" cy="5" r="5"/><circle cx="21" cy="5" r="5"/><rect x="32" width="10" height="10"/></svg>

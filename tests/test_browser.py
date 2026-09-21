@@ -9,8 +9,10 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 SITE = yaml.safe_load((ROOT / "site.yaml").read_text(encoding="utf-8"))
-SLUGS = [page["slug"] for page in SITE["pages"]]                 # '', 'research/', 'teaching/', 'commonplace/'
-NAV = [page["nav"] for page in SITE["pages"]]
+SLUGS = [page["slug"] for page in SITE["pages"]]                 # every page built, the colophon one included
+NAV_SLUGS = [page["slug"] for page in SITE["pages"] if page.get("nav")]   # the four the strip carries
+NAV = [page["nav"] for page in SITE["pages"] if page.get("nav")]
+COLOPHON = [page["colophon"] for page in SITE["pages"] if page.get("colophon")]
 WIDTHS = [320, 400, 768, 1280]                                   # 320px is the narrowest viewport supported
 
 
@@ -85,7 +87,7 @@ def test_structure_and_alt_text(browser, slug):
     assert page.locator("main section").count() >= 1
 
 
-@pytest.mark.parametrize("slug", SLUGS)
+@pytest.mark.parametrize("slug", NAV_SLUGS)
 def test_the_navigation_reaches_every_page_without_javascript(browser, slug):
     """Ordinary links: a browser with scripting off follows them, and each one lands on a page whose own strip
     marks it as the one you are on."""
@@ -97,7 +99,7 @@ def test_the_navigation_reaches_every_page_without_javascript(browser, slug):
     current = page.locator('.sitenav a[aria-current="page"]')
     assert current.count() == 1
     assert current.inner_text().strip() == next(p["nav"] for p in SITE["pages"] if p["slug"] == slug)
-    for index, other in enumerate(SLUGS):
+    for index, other in enumerate(NAV_SLUGS):
         # the address each link resolves to is the folder the page is served from; a server answers it with
         # that folder's index.html, which a file:// URL does not, so the page itself is opened directly after
         resolved = page.locator(".sitenav a").nth(index).evaluate("a => a.href")
@@ -195,7 +197,7 @@ def test_the_theme_toggle_is_invisible_until_the_script_unhides_it(browser):
     assert page.locator("#theme-toggle").is_visible()
 
 
-@pytest.mark.parametrize("slug", SLUGS)
+@pytest.mark.parametrize("slug", NAV_SLUGS)
 @pytest.mark.parametrize("width", WIDTHS)
 def test_the_current_page_tick_sits_on_the_strip_rule(browser, width, slug):
     """The tick that marks the page you are on is the section tick of the margin rule, one floor up: 2px of
@@ -450,3 +452,62 @@ def test_focus_is_visible_on_every_control(browser, slug):
 
 def parse_px(value):
     return float(value.replace("px", "") or 0)
+
+
+# --- The accessibility statement: its own page, linked from the colophon of every page ---------------------
+
+@pytest.mark.parametrize("slug", SLUGS)
+def test_the_accessibility_statement_is_one_click_from_every_page(browser, slug):
+    """The owner asked for a statement reachable from every page. It is a page of its own and the link to it
+    stands in the colophon, not in the navigation strip -- see the note over `pages` in site.yaml. Here that
+    is checked where it matters: the link is on the page, it resolves to a file that exists, and following it
+    lands on the statement."""
+    page, _, _ = _page(browser, 1280, slug=slug)
+    links = page.locator(".colophon-nav a")
+    assert links.count() == len(COLOPHON) == 1
+    assert [t.strip() for t in links.all_inner_texts()] == COLOPHON
+    assert page.locator('.sitenav a:text-is("Accessibility")').count() == 0     # and not in the strip
+    href = page.get_attribute(".colophon-nav a", "href")
+    assert href == ("accessibility/" if slug == "" else "../accessibility/")
+    target = Path(page.evaluate("document.querySelector('.colophon-nav a').href").removeprefix("file://"))
+    assert (target / "index.html").exists() or target.exists(), (slug, target)
+
+
+@pytest.mark.parametrize("width", WIDTHS)
+def test_the_colophon_link_is_at_least_a_24px_target(browser, width):
+    """WCAG 2.2 SC 2.5.8, and the page itself says links are held to it, so this one is too. Its box is only
+    about 21px tall at this type size, so it gets the overlay the profile row gets."""
+    page, _, _ = _page(browser, width)
+    links = page.evaluate(HIT_TEST_JS, ".colophon-nav a")
+    assert [l["label"] for l in links] == COLOPHON
+    assert [l for l in links if l["height"] < 24 or not l["covered"]] == []
+
+
+def test_the_statement_marks_itself_as_the_page_you_are_on(browser):
+    """A page the strip does not carry marks nothing there, so the colophon row has to say where you are."""
+    page, _, _ = _page(browser, 1280, slug="accessibility/")
+    assert page.locator('.sitenav a[aria-current="page"]').count() == 0
+    assert page.locator('.colophon-nav a[aria-current="page"]').inner_text().strip() == "Accessibility"
+    other, _, _ = _page(browser, 1280, slug="research/")
+    assert other.locator('.colophon-nav a[aria-current="page"]').count() == 0
+
+
+def test_the_statement_says_the_aim_the_checks_the_limits_and_how_to_report(browser):
+    """The four things the owner asked it to state. The address is deliberately NOT repeated on this page:
+    the reporting section points at the colophon, which carries it on every page as "name [at] host"."""
+    page, _, _ = _page(browser, 1280, slug="accessibility/")
+    text = page.inner_text("main")
+    assert "WCAG 2.1 Level AA" in text
+    assert "not a certificate" in text and "nobody but me has audited" in text
+    assert "One person writes it" in text                      # a personal site, maintained by one person
+    assert "has not been tested with a screen reader" in text  # and what is therefore not claimed
+    assert "footer of this page" in text                       # how to report, without printing an address
+    # the statement itself carries no address; the colophon below it does, as it does on every page
+    main_html = page.eval_on_selector("main", "el => el.outerHTML")
+    assert "@" not in text and "mailto:" not in main_html
+    assert page.locator("main #email").count() == 0 and page.locator("footer a#email").count() == 1
+    assert [h.strip() for h in page.locator("main h2").all_inner_texts()] == [
+        "The aim", "What was done", "What is not claimed", "Reporting a problem"]
+    # no legal claim of any kind: this page states no obligation and cites no law
+    for word in ("law", "legal", "legally", "required by", "Section 508", "directive", "compliance"):
+        assert word.lower() not in text.lower(), word

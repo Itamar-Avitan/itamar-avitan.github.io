@@ -3,8 +3,8 @@
 Source of Itamar Avitan's personal academic website, served by GitHub Pages at
 <https://itamar-avitan.github.io/>. All content lives in `site.yaml`; `build.py` validates it and renders one
 template per page into `index.html`, `research/index.html`, `teaching/index.html`,
-`commonplace/index.html`, plus `sitemap.xml` and `robots.txt`. The built files are committed, so no
-continuous-integration build is needed.
+`commonplace/index.html`, `accessibility/index.html`, plus `sitemap.xml` and `robots.txt`. The built files
+are committed, so no continuous-integration build is needed.
 
 ## Updating the site
 
@@ -28,6 +28,15 @@ things about me and updates and stuff". Nothing was dropped in the split.
 | Research | `/research/` | Papers, Talks, Projects |
 | Teaching | `/teaching/` | Courses and Students |
 | Commonplace | `/commonplace/` | the quotations, in the owner's order |
+
+A fifth page, the **accessibility statement** at `/accessibility/`, is not in that strip. It is about the
+site rather than about him, so it is linked from a small row in the colophon of every page — the convention
+for this, and where a reader who needs it looks. `build.py` writes it into `sitemap.xml` with the other four.
+A page entry carries `nav` (the strip) or `colophon` (that row), exactly one of the two: with both, every
+page would print the same address twice; with neither, the page would be published with nothing leading to
+it. `build.py` refuses either case. The statement's own rules for editing are written over `accessibility`
+in `site.yaml` — the short version is that every line of it is a claim about this site, each bullet names a
+check that actually runs, and it must never claim conformance nobody tested or a legal duty nobody checked.
 
 **Every page names its sections**, and every section takes a 2px ink tick on the margin rule. `elsewhere`
 on the home page is the hand-off: one row per other page, each carrying a real line from it. Its gutter
@@ -95,7 +104,7 @@ current page is placed by the strip's own padding and has to land on its hairlin
 
 Two more checks, run by hand:
 
-- `python3 tools/shots.py` rebuilds the site and writes `shots/<page>-<view>.png` for all four pages (not
+- `python3 tools/shots.py` rebuilds the site and writes `shots/<page>-<view>.png` for every page (not
   committed) at 1280, 1440 and 400, in both themes, printing each page's height. Look at them after any
   change to a template or to `style.css`.
 - `python3 tools/check_links.py` requests every web address in `site.yaml`, the site's own included, and exits

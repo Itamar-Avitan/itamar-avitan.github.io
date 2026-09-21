@@ -1,0 +1,61 @@
+{#- The accessibility statement: the aim, what was actually done, what is not claimed, and how to report a
+    problem. Four sections rather than one block of prose, because this is a page people scan for one of four
+    things, and because the margin rule gives each of them a tick to aim at.
+
+    The page carries NO address of its own. "Reporting a problem" points at the colophon below it, which says
+    the address on every page of the site, written as "name [at] host" and turned into a link by the script in
+    base.html.j2. That is not squeamishness: only one element per page may carry id="email" (it is the hook
+    that script uses), and site.yaml refuses a plain address anywhere in the file.
+
+    The prose lists use the same `prose` measure as the About block, so the text column is the one the rest of
+    the site sets, and the bullets hang in it rather than in the gutter, which belongs to the time axis. -#}
+{% extends "base.html.j2" %}
+
+{% block main %}
+
+    <section id="accessibility" aria-labelledby="accessibility-h">
+      <h1 id="accessibility-h" class="inset">{{ page.heading }}</h1>
+{% if page.get("intro") %}
+      <p class="page-intro inset">{{ m.nb(page.intro) }}</p>
+{% endif %}
+    </section>
+
+    <section id="aim" aria-labelledby="aim-h">
+      <h2 id="aim-h" class="inset">The aim</h2>
+      <div class="prose inset">
+        <p>{{ m.nb(site.accessibility.aim) }}</p>
+      </div>
+    </section>
+
+    <section id="done" aria-labelledby="done-h">
+      <h2 id="done-h" class="inset">What was done</h2>
+      <div class="prose inset">
+        <p>{{ m.nb(site.accessibility.done_intro) }}</p>
+        <ul class="statement" role="list">
+{% for item in site.accessibility.done %}
+          <li>{{ m.nb(item) }}</li>
+{% endfor %}
+        </ul>
+      </div>
+    </section>
+
+    <section id="limits" aria-labelledby="limits-h">
+      <h2 id="limits-h" class="inset">What is not claimed</h2>
+      <div class="prose inset">
+        <p>{{ m.nb(site.accessibility.limits_intro) }}</p>
+        <ul class="statement" role="list">
+{% for item in site.accessibility.limits %}
+          <li>{{ m.nb(item) }}</li>
+{% endfor %}
+        </ul>
+      </div>
+    </section>
+
+    <section id="report" aria-labelledby="report-h">
+      <h2 id="report-h" class="inset">Reporting a problem</h2>
+      <div class="prose inset">
+        <p>{{ m.nb(site.accessibility.report) }}</p>
+      </div>
+    </section>
+
+{% endblock %}
