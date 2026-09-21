@@ -5,7 +5,7 @@
 site_url: https://itamar-avitan.github.io/
 alternate_name: Itamar Amram Avitan
 affiliation: Ben-Gurion University of the Negev
-show_cv: false
+show_cv: true
 show_ongoing: false
 news_visible: 5
 # How many commonplace lines stand open; the rest wait behind the same expander the news list uses. Every
