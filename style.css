@@ -48,8 +48,13 @@
   --btn-fill: #0B5F73;      /* the one filled control per group */
   --btn-fill-hover: #084A5A;
   --btn-ink: #FFFFFF;
-  --plot-filter: none;   /* a figure whose colour is data: dimmed in the dark, never hue-shifted */
-  --art-filter: none;    /* a picture: dimmed further, so it cannot become the brightest thing on the page */
+  /* A figure is printed as it is, in both themes. Nothing scales it, dims it or turns it; the mat below is
+     what settles it into the dark page. The two tokens stay because the distinction they carry is real --
+     a plot's colour is its data -- and because a later hand reaching for a filter has to change them here,
+     in the open, rather than quietly inside a rule. */
+  --plot-filter: none;
+  --art-filter: none;
+  --mat: #E7EDF0;        /* the mount the figure is pasted onto: a shade off the sheet it sits on */
   --ico: var(--muted);   /* link marks; set it to var(--ink) for the strict black-or-white of the brand guides */
 }
 
@@ -70,8 +75,9 @@
     --btn-fill: #1C6678;      /* a filled button must not out-shine the name */
     --btn-fill-hover: #217387;
     --btn-ink: #F2FAFC;
-    --plot-filter: brightness(0.86);
-    --art-filter: brightness(0.82) saturate(0.85);
+    --plot-filter: none;
+    --art-filter: none;
+    --mat: #BCCBD4;
   }
 }
 :root[data-theme="dark"] {
@@ -90,8 +96,9 @@
   --btn-fill: #1C6678;
   --btn-fill-hover: #217387;
   --btn-ink: #F2FAFC;
-  --plot-filter: brightness(0.86);
-  --art-filter: brightness(0.82) saturate(0.85);
+  --plot-filter: none;
+  --art-filter: none;
+  --mat: #BCCBD4;
 }
 
 /* ---------- Base ---------- */
@@ -234,9 +241,9 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
   text-wrap: balance;
 }
 
-/* how to reach him: two quiet rows of text links in the body face, the address first and the profiles under
-   it; the CV button is their only filled element */
-.links-nav { margin-top: 1.25rem; container-type: inline-size; }
+/* how to reach him: quiet rows of text links in the body face, the address first and the profiles under it;
+   the CV button is their only filled element */
+.links-nav { margin-top: 1.25rem; }
 .links {
   display: flex;
   flex-wrap: wrap;
@@ -266,30 +273,24 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
 a:hover > .ico,
 a:focus-visible > .ico { color: var(--accent-strong); }
 
-/* Optical sizing. The six marks are all drawn in a 24x24 box, but they fill it very differently, and a row of
-   equal boxes is not a row of equal weights. Measured as ink on the rendered page (the sum of the ink each
-   mark lays down at 16px, in thousands): LinkedIn 28.1, ORCID 25.9, Bluesky 22.1, Scholar 16.4, GitHub 16.2,
-   X 9.1. So the two that fill their box -- the solid LinkedIn square and the solid Bluesky butterfly -- come
-   down a pixel or two, which brings the middle of the row inside 16-21 rather than 16-28. The ORCID iD mark
-   keeps the full 16px because its brand guide sets that as the floor, and so it stays the heaviest mark here;
-   X keeps it because two thin strokes need every pixel they can get, and it stays the lightest. */
-.ico--linkedin { width: 0.875rem; height: 0.875rem; }     /* the only full-bleed filled square */
-.ico--bluesky { width: 0.9375rem; height: 0.9375rem; }    /* solid, and the widest of the six */
-/* Sizing them settles their alignment too, so no mark is nudged by hand. Against a 16px label whose cap line
-   and baseline are 12px apart, the ink of the three round marks (the GitHub and ORCID discs, and the X drawn
-   to the full box) now runs 1px above the cap and 2px below the baseline -- the overshoot a round shape has
-   to have -- while the flat and square ones (Scholar, Bluesky, LinkedIn) sit inside the band, which is where
-   a square belongs. Their ink centroids agree to within 0.7px. */
+/* Optical sizing. The three marks are drawn in the same 24x24 box but fill it very differently, and three
+   equal boxes are not three equal weights. Rendered at 16px and sampled at 8x, the ink each lays down covers
+   Bluesky 58.7% of its box, mail 45.2%, GitHub 42.7%. So the solid butterfly comes down a pixel, which brings
+   the three inside 42-52% rather than 43-59%; the envelope and the GitHub disc keep the full 16px. */
+.ico--bluesky { width: 0.9375rem; height: 0.9375rem; }    /* solid, and the widest of the three */
+/* Sizing them settles their alignment too, so no mark is nudged by hand. Measured the same way, the ink of
+   the GitHub disc runs from 0.25px to 15.62px of its box -- past the band at both ends, the overshoot a
+   circle has to have -- while the envelope (3.00 to 12.88) and the butterfly (1.00 to 14.88) sit inside it,
+   which is where a flat-topped shape belongs. Their ink centroids agree to within 0.7px. */
 
-/* the profile row decides by its own width: one line while it fits, then aligned columns of three, then two.
-   Never a ragged wrap that strands "X" on a line of its own. */
-.links--profiles { column-gap: 1rem; }
-@container (max-width: 36rem) {
-  .links--profiles { display: grid; grid-template-columns: repeat(3, max-content); gap: 0 1.25rem; }
-}
-@container (max-width: 22rem) {
-  .links--profiles { grid-template-columns: repeat(2, max-content); }
-}
+/* Two groups, not one ragged row. Only three of the seven destinations allow their mark to be drawn here, so
+   a single row would show three marks among seven labels and read as four icons that failed to load. The
+   marked links are set together and the plain ones together, and the step between the groups (3rem) is more
+   than twice the step between two links inside one (1.25rem), which is what makes the split visible before
+   it is worked out. Each group keeps its own width: side by side while both fit, whole groups stacking when
+   they do not, and a group wrapping inside itself only when it alone is wider than the page. */
+.links-row { display: flex; flex-wrap: wrap; column-gap: 3rem; }
+.links-row > .links { flex: none; max-width: 100%; }
 
 .bio { margin-top: 1.75rem; }
 .bio p + p { margin-top: 0.875rem; }
@@ -414,8 +415,15 @@ h3 a:hover { text-decoration-color: currentColor; }
 .paper + .paper { margin-top: 1.5rem; }
 .paper__badges { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-bottom: 0.75rem; }
 .paper__badges li { display: flex; }
+/* The mat. A picture is never inverted, dimmed or desaturated here: an illustration misread is as wrong as a
+   plot misread, and the dark theme has no more right to repaint one than the other. What the dark theme gets
+   instead is the mount -- a light border of card between the print and the sheet, the way a print is mounted
+   before it is pasted in. It is what stops a pale figure reading as a hole cut in a dark page: the brightness
+   now has an edge that was put there on purpose, and steps down to the sheet rather than falling off it. */
 .paper__plot {
   display: block;
+  padding: 0.375rem;
+  background: var(--mat);
   border: 1px solid var(--rule-strong);
   border-radius: 2px;
   overflow: hidden;
@@ -426,9 +434,9 @@ h3 a:hover { text-decoration-color: currentColor; }
   width: 100%;
   height: auto;
 }
-/* The dark theme dims a figure so it does not outshine the page, and nothing else: brightness() scales the
-   three channels together, so every hue and every saturation survives it. A plot is dimmed less than a
-   picture, because its colours are the data and a reader may be holding the paper's own figure beside it. */
+/* Both are none in every theme, and the hooks are kept so that a filter cannot come back by accident: any
+   value put here has to pass the test that only a brightness() scale may ever touch a plot, because scaling
+   the three channels together is the one operation that leaves every hue and saturation where it was. */
 .paper__fig--plot img { filter: var(--plot-filter); }
 .paper__fig--art img { filter: var(--art-filter); }
 .paper__fig figcaption {
@@ -502,8 +510,10 @@ h3 a:hover { text-decoration-color: currentColor; }
 @media (max-width: 44.99rem) {
   .toggle { padding-block: 0.6875rem; }
 
-  /* tap targets */
-  .links a:not(.btn) { min-width: 1.5rem; padding-block: 0.5rem; }
+  /* tap targets. The one-letter label is the only one narrower than the 24px a finger needs, so it is the
+     only one whose box is wider than its word: centre the content, or "X" sits against its left edge and
+     opens a gap on its right that reads as a missing item. */
+  .links a:not(.btn) { min-width: 1.5rem; padding-block: 0.5rem; justify-content: center; }
   .older > summary { padding-block: 0.625rem; }
   .btn { padding-block: 0.875rem; }
 
@@ -531,10 +541,23 @@ h3 a:hover { text-decoration-color: currentColor; }
     border-inline: 0;
     border-radius: 0;
   }
-  /* The figure sits under the badges and above the title, at full width of the column. Floated beside the
-     title it cut the measure to about two dozen characters and broke the one line that matters most on the
-     page into four. */
-  .paper__fig { float: none; width: 8rem; margin: 0 0 1rem; }
+  /* The card in one column: badges, title, byline, the figure as a plate with its caption at the foot, then
+     the summary and the links. Floated beside the title the figure cut the measure to about two dozen
+     characters and broke the one line that matters most on the page into four; moved above the title it
+     opened the card with a picture and left a third of that row empty beside it. Below the byline it has the
+     column to itself, the title gets the full measure back, and the order is a paper's own: what it is, who
+     wrote it, the plate, what it found. 13rem is the width at which the running figures still read at arm's
+     length without the plate becoming the loudest thing in the card. */
+  .paper { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .paper__aside, .paper__body { display: contents; }
+  .paper__badges { order: 1; }
+  .paper h3 { order: 2; }
+  .paper .authors { order: 3; }
+  .paper__fig { order: 4; float: none; width: 13rem; max-width: 100%; margin: 1.125rem 0 0; }
+  .paper .tldr { order: 5; }
+  .paper .buttons { order: 6; }
+  /* the caption hangs under the left edge of the plate, like every other label on a phone */
+  .paper__fig figcaption { text-align: left; }
 }
 
 /* ==========================================================================

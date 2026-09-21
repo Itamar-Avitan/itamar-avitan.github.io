@@ -23,12 +23,24 @@ and the card points at one of them:
   figure: *recovery_matrix      # the paper's own Figure 1D
 ```
 
-Change that line, run `python3 build.py`, and the card swaps. A figure whose colour is the data — a heat map,
-a colour-coded plot — carries `plot: true`, and the dark theme then only dims it, so that its hues still match
-the ones printed in the paper. A figure without the flag is treated as artwork and dimmed a little further, so
-that it cannot become the brightest thing on a dark page.
+Change that line, run `python3 build.py`, and the card swaps.
 To prepare another one, run `python3 tools/make_paper_thumb.py <image> <name>`: it writes `img/<name>.webp`
 and a `.jpg` fallback, square and stripped of metadata, and prints their sizes.
+
+**No theme alters a figure.** Nothing inverts, dims or desaturates one, in either theme: an illustration
+misread is as wrong as a plot misread. What settles a pale print into the dark page is the mount — the light
+card behind it, `--mat` in `style.css`. A figure whose colour is the data still carries `plot: true`, because
+the distinction is real and the `--plot-filter` hook is what a future change has to go through in the open.
+
+## The link marks: three, and only three
+
+Email, GitHub and Bluesky carry a mark; Google Scholar, LinkedIn, X and ORCID carry their text label alone.
+That is the owner's ruling of 2026-09-21 and it is not a gap to fill: LinkedIn's policy forbids third-party
+use of its logo, ORCID's terms forbid altering the iD icon, the Google Scholar stand-in was illegible at the
+size it was used, and X's terms could not be established. The long form is in the comment above `ICONS` in
+`templates/index.html.j2`; `tests/test_build.py` fails if the set changes. Because three marks among seven
+labels in one row would read as four icons that failed to load, the template renders the marked links and the
+plain ones as two groups, and the stylesheet steps further between the groups than inside them.
 
 Two more checks, run by hand:
 

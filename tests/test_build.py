@@ -226,6 +226,19 @@ def test_a_figure_whose_colour_is_data_is_never_hue_shifted():
     assert "invert(" not in css and "hue-rotate(" not in css
 
 
+def test_no_theme_alters_a_figure_and_a_light_mat_answers_the_dark_page_instead():
+    """The owner's ruling of 2026-09-21. Inverting an illustration misrepresents it for the same reason
+    inverting a plot does, and so, more quietly, does dimming or desaturating one. Nothing filters a figure in
+    any theme now; what settles a pale print into a dark page is the mount around it."""
+    css = (build.ROOT / "style.css").read_text(encoding="utf-8")
+    for token in ("--plot-filter", "--art-filter"):
+        values = [v.strip() for v in re.findall(rf"{token}:\s*([^;]+);", css)]
+        assert values == ["none", "none", "none"], (token, values)           # light, and both dark blocks
+    assert len(re.findall(r"--mat:\s*#[0-9A-Fa-f]{6};", css)) == 3           # a mount in every theme
+    mat = re.search(r"\.paper__plot \{[^}]*\}", css).group(0)
+    assert "background: var(--mat);" in mat and re.search(r"padding: [\d.]+rem;", mat)
+
+
 def test_ongoing_card_gets_an_ongoing_badge_only_when_shown():
     site = copy.deepcopy(SITE)
     site["research"].append({**site["research"][0], "title": "FIXTURE ONGOING", "ongoing": True})
@@ -320,13 +333,13 @@ def test_quotes_print_the_line_its_attribution_and_its_context_and_nothing_else(
     html = build.render(SITE)
     section = html.partition('<section id="quotes"')[2].partition("</section>")[0]
     shown = _visible_text(section)
-    assert section.count("<blockquote>") == len(SITE["quotes"]) == 3
+    assert section.count("<blockquote>") == len(SITE["quotes"]) == 4
     for quote in SITE["quotes"]:
         assert f'<blockquote><p>{quote["text"]}</p></blockquote>' in section         # printed exactly as verified
         assert quote["attribution"] in shown and quote.get("note", "") in shown
         for private in ("evidence", "status", "copyright"):                          # provenance, not page text
             assert quote[private] not in shown
-    assert section.count('<time class="when" datetime="1887">1887</time>') == 2      # the year takes its tick
+    assert section.count('<time class="when" datetime="1887">1887</time>') == 3      # the year takes its tick
     assert '<time class="when" datetime="2003">2003</time>' in section
     # the borrowed line keeps its own date in the attribution, where it cannot break at the hyphen
     assert 'Epistle II (<span class="nb">1733-34</span>)</p>' in section
@@ -341,6 +354,39 @@ def test_a_quotation_carries_its_own_quotation_marks():
     css = (build.ROOT / "style.css").read_text(encoding="utf-8")
     assert "\\201C" not in css and "\\201D" not in css
     assert section.count("“") >= 3 and section.count("”") >= 3
+
+
+def test_the_fourth_quotation_is_the_verified_family_resemblance_line():
+    """Checked against Project Gutenberg ebook #244 in full; see the entry's own evidence. The apostrophe in
+    "can't" is the curly U+2019 the source prints, which is the one place a retyped copy drifts."""
+    quote = next(q for q in SITE["quotes"] if "family resemblance" in q["text"])
+    assert quote["text"] == ("“There is a strong family resemblance about misdeeds, and if you have all "
+                             "the details of a thousand at your finger ends, it is odd if you can’t "
+                             "unravel the thousand and first.”")
+    assert "can't" not in quote["text"]
+    assert quote["attribution"] == ("Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet (1887), "
+                                    "Part I, Chapter II, “The Science of Deduction”")
+    assert quote["year"] == "1887" and quote["status"] == "verified" and quote["copyright"] == "public-domain"
+    years = [q["year"] for q in SITE["quotes"]]
+    assert years == sorted(years)                             # the gutter is a time axis: it only goes forward
+
+
+def test_the_in_copyright_quotation_is_the_long_extract_the_owner_ruled_for():
+    """He was shown that the novel is in copyright and that the single sentence was the safer extract, and
+    chose the full passage. Shortening it back is undoing a decision, not tidying, so the reason is recorded
+    in site.yaml beside the entry as well as here. The verifier's two corrections are applied."""
+    quote = next(q for q in SITE["quotes"] if q["copyright"].startswith("in-copyright"))
+    assert quote["text"].startswith("“Only Muggles talk of ‘mind reading.’ ")
+    assert quote["text"].endswith("or at least, most minds are.”")       # not broken off after "Potter—"
+    assert "mind-reading" not in quote["text"]                                # two words, as every source has
+    for sentence in ("The mind is not a book, to be opened at will and examined at leisure.",
+                     "Thoughts are not etched on the inside of skulls, to be perused by any invader.",
+                     "The mind is a complex and many-layered thing, Potter—"):
+        assert sentence in quote["text"]
+    assert quote["attribution"] == ("Severus Snape, in J.K. Rowling, Harry Potter and the Order of the "
+                                    "Phoenix (2003), Chapter 24, “Occlumency”")
+    assert "owner-ruled" in quote["copyright"] and "2026-09-21" in quote["evidence"]
+    assert "do not silently shorten it back" in (build.ROOT / "site.yaml").read_text(encoding="utf-8")
 
 
 def test_the_attribution_is_a_paragraph_not_a_cite():
@@ -390,11 +436,14 @@ def test_role_line_keeps_the_lab_link():
     assert '<li><a href="https://brainsandmachines.org">Brains and Machines Lab</a></li>' in html
 
 
-def test_portrait_and_two_calm_rows_of_links():
+def test_portrait_and_calm_rows_of_links():
     html = build.render(SITE)
     assert ('<picture><source srcset="img/portrait-400.webp" type="image/webp">'
             '<img src="img/portrait-800.jpg" width="120" height="120" alt="Itamar Avitan"></picture>') in html
-    assert html.count('<ul class="links ') == 2 and "monogram" not in html      # the address, then the profiles
+    # the address, then the profiles this page may mark, then the profiles it may not
+    assert html.count('<ul class="links ') == 3 and "monogram" not in html
+    email_row = html.partition('<li class="links__email">')[2].partition("</li>")[0]
+    assert email_row.count("<svg") == 1 and ">Email</span>" in email_row       # the envelope leads the block
     page = unescape(html)
     for link in SITE["links"]:
         if link["label"] not in ("Email", "CV"):
@@ -405,11 +454,11 @@ def test_portrait_and_two_calm_rows_of_links():
     assert build.render(site).count('<a class="btn btn--primary" href="cv.pdf">CV</a>') == 1
 
 
-def test_each_profile_link_carries_a_silent_mark_beside_its_visible_label():
+def test_each_marked_link_carries_a_silent_mark_beside_its_visible_label():
     page = unescape(build.render(SITE))
     marked = [link for link in SITE["links"] if link.get("icon")]
-    assert len(marked) == 6
-    assert page.count('<svg class="ico ') == 6                                # every mark, and nothing else
+    assert len(marked) == 3
+    assert page.count('<svg class="ico ') == 3                                # every mark, and nothing else
     for link in marked:
         opens = f'href="{link["url"]}">' if link.get("url") else 'class="links__label">'
         after = page.partition(opens)[2]
@@ -422,25 +471,45 @@ def test_each_profile_link_carries_a_silent_mark_beside_its_visible_label():
     assert 'class="ico' not in build.render(bare)
 
 
-def test_every_mark_is_a_brand_mark_of_the_place_its_link_leads():
-    """The marks say where a link goes, which is the whole reason they are there. So the address line, whose
-    label is not a link, carries none: an envelope beside the word "Email" would only say "Email" twice."""
+def test_only_the_safe_subset_of_marks_exists_at_all():
+    """The owner's ruling of 2026-09-21, and the reason this file exists: LinkedIn's policy forbids third-party
+    use of its logo (Simple Icons removed the mark on 2024-12-17), ORCID's terms forbid altering the iD icon
+    and set a 16px floor the old 12.4px trace broke twice over, the Google Scholar stand-in closed into a blob
+    under about 20px, and X's brand terms could not be fetched. A mark that cannot be drawn is not drawn: the
+    four links carry their text label, which is what says where they go."""
     marked = {link["label"]: link.get("icon") for link in SITE["links"] if link.get("icon")}
-    assert marked == {"Google Scholar": "scholar", "GitHub": "github", "LinkedIn": "linkedin",
-                      "Bluesky": "bluesky", "X": "x", "ORCID": "orcid"}
-    assert all(link.get("url") for link in SITE["links"] if link.get("icon"))
+    assert marked == {"Email": "mail", "GitHub": "github", "Bluesky": "bluesky"}
+    template = (build.ROOT / "templates" / "index.html.j2").read_text(encoding="utf-8")
+    paths = template.partition("{%- set ICONS = {")[2].partition("} -%}")[0]
+    assert sorted(re.findall(r'"(\w+)":', paths)) == ["bluesky", "github", "mail"]
     html = build.render(SITE)
-    email_row = html.partition('<li class="links__email">')[2].partition("</li>")[0]
-    assert "<svg" not in email_row and '<span class="links__label">Email</span>' in email_row
+    for gone in ("scholar", "linkedin", "orcid", "x"):                        # no dormant path to restore
+        assert f'"{gone}":' not in paths and f"ico--{gone}" not in html
+    for link in SITE["links"]:                                                # every link keeps its label
+        assert link["label"] and (link.get("url") or link.get("text"))
 
 
-def test_the_marks_are_sized_one_by_one_so_the_row_reads_as_one_set():
-    """A row of equal boxes is not a row of equal weights: measured ink at 16px runs from 9.1 (X, two thin
-    strokes) to 28.1 (the solid LinkedIn square). Only the two heaviest come down; ORCID keeps the 16px its
-    brand guide sets as the floor."""
+def test_the_marks_sit_with_the_marks_and_the_plain_links_with_the_plain_ones():
+    """Three marks among seven labels in one row read as four icons that failed to load. The template renders
+    two lists instead, and the stylesheet steps between them more than twice as far as it steps inside one."""
+    html = build.render(SITE)
+    row = html.partition('<div class="links-row">')[2].partition("</div>")[0]
+    order = re.findall(r'<span>([^<]+)</span>', row)
+    assert order == ["GitHub", "Bluesky", "Google Scholar", "LinkedIn", "X", "ORCID"]
+    before, _, after = row.partition('class="links links--plain"')
+    assert before.count("<svg") == 2 and "<svg" not in after   # every mark on one side of the split
+    css = (build.ROOT / "style.css").read_text(encoding="utf-8")
+    between = float(re.search(r"\.links-row \{[^}]*column-gap: ([\d.]+)rem", css).group(1))
+    inside = float(re.search(r"^\.links \{[^}]*gap: 0 ([\d.]+)rem", css, re.M).group(1))
+    assert between >= 2 * inside
+
+
+def test_the_marks_are_sized_one_by_one_so_they_read_as_one_set():
+    """Three equal boxes are not three equal weights: rendered at 16px and sampled at 8x, the ink covers 58.7%
+    of the Bluesky box, 45.2% of the envelope and 42.7% of the GitHub disc. Only the heaviest comes down."""
     css = (build.ROOT / "style.css").read_text(encoding="utf-8")
     sized = dict(re.findall(r"\.ico--(\w+) \{ width: ([\d.]+rem);", css))
-    assert sized == {"linkedin": "0.875rem", "bluesky": "0.9375rem"}
+    assert sized == {"bluesky": "0.9375rem"}
     assert re.search(r"\.ico \{[^}]*width: 1rem;", css)                       # the rest keep the full 16px
     marks = re.findall(r"\.ico(?:--\w+)?[^{}]*\{[^}]*\}", css)                # sizing settled the alignment:
     assert marks and not any("transform" in rule for rule in marks)           # no mark is nudged by hand

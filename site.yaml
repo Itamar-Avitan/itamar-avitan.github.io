@@ -37,33 +37,33 @@ bio:
 - I am a PhD candidate in the Brains and Machines Lab at Ben-Gurion University of the Negev, advised by Dr. Tal Golan. My department is Industrial Engineering and Management, and I am affiliated with the School of Brain Sciences and Cognition.
 - Neural networks can predict human visual judgments, such as which of three images is the odd one out. I ask when that accuracy means a network represents the world as people do. A flexible mapping from model features to human data can make the wrong model look right, so I use model-recovery simulations to test whether a comparison recovers the model that generated the data. Our results argue for experiments that balance predictive accuracy against identifiability.
 - I have been a teaching assistant for courses on computation, cognition and deep learning, and have built neurotechnology prototypes in teams.
-# icon: which mark the template draws before the label. Known names: mail, scholar, github, linkedin,
-# bluesky, x, orcid. Leave it out and the link shows its label alone.
-# Every mark on this row is the destination's own brand mark, so it says where the link goes. The address
-# line carries none: an envelope beside the word "Email" would only say "Email" twice, and it is the one
-# row whose label is not a link. Add "icon: mail" back here to draw it again.
+# icon: which mark the template draws before the label. The template now holds three, and only three:
+# mail, github, bluesky. The owner ruled on 2026-09-21 that LinkedIn, ORCID, Google Scholar and X carry no
+# mark, for reasons of policy and legibility that are not open to revision; templates/index.html.j2 records
+# each one beside the marks it still draws. Do not add an icon key to those four: the build has nothing to
+# draw for them, and tests/test_build.py fails if the set changes.
+# A marked link and a plain one are two groups, not one ragged row, and the template renders them as two
+# lists in that order. The address line leads the group above them with the envelope: it is the one row
+# whose label is not a link, and the mark is drawn here rather than taken from anyone's brand.
 links:
 - label: Email
   url: null
   text: avitanit [at] post.bgu.ac.il
+  icon: mail
 - label: Google Scholar
   url: https://scholar.google.com/citations?user=3fynQuAAAAAJ&hl=en
-  icon: scholar
 - label: GitHub
   url: https://github.com/Itamar-Avitan
   icon: github
 - label: LinkedIn
   url: https://www.linkedin.com/in/itamar-avitan/
-  icon: linkedin
 - label: Bluesky
   url: https://bsky.app/profile/avitanit.bsky.social
   icon: bluesky
 - label: X
   url: https://x.com/avitanit
-  icon: x
 - label: ORCID
   url: https://orcid.org/0009-0004-3662-7881
-  icon: orcid
 - label: CV
   url: cv.pdf
 news:
@@ -160,8 +160,10 @@ projects:
   period: 2022–2023
   blurb: In a team of five, we built a brain–computer interface (BCI) that let a person with amyotrophic lateral sclerosis (ALS) answer yes/no questions through the P300 brain response measured with electroencephalography (EEG). The patient used it live.
 # Lines about the mind, collected. text, attribution and note are printed; year is the gutter label; status,
-# evidence and copyright are the provenance record and are not rendered. Keep a quotation from a work that is
-# still in copyright to a single sentence, and always name its source.
+# evidence and copyright are the provenance record and are not rendered. Always name a quotation's source.
+# House rule: keep a quotation from a work that is still in copyright to a single sentence. The Snape entry
+# below is a deliberate exception, ruled by the owner and recorded there; every future in-copyright entry
+# still starts from the single sentence.
 # The quotation marks belong to the text here, not to a CSS rule, so that a reader who copies a line gets the
 # marks with it. The year is a plain date like every other label in the gutter: a date that needs a
 # parenthetical belongs in the attribution, where there is room to say it properly.
@@ -198,7 +200,34 @@ quotes:
     (“Plac’d on this isthmus”).
   copyright: public-domain
   note: Doyle prints it in single quotation marks because Watson is himself quoting Pope; Stamford’s reply is “You must study him, then… You’ll find him a knotty problem.”
-- text: “The mind is not a book, to be opened at will and examined at leisure.”
+- text: “There is a strong family resemblance about misdeeds, and if you have all the details of a thousand at your finger ends, it is odd if you can’t unravel the thousand and first.”
+  attribution: Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter II, “The Science of Deduction”
+  year: '1887'
+  status: verified
+  evidence: >-
+    Project Gutenberg ebook #244 (https://www.gutenberg.org/cache/epub/244/pg244.txt), downloaded in full
+    (268,777 bytes) and grepped. “family resemblance” occurs exactly once in the book. The sentence spans
+    lines 669-671 (byte offset 31491), which falls between the CHAPTER II heading (line 407, offset 17066,
+    title “THE SCIENCE OF DEDUCTION”) and CHAPTER III (line 787, offset 36946), and inside PART I (line 69,
+    offset 1581; PART II does not begin until offset 121861) — so Part I, Chapter II is correct, and the
+    chapter title is confirmed both at the heading itself and in the book’s own CONTENTS list (“CHAPTER II.
+    THE SCIENCE OF DEDUCTION.”). Extracted character for character and diffed in Python against the owner’s
+    wording: the sole difference is the apostrophe in “can’t”, a curly U+2019 in the source, which is what is
+    printed above. Speaker confirmed as Holmes from the surrounding dialogue: Doyle narrates ‘“You would lose
+    your money,” Sherlock Holmes remarked calmly. “As for the article, I wrote it myself.”’ and the quoted
+    sentence sits inside the same unbroken Holmes speech that begins “Well, I have a trade of my own. I
+    suppose I am the only one in the world. I’m a consulting detective…” (line 663). Watson is not speaking
+    here. Publication year 1887 is stated on the Gutenberg catalogue page for the work
+    (https://www.gutenberg.org/ebooks/244) and matches the two A Study in Scarlet entries above. The
+    enclosing curly quotation marks are this file’s house convention, not part of the source sentence.
+  copyright: public-domain
+  note: From the speech in which Holmes first explains his trade — “I suppose I am the only one in the world. I’m a consulting detective” — moments after admitting to Watson that he himself wrote the magazine article on deduction Watson had just ridiculed.
+# The owner was shown that this novel is in copyright and that the single sentence “The mind is not a book…”
+# was the safer extract, and chose the full four-sentence passage anyway on 2026-09-21. It is printed here at
+# his instruction: do not silently shorten it back. The verifier’s two corrections are applied — “mind
+# reading” as two words, and the last sentence carried through to “most minds are” instead of breaking off
+# after “Potter—”.
+- text: “Only Muggles talk of ‘mind reading.’ The mind is not a book, to be opened at will and examined at leisure. Thoughts are not etched on the inside of skulls, to be perused by any invader. The mind is a complex and many-layered thing, Potter—or at least, most minds are.”
   attribution: Severus Snape, in J.K. Rowling, Harry Potter and the Order of the Phoenix (2003), Chapter 24, “Occlumency”
   year: '2003'
   status: corrected
@@ -213,10 +242,15 @@ quotes:
     Severus Snape by Wikiquote’s Order of the Phoenix page. Chapter confirmed by two reference works citing it
     directly: Waters, Ultimate Unofficial Guide to the Mysteries of Harry Potter (“that pun in the title of
     Chapter 24 — ‘Occlumency’”) and Boughey, Unauthorized Harry Potter and the Art of Spying (“Chapter 24,
-    ‘Occlumency,’ understandably focuses on what Muggles…”). Recommended extract is one sentence — the shortest
-    faithful unit that carries the thought — because the work is in copyright.
-  copyright: in-copyright-short-quotation
-  note: Snape’s retort in Harry’s first Occlumency lesson, after Harry calls Legilimency “mind reading”.
+    ‘Occlumency,’ understandably focuses on what Muggles…”). Recommended extract was one sentence — the
+    shortest faithful unit that carries the thought — because the work is in copyright; the owner read that
+    recommendation and ruled on 2026-09-21 for the full four-sentence passage, which is what is printed.
+    Two corrections were applied to his wording: “mind reading” is two words in every source consulted, and
+    the closing sentence runs on to “or at least, most minds are” rather than breaking off after “Potter—”.
+  copyright: in-copyright-extended-extract-owner-ruled
+  # The note used to end “after Harry calls Legilimency “mind reading”” — which the first sentence of the
+  # longer extract now says itself, two lines above it. It points back at those words instead of repeating them.
+  note: Snape’s retort in Harry’s first Occlumency lesson, after Harry gives Legilimency that name.
 teaching:
 - 'Teaching assistant, Introduction to Cognition and Computation, Ben-Gurion University of the Negev: 2023/24, 2024/25 and 2025/26.'
 - 'Teaching assistant, Deep Learning for Neuroscience and Cognition, Ben-Gurion University of the Negev: spring 2026.'

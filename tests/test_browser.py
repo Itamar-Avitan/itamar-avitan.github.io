@@ -72,7 +72,38 @@ def test_structure_and_alt_text(browser):
     for sec in ("research", "news", "talks", "projects", "quotes", "teaching"):
         assert page.locator(f"#{sec}").count() == 1
     assert page.evaluate("[...document.querySelectorAll('svg.ico')].every(s => s.getAttribute('aria-hidden') === 'true')")
-    assert page.locator("svg.ico").count() == 6
+    assert page.locator("svg.ico").count() == 3       # Email, GitHub, Bluesky, and nothing else
+
+
+def test_no_theme_filters_the_card_figure(browser):
+    """A figure is printed as it is, in both themes. What answers the dark page is the mount: a light card
+    behind the print, which has to stay light in either theme and has to be told apart from the sheet it is
+    pasted on, or there is no mount to see."""
+    for scheme in ("light", "dark"):
+        page, _, _ = _page(browser, 1280, scheme)
+        assert page.evaluate("getComputedStyle(document.querySelector('.paper__fig img')).filter") == "none"
+        mat, card = page.evaluate("""() => [
+            getComputedStyle(document.querySelector('.paper__plot')).backgroundColor,
+            getComputedStyle(document.querySelector('.paper')).backgroundColor]""")
+        assert _luminance(mat) > 0.45, (scheme, mat)            # a light mount, not a dark one
+        assert _contrast(mat, card) >= 1.1, (scheme, mat, card)  # and visibly not the sheet
+
+
+def test_the_research_card_on_a_phone_puts_the_figure_under_the_title(browser):
+    """Beside the title the figure cut the measure to about two dozen characters; above it, it opened the card
+    with a picture. Below the byline the title gets the column back and the plate keeps its own width."""
+    page, _, _ = _page(browser, 400)
+    box = page.evaluate("""() => {
+      const card = document.querySelector('.paper'), r = s => card.querySelector(s).getBoundingClientRect();
+      const pad = parseFloat(getComputedStyle(card).paddingLeft);
+      const measure = card.getBoundingClientRect().width - 2 * pad;
+      return {title: r('h3'), fig: r('.paper__fig'), tldr: r('.tldr'), measure: measure};
+    }""")
+    assert box["title"]["bottom"] <= box["fig"]["top"]                  # the title is above it, not beside it
+    assert box["fig"]["bottom"] <= box["tldr"]["top"]                   # and the summary below it
+    assert box["title"]["width"] > 0.95 * box["measure"]                # the title has the full measure back
+    assert 200 <= box["fig"]["width"] <= 216                            # a 13rem plate, not the whole column
+    assert box["fig"]["left"] == pytest.approx(box["title"]["left"], abs=1)
 
 
 def test_body_text_is_at_least_16px(browser):
