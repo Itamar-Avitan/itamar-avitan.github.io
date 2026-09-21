@@ -122,7 +122,7 @@ def test_a_bracket_a_sentence_left_on_a_url_is_not_part_of_the_address():
     """The evidence notes cite their sources in brackets -- "(https://gutenberg.org/ebooks/244)" -- and the
     checker read the closing bracket as part of the address, reporting two live Project Gutenberg pages as
     404. Only unbalanced brackets are trimmed, so a Wikipedia-style URL that contains a real pair survives."""
-    from check_links import _tidy
+    _tidy = check_links._tidy          # the module is loaded by path at the top of this file
     assert _tidy("https://www.gutenberg.org/ebooks/244)") == "https://www.gutenberg.org/ebooks/244"
     assert _tidy("https://example.org/a),") == "https://example.org/a"
     assert _tidy("https://example.org/a.") == "https://example.org/a"
