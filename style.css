@@ -487,11 +487,13 @@ main.opens-with-h1 { margin-top: 2.25rem; }
 .log > .row + .row { margin-top: 1.75rem; }
 .log--tight > .row + .row { margin-top: 1rem; }
 
+/* A log whose rows carry a role as well as a date: the talks, and the teaching posts, which are laid out the
+   same way for the same reason -- the gutter says when and in what capacity, the column says what. */
 .kind { line-height: 1; margin-bottom: 0.5rem; }
-.log--talks .when { float: left; margin: 0 0.625rem 0 0; line-height: 1.5rem; }
-.log--talks .kind { min-height: 1.5rem; }
-.log--talks .what { clear: left; }
-.log--talks h3 { font-size: 1.0625rem; }   /* the paper card keeps the only large title */
+.log--kind .when { float: left; margin: 0 0.625rem 0 0; line-height: 1.5rem; }
+.log--kind .kind { min-height: 1.5rem; }
+.log--kind .what { clear: left; }
+.log--kind h3 { font-size: 1.0625rem; }   /* the paper card keeps the only large title */
 .authors { color: var(--ink-2); font-size: 1rem; margin-top: 0.25rem; }
 .me { color: var(--ink); font-weight: 600; }
 .venue { font-size: 1rem; margin-top: 0.125rem; }
@@ -499,8 +501,11 @@ main.opens-with-h1 { margin-top: 2.25rem; }
 .note { color: var(--ink-2); font-size: 1rem; margin-top: 0.375rem; }
 .what > h3 + p:not([class]) { margin-top: 0.375rem; }
 
-/* rows whose sentence runs "what: when." in the markup; shown when-first like the rest */
-.log--said > .row { display: flex; flex-direction: column-reverse; }
+/* ---------- Elsewhere on this site: the home page's hand-off ----------
+   The one list whose gutter carries an address instead of a date, so it carries the site's outlined label --
+   never clickable -- and no tick. The margin rule stays a time axis; a page name is not a point on it. */
+.log--go .kind { margin-bottom: 0.375rem; }
+.log--go .what > a { font-weight: 600; }
 
 /* ---------- The expander: the older end of the news list ----------
    The commonplace had one of these too, while it shared a page with everything else. It has a page of its own
@@ -643,10 +648,33 @@ main.opens-with-h1 { margin-top: 2.25rem; }
    Phone: the rule moves to the left edge and keeps its ticks
    ========================================================================== */
 @media (max-width: 44.99rem) {
-  /* The strip stacks: the toggle takes the first line, on the right, and the links take the last one, so the
-     tick that marks the current page still lands on the hairline under them. */
-  .topstrip { flex-direction: column; align-items: stretch; gap: 0.5rem; }
-  .toggle { order: -1; align-self: flex-end; margin-left: 0; padding-block: 0.6875rem; }
+  /* The strip stays one row. It used to stack, which put a preference control on the first line of the page,
+     above the navigation and above his name: the first thing a visitor met on a phone was the theme toggle,
+     and it cost about 56px of a fold that is already crowded. Now the nav keeps the line and wraps inside its
+     own column, and the toggle comes down to a 44px square holding only its mark -- the label is still in the
+     DOM (it is the button's accessible name, and the script writes to it), just not painted. */
+  /* nowrap, and a basis of 0 on the nav: with the nav's natural width (it wants about 400px) as its basis it
+     was wider than the line, so the toggle was pushed onto a line of its own below -- the same whole row the
+     stacked strip used to take, only underneath. A basis of 0 lets the nav take what is left beside the
+     toggle and wrap inside itself, which is where the wrapping belongs. */
+  .topstrip { flex-wrap: nowrap; align-items: flex-start; gap: 0.75rem; }
+  .sitenav { flex: 1 1 0; min-width: 0; }
+  .toggle {
+    flex: none;
+    display: grid;
+    place-items: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0.5rem;
+  }
+  .toggle span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
 
   /* tap targets: a finger asks for more height than a pointer does. The width is already settled for every
      viewport by the overlay on .links a, so nothing here has to widen a box. */
@@ -717,8 +745,11 @@ main.opens-with-h1 { margin-top: 2.25rem; }
     align-items: start;
     margin-top: 2.5rem;
   }
-  /* right-aligned to the rule, like a date; it spans the rows beside it so that none of them stretches */
-  .masthead picture { grid-row: 1 / span 4; justify-self: end; width: 7.5rem; }
+  /* The portrait fills the gutter exactly, so its left edge sits on the page's edge with the first word of
+     the navigation strip above it and its right edge on the margin rule, like a plate pasted into the margin.
+     At 7.5rem inside an 8.5rem gutter it was right-aligned to the rule but started 16px inside the page edge,
+     which read at the top left as a wobble against the nav. It spans the rows beside it so none stretches. */
+  .masthead picture { grid-row: 1 / span 4; justify-self: end; width: var(--gutter); }
   .masthead h1 { font-size: 2.75rem; margin-top: -0.12em; }
   .role, .lede, .links-nav { grid-column: 2; }
   .role { margin-top: 0.375rem; }
@@ -760,7 +791,7 @@ main.opens-with-h1 { margin-top: 2.25rem; }
     background: var(--ink);
   }
 
-  .row, .log--said > .row {
+  .row {
     display: grid;
     grid-template-columns: var(--gutter) minmax(0, 1fr);
     column-gap: var(--gap);
@@ -790,8 +821,8 @@ main.opens-with-h1 { margin-top: 2.25rem; }
     background: var(--accent);
   }
 
-  /* talks: the kind tag lives in the gutter under its date, as in the paper card */
-  .log--talks > .row { grid-template-rows: auto 1fr; }
+  /* talks and teaching: the kind tag lives in the gutter under its date, as in the paper card */
+  .log--kind > .row { grid-template-rows: auto 1fr; }
   .row > .kind {
     grid-column: 1;
     grid-row: 2;
@@ -800,7 +831,10 @@ main.opens-with-h1 { margin-top: 2.25rem; }
     margin: 0.25rem 0 0;
     text-align: right;
   }
-  .log--talks > .row > .what { grid-row: 1 / span 2; clear: none; }
+  .log--kind > .row > .what { grid-row: 1 / span 2; clear: none; }
+
+  /* the hand-off rows have no date above the tag, so the tag takes the first row of the grid itself */
+  .log--go > .row > .kind { grid-row: 1; margin-top: 0.125rem; }
 
   /* expander sits on the rule */
   .older > summary {
@@ -835,6 +869,13 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   .paper__fig figcaption { text-align: right; }
   .paper__body { grid-column: 2; }
 
+  /* The quotations are the reason the commonplace page exists, so on anything wider than a phone they take
+     one step up from the prose they are set among: 20px against the 17px of the note under them and of the
+     text everywhere else. Still well below the page's own title -- a quotation is not a heading -- but no
+     longer the same size as its own footnote, which left the loudest thing on the page the word
+     "Commonplace". The phone stays as it was: at 400px the measure cannot afford the step. */
+  .quote blockquote { font-size: 1.25rem; line-height: 1.5; }
+
   /* the rule ends at the last tick: "Last updated" */
   .colophon { padding-block: 4.5rem 4rem; }
   .colophon .row { position: relative; }
@@ -848,6 +889,49 @@ main.opens-with-h1 { margin-top: 2.25rem; }
     background: var(--rule);
   }
   .colophon .when { display: block; }
+}
+
+/* ==========================================================================
+   Laptop: the page grows, and the type grows with it
+   --------------------------------------------------------------------------
+   Above 45rem the composition was finished: --col was fixed at 47.5rem, so an
+   824px block sat in the middle of every screen wider than that and the only
+   thing an extra 600px of laptop did was push the same column further from
+   both edges -- 308px of empty paper on each side at 1440, 38% of the screen,
+   with nothing designed for it. This step grows the page and the type
+   together, so the measure stays near the same number of characters and the
+   gutter gets wide enough to carry a date, a tag and the portrait at a size
+   that belongs to the screen. It must come after the 45rem block: same
+   specificity, so source order is what decides.
+   ========================================================================== */
+@media (min-width: 64rem) {
+  :root {
+    --col: 56rem;        /* 896px: 192 gutter + 32 gap + 672 of text */
+    --gutter: 12rem;     /* the margin is the design here, and it now has to hold a 192px plate */
+    --pad: 2.5rem;
+  }
+
+  body { font-size: 1.125rem; }          /* 18px against 672px: about 74 characters, as before the step */
+
+  .masthead h1 { font-size: 3.25rem; }
+  .lede { font-size: 1.5rem; }
+  main > section > h1 { font-size: 2.25rem; }
+  h2.inset { font-size: 1.625rem; }
+  h3 { font-size: 1.25rem; }
+  .paper h3 { font-size: 1.375rem; }
+  .log--kind h3 { font-size: 1.125rem; }
+  .quote blockquote { font-size: 1.375rem; }
+  .quote__by { font-size: 1.0625rem; }   /* the three steps of the commonplace keep their order: 22 / 17 / 16 */
+  .quote__note { font-size: 1rem; }
+
+  /* The mono labels come up with the body, or the gutter reads as dust beside it. The navigation strip is
+     the one thing here that does NOT move: the tick that marks the current page is placed by the strip's own
+     padding and lands on its hairline, and changing the height of a strip link moves the tick off the rule.
+     It is a utility strip one floor above the page, and it is allowed to keep its own scale. */
+  .when, .colophon .row { font-size: 0.875rem; }
+  .buttons .btn, .older > summary { font-size: 0.875rem; }
+  .tag { font-size: 0.8125rem; }
+  .authors, .venue, .note, .role, .links { font-size: 1.0625rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

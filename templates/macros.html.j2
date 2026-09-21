@@ -121,27 +121,70 @@
     plain, because a wider step between the two lists read at desktop width as a missing item rather than as
     two groups. The lists stay separate so that they wrap as whole groups. The envelope on the address above
     them gives the block a mark on its first line as well, so the left edge is the same shape all the way down.
-    The CV is not here any more: it is the filled chip in the navigation strip, on every page. -#}
-{%- macro contact(label) %}
+    The CV is not here any more: it is the filled chip in the navigation strip, on every page.
+
+    Two halves, because the home page says them in two places. The address belongs at the top of the front
+    door, where a visitor who came to write to him is looking; six profile links there do not -- on a phone
+    they broke into three ragged rows between the lede and the first word of the page, about 120px of link
+    hedge before "About". So the profiles stand in the colophon of every page, the address in the masthead at
+    home and in the colophon everywhere else, and no page says either of them twice. Each page still carries
+    exactly one element with id="email", which is the hook the script in base.html.j2 turns into a mailto. -#}
+{%- macro contact(label, reach=true, profiles=true) %}
       <nav class="links-nav" aria-label="{{ label }}">
+{% if reach %}
         <ul class="links links--reach" role="list">
-{% for link in site.links if link.label == "Email" and link.get("text") %}
+  {% for link in site.links if link.label == "Email" and link.get("text") %}
           <li class="links__email"><span class="links__label">{{ icon(link.get("icon")) }}{{ link.label }}</span> <span id="email">{{ link.text }}</span></li>
-{% endfor %}
+  {% endfor %}
         </ul>
+{% endif %}
+{% if profiles %}
         <div class="links-row">
           <ul class="links links--marked" role="list">
-{% for link in site.links if link.label not in ("CV", "Email") and link.get("url") and link.get("icon") %}
+  {% for link in site.links if link.label not in ("CV", "Email") and link.get("url") and link.get("icon") %}
             <li><a rel="me" href="{{ link.url }}">{{ icon(link.icon) }}<span>{{ link.label }}</span></a></li>
-{% endfor %}
+  {% endfor %}
           </ul>
           <ul class="links links--plain" role="list">
-{% for link in site.links if link.label not in ("CV", "Email") and link.get("url") and not link.get("icon") %}
+  {% for link in site.links if link.label not in ("CV", "Email") and link.get("url") and not link.get("icon") %}
             <li><a rel="me" href="{{ link.url }}"><span>{{ link.label }}</span></a></li>
-{% endfor %}
+  {% endfor %}
           </ul>
         </div>
+{% endif %}
       </nav>
+{% endmacro -%}
+
+{#- Where to go next, on the home page. The gutter carries the page's name as an outlined tag rather than a
+    date, because these rows are addresses and not points in time: a tag is the site's label that is never
+    clickable, it takes no tick, and so nothing false is put on the margin rule, which stays a time axis. The
+    link is a real thing on the page it leads to -- a paper's title, a course, a speaker -- and the clause
+    after the em dash says what else is there. -#}
+{%- macro elsewhere_rows(items) %}
+{% for item in items %}
+        <li class="row">
+          <p class="kind"><span class="tag">{{ item.page }}</span></p>
+          <p class="what"><a href="{{ item.url|local(base) }}">{{ nb(item.label) }}</a> — {{ nb(item.text) }}</p>
+        </li>
+{% endfor %}
+{% endmacro -%}
+
+{#- A teaching post, laid out exactly like a talk: the years in the gutter, his role under them as a tag, the
+    course and what it is about in the text column. `what` is optional -- the two rows under "Students" are
+    the people, not a syllabus, and have nothing to add under the title. -#}
+{%- macro teaching_rows(items) %}
+{% for item in items %}
+        <li class="row">
+          <p class="when">{{ dates(item.when) }}</p>
+          <p class="kind"><span class="tag">{{ item.kind }}</span></p>
+          <div class="what">
+            <h3>{{ nb(item.title) }}</h3>
+  {% if item.get("what") %}
+            <p>{{ nb(item.what) }}</p>
+  {% endif %}
+          </div>
+        </li>
+{% endfor %}
 {% endmacro -%}
 
 {%- macro news_rows(items) %}

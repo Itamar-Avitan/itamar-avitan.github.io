@@ -7,7 +7,9 @@
       <h1>{{ site.name }}</h1>
       {{ m.role_line()|trim }}
       <p class="lede">{{ site.identity_line }}</p>
-      {{ m.contact("Contact and profiles")|trim }}
+{# The address only. The six profile links that used to stand here are in the colophon now, on every page:
+   see the note over `contact` in macros.html.j2. #}
+      {{ m.contact("Contact", reach=true, profiles=false)|trim }}
     </div>
 {% endblock %}
 
@@ -21,6 +23,19 @@
 {% endfor %}
       </div>
     </section>
+
+{# The hand-off. Home named the commonplace, the teaching and the paper without a way to reach any of them,
+   so the navigation strip was the only route into the site. Each row carries a real line from the page it
+   leads to, and the gutter carries the page's name as a tag rather than a date -- see the note over
+   `elsewhere` in site.yaml for why it takes no tick. #}
+{% if site.get("elsewhere") %}
+    <section id="elsewhere" aria-labelledby="elsewhere-h">
+      <h2 id="elsewhere-h" class="inset">Elsewhere on this site</h2>
+      <ul class="log log--tight log--go" role="list">
+        {{ m.elsewhere_rows(site.elsewhere)|trim }}
+      </ul>
+    </section>
+{% endif %}
 
 {# What he is doing at the moment, dated, so it is read as a snapshot and not as a standing claim. The date
    takes the gutter and its tick like every other date on the site; the lines themselves are one list in the

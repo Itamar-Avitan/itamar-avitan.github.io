@@ -229,6 +229,66 @@ def test_every_page_says_whose_site_it_is_without_repeating_the_bio():
     assert sum(1 for h in every_page().values() if SITE["about"][0].split(".")[0] in _visible_text(h)) == 1
 
 
+def test_home_hands_the_visitor_on_to_every_other_page():
+    """The front door named the commonplace, the teaching and the paper and linked to none of them, so the
+    navigation strip was the only way in. One row per other page, each carrying a real thing from it."""
+    html = html_of("")
+    section = html.partition('<section id="elsewhere"')[2].partition("</section>")[0]
+    assert [row["page"] for row in SITE["elsewhere"]] == [p["nav"] for p in SITE["pages"][1:]]
+    assert section.count('<li class="row">') == 3
+    for row in SITE["elsewhere"]:
+        assert f'<span class="tag">{row["page"]}</span>' in section, row["page"]   # a label, never a link
+        assert f'<a href="{row["url"]}">' in section, row["url"]                   # relative to the root page
+        assert row["label"] in _visible_text(section) and row["text"] in _visible_text(section)
+        assert "read more" not in row["label"].lower() and row["label"] != row["page"]
+    assert '<p class="when">' not in section          # the gutter carries an address here, so it takes no tick
+    assert section.count("<a ") == 3                  # one way out of each row, and no second link to dilute it
+    for slug in SLUGS[1:]:                            # and only the home page hands off; no page does it twice
+        assert 'id="elsewhere"' not in html_of(slug), slug
+
+
+def test_the_address_is_said_at_the_top_and_the_profiles_at_the_foot():
+    """Six profile links between the lede and the first word of the home page cost about 120px of a phone
+    screen, and they are not what a visitor comes to a front door for. The address keeps the masthead; the
+    profiles stand in the colophon of every page. Each page still says each of them exactly once -- and only
+    one element on any page carries id="email", which is the hook the script turns into a mailto."""
+    home = html_of("")
+    masthead = home.partition('<div class="masthead">')[2].partition("<main")[0]
+    assert 'class="links links--reach"' in masthead and 'class="links-row"' not in masthead
+    foot = home.partition("<footer")[2]
+    assert 'class="links-row"' in foot and "links--reach" not in foot
+    for slug, html in every_page().items():
+        assert html.count('id="email"') == 1, slug
+        assert html.count('class="links-row"') == 1, slug
+        assert html.count('<nav class="links-nav"') == (1 if slug else 2), slug
+        deep_foot = html.partition("<footer")[2]
+        assert ("links--reach" in deep_foot) is bool(slug), slug             # deep pages say the address here
+
+
+def test_the_research_page_names_the_paper_section_like_the_other_two():
+    """The card had no heading, so two of the three things the page holds took a tick on the margin rule and
+    the third did not -- which left the paper reading as an illustration of the intro rather than as the work.
+    Naming it also closes the heading-level skip: h1 Research, h2 Papers, then the card's h3 title."""
+    html = html_of("research/")
+    assert '<h2 id="papers-h" class="inset">Papers</h2>' in html
+    papers = html.partition('<section id="papers"')[2].partition('<section id="talks"')[0]
+    assert '<article class="paper">' in papers                       # the card is inside the section it names
+    assert papers.count("<h3>") == len(SITE["research"]) == 1        # and its title is a level below "Papers"
+    assert SITE["research"][0]["title"][:20] in _visible_text(papers)
+    assert re.findall(r"<h([123])", html) == ["1", "2", "3", "2", "3", "3", "3", "2", "3", "3"]
+
+
+@pytest.mark.parametrize("slug", SLUGS)
+def test_no_page_skips_a_heading_level(slug):
+    """A reader moving by headings should never fall through a level. The research page used to run h1 -> h3,
+    because Research was an h2 when the site was one page and the card's title was never re-levelled when it
+    became the page's h1."""
+    levels = [int(n) for n in re.findall(r"<h([1-6])", html_of(slug))]
+    assert levels and levels[0] == 1 and levels.count(1) == 1, slug
+    for before, after in zip(levels, levels[1:]):
+        assert after <= before + 1, (slug, before, after, levels)
+
+
 # --- the templates ----------------------------------------------------------------------------------------
 
 def _visible_text(html: str) -> str:
@@ -251,9 +311,14 @@ def _values(node):
 
 def test_every_content_string_is_rendered_on_one_page_or_another():
     text = " ||| ".join(_visible_text(h) for h in every_page().values())
-    wanted = {k: SITE[k] for k in ("identity_line", "about", "now", "news", "talks", "projects", "teaching")}
+    wanted = {k: SITE[k] for k in ("identity_line", "about", "now", "elsewhere", "news", "talks", "projects",
+                                   "teaching")}
     wanted["intros"] = [p.get("intro") for p in SITE["pages"] if p.get("intro")]
-    missing = [s for s in _values(wanted) if not s.startswith("http") and " ".join(s.split()) not in text]
+    # an address is not text: full ones start with http, and the "elsewhere" rows point at this site's own
+    # slugs, which the template turns into a relative link rather than printing
+    addresses = set(SLUGS)
+    missing = [s for s in _values(wanted)
+               if not s.startswith("http") and s not in addresses and " ".join(s.split()) not in text]
     assert missing == []
 
 
@@ -287,15 +352,17 @@ def test_open_graph_points_at_the_site_and_its_card():
 
 
 def test_section_ids_and_script_hooks():
-    where = {"": ["about", "now", "news"], "research/": ["research", "talks", "projects"],
-             "teaching/": ["teaching"], "commonplace/": ["quotes"]}
+    where = {"": ["about", "elsewhere", "now", "news"],
+             "research/": ["research", "papers", "talks", "projects"],
+             "teaching/": ["teaching", "courses", "students"], "commonplace/": ["quotes"]}
     for slug, html in every_page().items():
         for sec in where[slug]:
             assert html.count(f'<section id="{sec}"') == 1, (slug, sec)
         assert html.count('id="theme-toggle"') == 1, slug
         assert '<span id="email">avitanit [at] post.bgu.ac.il</span>' in html, slug
     research = html_of("research/")
-    assert research.index('id="research"') < research.index('id="talks"') < research.index('id="projects"')
+    assert (research.index('id="research"') < research.index('id="papers"')
+            < research.index('id="talks"') < research.index('id="projects"'))
 
 
 def test_research_card_shows_every_field():
@@ -476,22 +543,45 @@ def test_the_about_and_now_drafts_are_marked_as_drafts_in_site_yaml():
     assert 3 <= len(SITE["now"]) <= 5
 
 
-def test_teaching_sentences_stay_whole_and_lift_their_dates():
+def test_teaching_is_two_sections_and_every_row_is_dated_and_titled():
+    """It was one flat list of four sentences: no headings, no section ticks, the only page on the site with
+    no internal structure -- and a mentorship ranked level with a three-year teaching assistantship. It is
+    Courses and Students now, and each row is laid out like a talk: the years in the gutter, the role under
+    them as a tag, the course and what it is about in the column."""
     html = html_of("teaching/")
-    assert ('University of the Negev<span class="vh">: </span></p>' in html
-            and '<p class="when">spring 2026<span class="vh">.</span></p>' in html)
-    assert '<p class="when"><time datetime="2021">2021</time>–<time datetime="2023">2023</time><span class="vh">.</span></p>' in html
-    # every teaching row is dated, the mentoring one included: none of them sits in the list without a tick
-    assert ('<p class="what">Mentoring two undergraduate research students<span class="vh">: </span></p>' in html
-            and '<p class="when"><time datetime="2025">2025</time>–<time datetime="2026">2026</time><span class="vh">.</span></p>' in html)
-    teaching = html.partition('<section id="teaching"')[2].partition("</section>")[0]
-    assert teaching.count('<li class="row">') == teaching.count('<p class="when">') == len(SITE["teaching"])
+    for section, heading in (("courses", "Courses"), ("students", "Students")):
+        assert f'<section id="{section}" aria-labelledby="{section}-h">' in html, section
+        assert f'<h2 id="{section}-h" class="inset">{heading}</h2>' in html, section
+    rows = html.count('<li class="row">')
+    assert rows == html.count('<p class="when">') == html.count('<p class="kind">') == 5
+    assert rows == len(SITE["teaching"]["courses"]) + len(SITE["teaching"]["students"])
+    for entry in SITE["teaching"]["courses"] + SITE["teaching"]["students"]:
+        assert f'<span class="tag">{entry["kind"]}</span>' in html, entry["title"]
+    assert '<p class="when">2023/24, 2024/25 and 2025/26</p>' in html          # not a date the page can read
+    assert '<p class="when"><time datetime="2021">2021</time>–<time datetime="2023">2023</time></p>' in html
+    assert '<h3>Two undergraduate research students</h3>' in html              # its own row, not a line in a list
 
 
-def test_a_sentence_without_a_date_still_renders_whole():
+def test_the_teaching_page_carries_the_course_home_announces():
+    """This page is the authority on his teaching, and it did not list the academic writing course that both
+    "about" and "now" on the home page announce for 2026/27."""
+    courses = SITE["teaching"]["courses"]
+    writing = next(c for c in courses if "writing" in c["title"].lower())
+    assert writing["when"] == "from 2026/27" and "2026/27" in SITE["now"][1]
+    assert "academic writing course" in SITE["about"][2]
+    assert writing["title"] in _visible_text(html_of("teaching/"))
+    assert [c["title"] for c in courses][0] == "Introduction to Cognition and Computation"
+
+
+def test_a_teaching_row_without_a_sentence_still_renders():
+    """The two rows under "Students" are people, not a syllabus: they carry a title and nothing under it."""
+    html = html_of("teaching/")
+    students = html.partition('<section id="students"')[2].partition("</section>")[0]
+    assert students.count("<h3>") == 2 and "<p>" not in students
     site = copy.deepcopy(SITE)
-    site["teaching"] = ["Mentoring: two undergraduate research students."]
-    assert '<p class="what">Mentoring: two undergraduate research students.</p>' in html_of("teaching/", site)
+    site["teaching"] = {"courses": [{"title": "A course", "kind": "Teaching assistant", "when": "2026"}]}
+    only = html_of("teaching/", site)
+    assert "<h3>A course</h3>" in only and '<section id="students"' not in only
 
 
 def test_quotes_print_the_line_its_attribution_and_its_context_and_nothing_else():

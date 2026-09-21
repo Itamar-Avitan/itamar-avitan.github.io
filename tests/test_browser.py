@@ -145,6 +145,10 @@ def test_no_theme_filters_the_card_figure(browser):
 
 HIT_TEST_JS = """
 (selector) => [...document.querySelectorAll(selector)].map(a => {
+  // elementFromPoint answers for the viewport only, and the profile links stand in the colophon at the foot
+  // of the page, so each target is brought into view before it is pointed at. "instant" because the
+  // stylesheet asks for smooth scrolling and a rect read mid-animation is a rect of nowhere in particular.
+  a.scrollIntoView({block: "center", inline: "center", behavior: "instant"});
   const r = a.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
   const hit = (dx, dy) => { const el = document.elementFromPoint(x + dx, y + dy);
                             return !!(el && el.closest('a') === a); };
@@ -234,6 +238,85 @@ def test_the_research_card_on_a_phone_puts_the_figure_under_the_title(browser):
     assert box["title"]["width"] > 0.95 * box["measure"]                # the title has the full measure back
     assert 200 <= box["fig"]["width"] <= 216                            # a 13rem plate, not the whole column
     assert box["fig"]["left"] == pytest.approx(box["title"]["left"], abs=1)
+
+
+def test_the_laptop_gets_a_composition_of_its_own(browser):
+    """Above 45rem the page used to be finished: an 824px block centred on every wider screen, so the only
+    thing 600px of laptop did was push the same column further from both edges -- 308px of empty paper on
+    each side at 1440. The page and the type step up together at 64rem, so the measure stays near the same
+    number of characters rather than the same number of pixels."""
+    narrow, _, _ = _page(browser, 1023)
+    wide, _, _ = _page(browser, 1280)
+    block = "document.querySelector('.page').getBoundingClientRect().width"
+    size = "parseFloat(getComputedStyle(document.body).fontSize)"
+    assert narrow.evaluate(block) == 824 and narrow.evaluate(size) == 17
+    assert wide.evaluate(block) == 976 and wide.evaluate(size) == 18
+    # the measure in ems, which is what a reader actually feels, moves by less than a tenth
+    ems = lambda p: p.evaluate("document.querySelector('.prose p').getBoundingClientRect().width") / p.evaluate(size)
+    assert abs(ems(wide) - ems(narrow)) < 3, (ems(narrow), ems(wide))
+    # and the navigation strip keeps its own scale, because the tick that marks the current page is placed
+    # by the strip's padding and lands on its hairline: a taller strip link moves the tick off the rule
+    nav = "parseFloat(getComputedStyle(document.querySelector('.sitenav a')).fontSize)"
+    assert wide.evaluate(nav) == narrow.evaluate(nav) == 13
+
+
+@pytest.mark.parametrize("width", [320, 400])
+def test_a_phone_meets_the_name_before_the_preferences(browser, width):
+    """The strip used to stack, which put the theme toggle on the first line of the page -- above the
+    navigation and above his name. The strip is one row now: the nav keeps the line and wraps inside it, and
+    the toggle is a 44px square holding only its mark. The label stays in the DOM, because it is the button's
+    accessible name and the script writes to it.
+
+    What this buys is order at every width, and height where it was worst: the strip measures 110.6px at 320
+    against the stacked 156.6, and 108.8 against 105.8 at 400, where the five items used to fit on one line
+    precisely because the toggle had taken a row of its own above them. Three pixels there for forty-six
+    here, and on both the first thing met is the way around the site rather than a preference."""
+    page, _, _ = _page(browser, width)
+    box = page.evaluate("""() => {
+      const t = document.querySelector('#theme-toggle').getBoundingClientRect();
+      const nav = document.querySelector('.sitenav a').getBoundingClientRect();
+      const label = document.querySelector('#theme-toggle span');
+      return {toggleTop: t.top, toggleW: t.width, toggleH: t.height, navTop: nav.top,
+              strip: document.querySelector('.topstrip').getBoundingClientRect().height,
+              painted: label.getBoundingClientRect().width, text: label.textContent};
+    }""")
+    assert abs(box["toggleTop"] - box["navTop"]) <= 1             # beside the navigation, not above it
+    assert box["toggleW"] >= 44 and box["toggleH"] >= 44          # still a finger-sized target
+    assert box["painted"] <= 1 and box["text"] == "Use dark theme"
+    assert page.get_attribute("#theme-toggle", "aria-label") is None      # the span is the accessible name
+    assert box["strip"] <= 112, box["strip"]
+
+
+@pytest.mark.parametrize("width", [768, 1280])
+def test_the_portrait_fills_the_gutter_it_sits_in(browser, width):
+    """It was 120px right-aligned inside a 136px gutter, so its left edge stood 16px inside the page's own
+    edge and read as a wobble against the first word of the navigation above it. It fills the gutter now:
+    left edge on the page edge, right edge on the margin rule, like a plate pasted into the margin."""
+    page, _, _ = _page(browser, width)
+    left = page.evaluate("""() => [document.querySelector('.masthead picture').getBoundingClientRect().left,
+                                   document.querySelector('.sitenav a').getBoundingClientRect().left,
+                                   document.querySelector('.masthead picture').getBoundingClientRect().width]""")
+    assert left[0] == pytest.approx(left[1], abs=0.5), left
+    assert left[2] == (136 if width < 1024 else 192), left
+
+
+def test_the_commonplace_sets_its_quotations_above_the_prose(browser):
+    """The page exists for the quotations, and they were set at body size -- barely larger than the note
+    under them, which left the loudest thing on the page the word "Commonplace". One step up, still well
+    below the page's own title: a quotation is not a heading. The phone keeps body size; the measure there
+    cannot afford the step."""
+    sizes = {}
+    for width in (400, 800, 1280):
+        page, _, _ = _page(browser, width, slug="commonplace/")
+        sizes[width] = page.evaluate("""() => [
+            parseFloat(getComputedStyle(document.querySelector('.quote blockquote')).fontSize),
+            parseFloat(getComputedStyle(document.body).fontSize),
+            parseFloat(getComputedStyle(document.querySelector('h1')).fontSize),
+            parseFloat(getComputedStyle(document.querySelector('.quote__note')).fontSize)]""")
+    quote, body, h1, note = sizes[1280]
+    assert sizes[400][0] == sizes[400][1] == 17          # the phone is as it was
+    assert sizes[800][0] == 20 and quote == 22
+    assert body < quote < h1 and note < body
 
 
 @pytest.mark.parametrize("slug", SLUGS)

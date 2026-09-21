@@ -1,11 +1,13 @@
-"""Screenshot every page of the built site: desktop light, desktop dark, phone light.
+"""Screenshot every page of the built site, in both themes, at the three widths the layout changes at.
 
     python3 tools/shots.py
 
-Writes shots/<page>-<view>.png (git-ignored) and prints each page's height at both widths, because the point
-of the four-page split was that no page comes near the 4383px (laptop) and 6548px (phone) the single page
-stood at. The site is rebuilt first, so the pictures always show the current site.yaml, templates and
-style.css. Look at them.
+Writes shots/<page>-<view>.png (git-ignored) and prints each page's height, because the point of the
+four-page split was that no page comes near the 4383px (laptop) and 6548px (phone) the single page stood at.
+1280 and 1440 are both here because the page steps up at 64rem and the wider one is where the old fixed
+column left the most empty paper; the phone is shot in both themes because that is where most of it is read.
+The site is rebuilt first, so the pictures always show the current site.yaml, templates and style.css.
+Look at them.
 """
 import subprocess
 import sys
@@ -16,7 +18,9 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "shots"
-VIEWS = [("desktop-light", 1280, 900, "light"), ("desktop-dark", 1280, 900, "dark"), ("phone-light", 400, 850, "light")]
+VIEWS = [("desktop-light", 1280, 900, "light"), ("desktop-dark", 1280, 900, "dark"),
+         ("laptop-1440-light", 1440, 900, "light"),
+         ("phone-light", 400, 850, "light"), ("phone-dark", 400, 850, "dark")]
 
 
 def main() -> int:

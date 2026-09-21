@@ -1,6 +1,8 @@
-{#- Teaching. Each line is one sentence from site.yaml, kept whole and in order in the markup. When it ends in
-    ": <dates>." the layout lifts the dates into the gutter; the colon and the full stop are then visually
-    hidden, because the grid does their job. A sentence that does not end in a date is left as it is. -#}
+{#- Teaching, in two sections: the courses he helps teach, and the students he works with one to one. It was
+    one flat list of four sentences with no headings and no internal structure -- the only page on the site
+    without any -- which also left a mentorship ranked level with a three-year teaching assistantship.
+    Each row is laid out like a talk: the years in the gutter, the role under them as an outlined tag, the
+    course and what it is about in the text column. -#}
 {% extends "base.html.j2" %}
 
 {% block main %}
@@ -10,20 +12,24 @@
 {% if page.get("intro") %}
       <p class="page-intro inset">{{ m.nb(page.intro) }}</p>
 {% endif %}
-      <ul class="log log--tight log--said" role="list">
-{% for line in site.teaching %}
-  {% set what, colon, tail = line.rpartition(": ") %}
-  {% set when = tail[:-1] %}
-        <li class="row">
-  {% if what and tail.endswith(".") and when and when[-1] in "0123456789" %}
-          <p class="what">{{ m.nb(what) }}<span class="vh">: </span></p>
-          <p class="when">{{ m.dates(when) }}<span class="vh">.</span></p>
-  {% else %}
-          <p class="what">{{ m.nb(line) }}</p>
-  {% endif %}
-        </li>
-{% endfor %}
+    </section>
+
+{% if site.teaching.get("courses") %}
+    <section id="courses" aria-labelledby="courses-h">
+      <h2 id="courses-h" class="inset">Courses</h2>
+      <ul class="log log--kind" role="list">
+        {{ m.teaching_rows(site.teaching.courses)|trim }}
       </ul>
     </section>
+{% endif %}
+
+{% if site.teaching.get("students") %}
+    <section id="students" aria-labelledby="students-h">
+      <h2 id="students-h" class="inset">Students</h2>
+      <ul class="log log--kind log--tight" role="list">
+        {{ m.teaching_rows(site.teaching.students)|trim }}
+      </ul>
+    </section>
+{% endif %}
 
 {% endblock %}

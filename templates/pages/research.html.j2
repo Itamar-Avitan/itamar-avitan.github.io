@@ -8,6 +8,14 @@
 {% if page.get("intro") %}
       <p class="page-intro inset">{{ m.nb(page.intro) }}</p>
 {% endif %}
+    </section>
+
+{# The paper had no heading of its own, so the page read h1 Research -> [card] -> h2 Talks -> h2 Projects:
+   two of the three things it holds took a tick on the margin rule and the third did not, which left the card
+   looking like an illustration of the intro rather than the work itself. It also skipped a heading level --
+   the card's title is an h3 and there was no h2 above it. Both are answered by naming the section. #}
+    <section id="papers" aria-labelledby="papers-h">
+      <h2 id="papers-h" class="inset">Papers</h2>
 {% for card in research %}
       <article class="paper">
         <div class="paper__aside">
@@ -55,7 +63,7 @@
 
     <section id="talks" aria-labelledby="talks-h">
       <h2 id="talks-h" class="inset">Talks</h2>
-      <ul class="log log--talks" role="list">
+      <ul class="log log--kind" role="list">
 {% for talk in site.talks %}
         <li class="row">
           <p class="when">{{ m.dates(talk.date) }}</p>

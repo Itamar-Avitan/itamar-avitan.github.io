@@ -67,14 +67,21 @@ identity_line: I study how to tell which neural network models of human vision a
 
 # DRAFT, awaiting the owner's own words. Written on 2026-09-21 in answer to his ask for "a proper about me in
 # your voice" and a "Now / what I'm up to" block. Every clause below is drawn from facts already on this site
-# or given by him -- the direct track, the advisor, the department and school, the two first degrees, the M.Sc.
-# finished inside the direct track in 2026, the question the work asks, the three venues, the teaching, the two
-# students, the EEG speller and the practicum product. Nothing about his life outside that is invented, and
-# nothing should be added here that he has not said. It replaces the old three-paragraph "bio", whose second
-# paragraph is kept verbatim as the Research page's intro above.
+# or given by him -- the lab, the advisor, the fields he came from, the question the work asks, the result the
+# paper found, the teaching, the two students, the EEG speller and the practicum product. Nothing about his
+# life outside that is invented, and nothing should be added here that he has not said. It replaces the old
+# three-paragraph "bio", whose second paragraph is kept verbatim as the Research page's intro above.
+#
+# Cut back on 2026-09-21, second pass. The first paragraph was an education record written as prose -- direct
+# track, department, school, B.Sc., B.A., M.Sc., 2026 -- which is exactly the online-CV register he rejected
+# ("not make it an online cv but more hey this is me website"), and cv.pdf already carries every one of those
+# facts. It is one sentence now and it points at the CV for the rest. The second paragraph used to ask the
+# lede's question again in the lede's words, 300px below it, so that at 1440 a reader met the same sentence
+# twice on one screen; it carries the question forward instead -- what the measure costs, and what a wrong
+# answer looks like. Do not put the degree list back, and do not let this paragraph restate identity_line.
 about:
-- I am a PhD candidate in the Brains and Machines Lab at Ben-Gurion University of the Negev, on the direct track, advised by Dr. Tal Golan. My department is Industrial Engineering and Management, and I am affiliated with the School of Brain Sciences and Cognition. I came here through a B.Sc. in Cognitive and Brain Sciences (computational track) and a B.A. in Psychology, and finished my M.Sc. inside the direct track in 2026.
-- What I keep coming back to is a measurement question. When we say that a neural network sees the way people do, can our measures tell us that it is the right model, or only that it is the best-fitting one? It has taken me to NeurIPS 2025, a talk at CCN 2025, and this September to Osnabrück.
+- I am a PhD candidate in the Brains and Machines Lab at Ben-Gurion University of the Negev, advised by Dr. Tal Golan, and I came to it from cognitive and brain sciences and from psychology — the degrees and the dates are in the CV.
+- The measure is the hard part. To say a network sees the way people do, you fit a mapping from its features to human judgments and check how well it predicts — and a mapping flexible enough to fit anything can make the wrong network look like the winner. In our simulations that comparison recovered the model that had generated the data less than 80% of the time.
 - 'I teach as well: courses on cognition and computation and on deep learning, an academic writing course from next year, and two undergraduate students whose research I mentor. I like building things with other people — an EEG speller that let a person with ALS answer yes or no, and a headphone add-on for the noises that set anxiety off. And I collect lines about the mind.'
 # DRAFT, as above. Short enough to keep true: rewrite it whenever it stops being what you are doing.
 now_as_of: Sep 2026
@@ -83,6 +90,37 @@ now:
 - Teaching assistant for Introduction to Cognition and Computation, and joining an academic writing course in 2026/27.
 - Mentoring two undergraduate research students.
 - Still collecting lines about the mind for the commonplace page.
+
+# The front door has to hand a visitor on. Added 2026-09-21: the home page named the commonplace, the teaching
+# and the NeurIPS paper without a way to reach any of them, so the only route into the site was the navigation
+# strip, and at laptop width the whole left gutter of the home page sat empty. These three rows use the grid
+# the rest of the site is built on -- a label in the gutter, the line in the text column -- and each one says
+# something real about where it goes rather than "read more".
+#   page   the gutter label. It is an outlined tag, not a date: this list is the one place on the site where
+#          the gutter carries an address instead of a point in time, so it takes a tag (a label that is never
+#          clickable) and no tick, exactly as the "kind" tag under a talk's date does. The margin rule stays a
+#          time axis; nothing false is put on it.
+#   label  the link itself, and it must be a real thing on that page -- the paper's short title, the course,
+#          the line -- never "read more" or the page's own name a second time.
+#   text   what else is there, in one clause. The template sets the em dash between the two.
+# The commonplace row deliberately does not quote the Snape passage again: the novel is in copyright, the
+# house rule keeps such an extract to the page that argued for it, and the full passage is printed there at
+# the owner's ruling. Naming the speaker and the subject gets a reader there without a second reproduction.
+elsewhere:
+- page: Research
+  label: When the Best-Fitting Model Isn’t the Right One
+  url: research/
+  text: the paper this all comes out of, the three talks that carried it, and the things I build with other people.
+# "the newest from 2026/27", not "and an academic writing course from 2026/27": the writing course is one of
+# the three, not a fourth beside them, and the first wording said there were four.
+- page: Teaching
+  label: Three courses, the newest from 2026/27
+  url: teaching/
+  text: what each one covers, and the students I work with.
+- page: Commonplace
+  label: Severus Snape on what a mind is not
+  url: commonplace/
+  text: the line I keep coming back to, first of four, each with its source and the place it falls.
 
 # icon: which mark the template draws before the label. The template now holds three, and only three:
 # mail, github, bluesky. The owner ruled on 2026-09-21 that LinkedIn, ORCID, Google Scholar and X carry no
@@ -221,7 +259,15 @@ talks:
 projects:
 - title: EarBetter
   period: 24 Jul–6 Aug 2026
-  blurb: 'Our five-person team’s product from the 2026 Brown University–Ben-Gurion University Embodied Brain Technology Practicum at Brown University: an add-on that works with any headphones, reads your biosignals and does its processing on your phone, and selectively filters the particular sounds that set a person’s anxiety off. The aim is simple — less anxiety from noise. We built a working version, did the go-to-market research, wrote a business plan and pitched it. I wrote the control software and put the system together.'
+  # Shortened on 2026-09-21 from 80 words to 64: at its old length a two-week practicum ran longer on the
+  # Research page than the peer-reviewed paper's own summary above it, which said the wrong thing about what
+  # weighs what. Only length changed. Every clause of his account is still here, in his words -- add-on, any
+  # headphones, biosignals, processing on the phone, the sounds that set anxiety off, the working version, the
+  # go-to-market work, the business plan, the pitch, and what he himself did. What went is the sentence that
+  # restated the aim ("less anxiety from noise", already said by "anxiety off"), the year (the row carries the
+  # dates), and the second "Brown University". It is mentioned three times on this site at three different
+  # lengths -- a news line, a clause in About, this row -- which is right; three at this length would not be.
+  blurb: 'Our five-person team’s product from the Embodied Brain Technology Practicum at Brown University: an add-on that works with any headphones, reads your biosignals, processes on your phone, and filters out the sounds that set a person’s anxiety off. We built a working version, did the go-to-market work, wrote a business plan and pitched it. I wrote the control software and put the system together.'
   url: https://github.com/Itamar-Avitan/earbetter-ebt-practicum
 - title: BCI4ALS
   period: 2022–2023
@@ -322,10 +368,43 @@ quotes:
     enclosing curly quotation marks are this file’s house convention, not part of the source sentence.
   copyright: public-domain
   note: From the speech in which Holmes first explains his trade — “I suppose I am the only one in the world. I’m a consulting detective” — moments after admitting to Watson that he himself wrote the magazine article on deduction Watson had just ridiculed.
+# Teaching, in two sections since 2026-09-21. It was one undifferentiated list of four sentences: no headings,
+# no ticks of its own, the only page on the site with no internal structure -- and it ranked "mentoring two
+# undergraduate research students" level with a three-year teaching assistantship. Worse, this page is meant
+# to be the authority on his teaching and it did not carry the academic writing course that "about" and "now"
+# above both announce for 2026/27. The institution is not repeated on every row any more: the page's own intro
+# says it once, and the one row that belongs to another unit names it (Dean of Students Office).
+#   title  the course, or the students.
+#   kind   what he is in it: an outlined tag in the gutter, under the dates -- the same label a talk carries.
+#   when   the years. Lifted into the gutter and ticked on the margin rule like every other date on the site.
+#   what   DRAFT. One sentence on what the course is about, written from the course's own name and from what
+#          this site already says; the rows carry no claim about his duties beyond the role in "kind", because
+#          nothing here records them. What he actually does inside each course is his to say -- when he says
+#          it, replace these sentences with his words rather than adding to them.
+# The academic writing course's own title is not recorded anywhere yet; "Academic writing" stands in for it,
+# and it is the one entry on this page whose name still has to be confirmed.
 teaching:
-- 'Teaching assistant, Introduction to Cognition and Computation, Ben-Gurion University of the Negev: 2023/24, 2024/25 and 2025/26.'
-- 'Teaching assistant, Deep Learning for Neuroscience and Cognition, Ben-Gurion University of the Negev: spring 2026.'
-- 'Tutor in algebra and calculus, Dean of Students Office, Ben-Gurion University of the Negev: 2021–2023.'
-- 'Mentoring two undergraduate research students: 2025–2026.'
+  courses:
+  - title: Introduction to Cognition and Computation
+    kind: Teaching assistant
+    when: 2023/24, 2024/25 and 2025/26
+    what: 'An introduction to treating a mind as something that computes: the questions cognitive science asks, and the models built to answer them.'
+  - title: Deep Learning for Neuroscience and Cognition
+    kind: Teaching assistant
+    when: spring 2026
+    what: 'Deep networks as models of brains and behaviour: how one is built and trained, and what it takes to read it as a claim about a mind.'
+  # "Joining", not "Teaching assistant": what "now" and "about" record is that he joins this course in
+  # 2026/27, not in what capacity. The tag says exactly that and no more until he says the rest.
+  - title: Academic writing
+    kind: Joining
+    when: from 2026/27
+    what: 'Writing up a result: what a paper has to say, and how to say it so that a reader can check it.'
+  students:
+  - title: Two undergraduate research students
+    kind: Mentoring
+    when: 2025–2026
+  - title: Algebra and calculus, Dean of Students Office
+    kind: Tutor
+    when: 2021–2023
 footer:
   updated: September 2026

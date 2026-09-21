@@ -24,10 +24,15 @@ things about me and updates and stuff". Nothing was dropped in the split.
 
 | Page | Address | What is on it |
 | --- | --- | --- |
-| Home | `/` | the masthead, `about`, `now`, and the news feed |
-| Research | `/research/` | the paper card, the talks it was given as, and the projects |
-| Teaching | `/teaching/` | the courses and the students |
+| Home | `/` | the masthead, `about`, `elsewhere`, `now`, and the news feed |
+| Research | `/research/` | Papers, Talks, Projects |
+| Teaching | `/teaching/` | Courses and Students |
 | Commonplace | `/commonplace/` | the quotations, in the owner's order |
+
+**Every page names its sections**, and every section takes a 2px ink tick on the margin rule. `elsewhere`
+on the home page is the hand-off: one row per other page, each carrying a real line from it. Its gutter
+holds the page's name as an outlined tag rather than a date, because these rows are addresses and not points
+in time — the margin rule stays a time axis, and a tag takes no tick.
 
 The list under `pages` in `site.yaml` **is** the site. Each entry's `slug` is three things at once: the
 address under `site_url`, the folder the file is written into, and the name of its template in
@@ -46,7 +51,9 @@ kept throughout: a filled box is the single primary action in its group.
 
 **The `about` and `now` blocks are drafts** written on 2026-09-21 and marked as such in `site.yaml`. They
 stand in for the owner's own words until he replaces them. Every clause in them comes from a fact already on
-the site; do not add anything to them that he has not said.
+the site; do not add anything to them that he has not said. The one-sentence descriptions under the courses
+in `teaching` are drafts of the same kind: they say what each course is about, drawn from its own name, and
+say nothing about what he does inside it beyond the role in its `kind` tag, because nothing on record does.
 
 The research card's thumbnail is chosen by one line. `site.yaml` holds both pictures under `figure_options`,
 and the card points at one of them:
@@ -73,14 +80,24 @@ use of its logo, ORCID's terms forbid altering the iD icon, the Google Scholar s
 size it was used, and X's terms could not be established. The long form is in the comment above `ICONS` in
 `templates/macros.html.j2`; `tests/test_build.py` fails if the set changes. Because three marks among six
 labels in one row would read as three icons that failed to load, the template renders the marked links and
-the plain ones as two groups. The row itself is in the masthead on the home page and in the colophon on every
-other page, so a visitor who lands deep has the name at the top and an address at the foot, and no page says
-either twice.
+the plain ones as two groups. The profile row stands in the colophon of every page, the home page included;
+the address stands in the masthead at home and in the colophon everywhere else. So a visitor who lands deep
+has the name at the top and an address at the foot, the front door is not six links deep before its first
+word, and no page says either of them twice.
+
+## Three widths, not two
+
+The page is a single column under 45rem, gains its gutter and margin rule above it, and steps up again at
+64rem: `--col`, `--gutter`, `--pad` and the body size all grow together, so a laptop gets a composition of
+its own rather than the phone column centred in more paper, and the measure stays near the same number of
+characters. The navigation strip is the one thing that does not scale with it — the tick that marks the
+current page is placed by the strip's own padding and has to land on its hairline.
 
 Two more checks, run by hand:
 
 - `python3 tools/shots.py` rebuilds the site and writes `shots/<page>-<view>.png` for all four pages (not
-  committed), printing each page's height. Look at them after any change to a template or to `style.css`.
+  committed) at 1280, 1440 and 400, in both themes, printing each page's height. Look at them after any
+  change to a template or to `style.css`.
 - `python3 tools/check_links.py` requests every web address in `site.yaml`, the site's own included, and exits
   with 1 if one is broken. It needs the network, so it is not part of the tests. A line that says `blocked` is
   a host that turns away every client that is not a browser: open that address in a browser. A `200` means

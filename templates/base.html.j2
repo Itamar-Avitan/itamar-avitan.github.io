@@ -111,12 +111,13 @@
   </main>
 
   <footer class="colophon">
-{# The way to reach him sits in the masthead on the home page and in the colophon everywhere else, so a
-   visitor who lands deep has both the name at the top and an address at the foot, and neither page repeats
-   the other. #}
-{% if page.get("heading") %}
-    {{ m.contact("Contact and profiles")|trim }}
-{% endif %}
+{# The profiles stand at the foot of every page, the home page included: six of them between the lede and the
+   first word of the page pushed the content of a phone screen down by about 120px, and they are not what a
+   visitor came to the front door for. The address is the half that is worth the top of the home page, so
+   there it stays in the masthead and only the profiles are down here; every other page says both, since its
+   masthead is a two-line byline. Either way each page says each of them exactly once. #}
+{% set deep = page.get("heading")|default("", true)|length > 0 %}
+    {{ m.contact("Contact and profiles" if deep else "Profiles", reach=deep, profiles=true)|trim }}
     <p class="row"><span class="when">Last updated</span> {{ m.dates(site.footer.updated, "what") }}</p>
     <svg class="mark inset" aria-hidden="true" viewBox="0 0 42 10" width="42" height="10"><circle cx="5" cy="5" r="5"/><circle cx="21" cy="5" r="5"/><rect x="32" width="10" height="10"/></svg>
   </footer>
