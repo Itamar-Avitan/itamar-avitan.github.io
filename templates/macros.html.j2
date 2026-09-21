@@ -1,0 +1,173 @@
+{#- Shared markup for every page. Imported "with context", so the macros can read `site` and `base`.
+    Optional keys (url, note, text, ongoing, authors, figure, me, role, nobreak) are tested before use,
+    because the build renders with StrictUndefined. -#}
+
+{#- Wrap the no-break terms listed in site.yaml; the text is escaped first, so content can never inject markup. -#}
+{%- macro nb(text) -%}
+  {%- set ns = namespace(out=text) -%}
+  {%- for term in site.get("nobreak") or [] -%}
+    {%- set ns.out = ns.out|replace(term, ('<span class="nb">'|safe) ~ term ~ ('</span>'|safe)) -%}
+  {%- endfor -%}
+  {{- ns.out -}}
+{%- endmacro -%}
+
+{%- set MONTHS = {"Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04", "May": "05", "Jun": "06",
+                  "Jul": "07", "Aug": "08", "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12"} -%}
+
+{#- The machine-readable form of ["2026"], ["Sep", "2026"] or ["14", "Sep", "2026"]; empty when it cannot be read. -#}
+{%- macro iso(words) -%}
+  {%- set year = words[-1] -%}
+  {%- set month = MONTHS.get(words[-2][:3]) if words|length > 1 else none -%}
+  {%- set day = words[0]|int(0) if words|length == 3 else 0 -%}
+  {%- if year|length == 4 and year|int(0) >= 1000 -%}
+    {%- if words|length == 1 -%}
+      {{- year -}}
+    {%- elif words|length == 2 and month -%}
+      {{- year }}-{{ month -}}
+    {%- elif words|length == 3 and month and 1 <= day <= 31 -%}
+      {{- year }}-{{ month }}-{{ "%02d"|format(day) -}}
+    {%- endif -%}
+  {%- endif -%}
+{%- endmacro -%}
+
+{#- A date or a range of two dates as <time> elements. The left side of a range borrows the words it leaves out from
+    the right side: "14–15 Sep 2026", "24 Jul–6 Aug 2026", "2022–2023". Anything else stays plain text.
+    With cls the result is one element carrying that class (a row's "when" or "what"). -#}
+{%- macro dates(text, cls=none) -%}
+  {%- set sides = text.split("–") -%}
+  {%- set last = sides[-1].split(" ") -%}
+  {%- set ns = namespace(stamps=[]) -%}
+  {%- for side in sides -%}
+    {%- set own = side.split(" ") -%}
+    {%- set ns.stamps = ns.stamps + [iso(own + last[own|length:])] -%}
+  {%- endfor -%}
+  {%- set readable = sides|length <= 2 and "" not in ns.stamps -%}
+  {%- if readable and cls and sides|length == 1 -%}
+    <time class="{{ cls }}" datetime="{{ ns.stamps[0] }}">{{ text }}</time>
+  {%- else -%}
+    {%- if cls %}<span class="{{ cls }}">{% endif -%}
+    {%- if readable -%}
+      {%- for side in sides -%}
+        <time datetime="{{ ns.stamps[loop.index0] }}">{{ side }}</time>{% if not loop.last %}–{% endif -%}
+      {%- endfor -%}
+    {%- else -%}
+      {{- text -}}
+    {%- endif -%}
+    {%- if cls %}</span>{% endif -%}
+  {%- endif -%}
+{%- endmacro -%}
+
+{#- The marks drawn before a link label, chosen by each link's "icon" key in site.yaml. One 16px solid shape
+    each, one colour (fill: currentColor), and aria-hidden: the text label beside a mark is its accessible name,
+    so the mark itself says nothing twice. They are inline, so the page still asks no other host for anything.
+
+    THREE MARKS, AND ONLY THREE. The owner ruled on 2026-09-21 that this site draws a mark for Email, GitHub
+    and Bluesky and for nothing else. Four were deleted that day and must not be put back:
+      linkedin -- Simple Icons removed the LinkedIn mark on 2024-12-17 because LinkedIn's brand policy forbids
+                  third-party use of the logo. There is no licensed file left to ship.
+      orcid    -- ORCID's terms say the iD icon "must be used as provided, and must not be changed or altered
+                  in any way". What stood here was a recoloured trace laid out at 12.4 CSS px, under ORCID's
+                  documented 16px floor: altered twice over.
+      scholar  -- the stand-in mortarboard closed into a blob below about 20px, and Google asks that its
+                  product icons not be imitated, so there was no truer mark to reach for instead.
+      x        -- X's brand terms could not be fetched, so permission could not be established at all.
+    A missing mark here is not a bug to fix: those four links carry their text label, which is what says where
+    they go. See the note above "links" in site.yaml, and the safe-subset test in tests/test_build.py.
+
+    Licences and provenance of the three that remain: "mail" is drawn here, so no third party's terms apply to
+    it -- it is an envelope, not anyone's brand. "github" and "bluesky" are the marks published by Simple Icons
+    16.32.0 (CC0-1.0, https://github.com/simple-icons/simple-icons). CC0 asks for no attribution; it is
+    recorded here because a brand mark is a trademark whatever its file licence says. Each is used unaltered
+    and only as a link to the owner's own page -- the use both brand guides allow. Their colour rules ask for
+    black or white; these follow the page instead, in the grey of its dates and labels, which is the one point
+    where this falls short of the letter of the guides. -#}
+{%- set ICONS = {
+  "mail": "M4 4.5h16a2 2 0 0 1 2 2v.3l-10 6.1L2 6.8v-.3a2 2 0 0 1 2-2zM2 8.55v8.95a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8.55l-9.48 5.78a1 1 0 0 1-1.04 0z",
+  "github": "M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12",
+  "bluesky": "M5.202 2.857C7.954 4.922 10.913 9.11 12 11.358c1.087-2.247 4.046-6.436 6.798-8.501C20.783 1.366 24 .213 24 3.883c0 .732-.42 6.156-.667 7.037-.856 3.061-3.978 3.842-6.755 3.37 4.854.826 6.089 3.562 3.422 6.299-5.065 5.196-7.28-1.304-7.847-2.97-.104-.305-.152-.448-.153-.327 0-.121-.05.022-.153.327-.568 1.666-2.782 8.166-7.847 2.97-2.667-2.737-1.432-5.473 3.422-6.3-2.777.473-5.899-.308-6.755-3.369C.42 10.04 0 4.615 0 3.883c0-3.67 3.217-2.517 5.202-1.026",
+} -%}
+
+{#- Each mark also carries its own class, because the three marks fill their 24x24 box very differently: the
+    stylesheet sizes them one by one so they read as one set rather than as three weights. -#}
+{%- macro icon(name) -%}
+  {%- if name and ICONS.get(name) -%}
+    <svg class="ico ico--{{ name }}" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path d="{{ ICONS[name] }}"/></svg>
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro authors(names, me) -%}
+  {%- for name in names -%}
+    {%- if name == me %}<span class="me">{{ name }}</span>{% else %}{{ name }}{% endif -%}
+    {%- if not loop.last %}, {% endif -%}
+  {%- endfor -%}
+{%- endmacro -%}
+
+{#- The role line under a name: "PhD candidate · Brains and Machines Lab · Ben-Gurion University of the Negev". -#}
+{%- macro role_line() %}
+{% if site.get("role") %}
+      <ul class="role" role="list">
+  {% for item in site.role %}
+        <li>{% if item.get("url") %}<a href="{{ item.url }}">{{ item.label }}</a>{% else %}{{ item.label }}{% endif %}</li>
+  {% endfor %}
+      </ul>
+{% endif %}
+{% endmacro -%}
+
+{#- Three lists, in this order: how to reach him, the profiles this site may mark, the profiles it may not.
+    The split is the answer to a design problem, not a ranking. Only three of the six destinations allow their
+    mark to be drawn here (see the note over ICONS), and a row in which three items out of six carry one,
+    scattered, looks like three icons failed to load. Listing the marked ones first puts the marks side by
+    side, which is what settles that; the stylesheet then sets one step between every pair of links, marked or
+    plain, because a wider step between the two lists read at desktop width as a missing item rather than as
+    two groups. The lists stay separate so that they wrap as whole groups. The envelope on the address above
+    them gives the block a mark on its first line as well, so the left edge is the same shape all the way down.
+    The CV is not here any more: it is the filled chip in the navigation strip, on every page. -#}
+{%- macro contact(label) %}
+      <nav class="links-nav" aria-label="{{ label }}">
+        <ul class="links links--reach" role="list">
+{% for link in site.links if link.label == "Email" and link.get("text") %}
+          <li class="links__email"><span class="links__label">{{ icon(link.get("icon")) }}{{ link.label }}</span> <span id="email">{{ link.text }}</span></li>
+{% endfor %}
+        </ul>
+        <div class="links-row">
+          <ul class="links links--marked" role="list">
+{% for link in site.links if link.label not in ("CV", "Email") and link.get("url") and link.get("icon") %}
+            <li><a rel="me" href="{{ link.url }}">{{ icon(link.icon) }}<span>{{ link.label }}</span></a></li>
+{% endfor %}
+          </ul>
+          <ul class="links links--plain" role="list">
+{% for link in site.links if link.label not in ("CV", "Email") and link.get("url") and not link.get("icon") %}
+            <li><a rel="me" href="{{ link.url }}"><span>{{ link.label }}</span></a></li>
+{% endfor %}
+          </ul>
+        </div>
+      </nav>
+{% endmacro -%}
+
+{%- macro news_rows(items) %}
+{% for item in items %}
+        <li class="row">
+          {{ dates(item.date, "when") }}
+          <p class="what">{{ nb(item.text) }}</p>
+        </li>
+{% endfor %}
+{% endmacro -%}
+
+{#- A commonplace book: lines he has copied out, on the same time axis as everything else, so the year sits in
+    the gutter and takes its tick like a talk. The attribution stands outside the blockquote, as the quoting
+    rules ask, and is a paragraph rather than a <cite>, because it opens with a person and <cite> marks the
+    title of a work; the note after it is the one sentence of context that tells you where the line falls. -#}
+{%- macro quote_rows(items) %}
+{% for quote in items %}
+        <li class="row">
+          {{ dates(quote.year, "when") }}
+          <div class="what quote">
+            <blockquote><p>{{ nb(quote.text) }}</p></blockquote>
+            <p class="quote__by">{{ nb(quote.attribution) }}</p>
+  {% if quote.get("note") %}
+            <p class="quote__note">{{ nb(quote.note) }}</p>
+  {% endif %}
+          </div>
+        </li>
+{% endfor %}
+{% endmacro -%}

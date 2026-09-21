@@ -4,9 +4,14 @@ import sys
 from pathlib import Path
 
 import pytest
+import yaml
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
+SITE = yaml.safe_load((ROOT / "site.yaml").read_text(encoding="utf-8"))
+SLUGS = [page["slug"] for page in SITE["pages"]]                 # '', 'research/', 'teaching/', 'commonplace/'
+NAV = [page["nav"] for page in SITE["pages"]]
+WIDTHS = [320, 400, 768, 1280]                                   # 320px is the narrowest viewport supported
 
 
 @pytest.fixture(scope="module")
@@ -18,32 +23,35 @@ def browser():
         b.close()
 
 
-def _page(browser, width, scheme="light"):
+def _page(browser, width, scheme="light", slug=""):
     ctx = browser.new_context(viewport={"width": width, "height": 900}, color_scheme=scheme)
     page = ctx.new_page()
     requests, errors = [], []
     page.on("request", lambda r: requests.append(r.url))
     page.on("requestfailed", lambda r: errors.append(f"failed {r.url}"))
     page.on("console", lambda m: errors.append(m.text) if m.type == "error" else None)
-    page.goto((ROOT / "index.html").as_uri())
+    page.goto((ROOT / slug / "index.html").as_uri())
     page.wait_for_timeout(300)
     return page, requests, errors
 
 
-@pytest.mark.parametrize("width", [400, 768, 1280])
-def test_no_horizontal_overflow(browser, width):
-    page, _, _ = _page(browser, width)
+@pytest.mark.parametrize("slug", SLUGS)
+@pytest.mark.parametrize("width", WIDTHS)
+def test_no_horizontal_overflow(browser, width, slug):
+    page, _, _ = _page(browser, width, slug=slug)
     assert page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
 
 
-def test_only_local_requests_and_no_errors(browser):
-    _, requests, errors = _page(browser, 1280)
+@pytest.mark.parametrize("slug", SLUGS)
+def test_only_local_requests_and_no_errors(browser, slug):
+    _, requests, errors = _page(browser, 1280, slug=slug)
     assert [u for u in requests if not u.startswith("file://") and not u.startswith("data:")] == []
     assert errors == []
 
 
-def test_theme_toggle_switches_and_persists(browser):
-    page, _, _ = _page(browser, 1280, "light")
+@pytest.mark.parametrize("slug", SLUGS)
+def test_theme_toggle_switches_and_persists(browser, slug):
+    page, _, _ = _page(browser, 1280, "light", slug)
     bg = lambda: page.evaluate("getComputedStyle(document.body).backgroundColor")
     before = bg()
     page.click("#theme-toggle")
@@ -59,20 +67,64 @@ def test_dark_scheme_is_followed_without_a_choice(browser):
     assert light.evaluate(get) != dark.evaluate(get)
 
 
-def test_email_link_is_built_in_the_browser(browser):
-    page, _, _ = _page(browser, 1280)
+@pytest.mark.parametrize("slug", SLUGS)
+def test_email_link_is_built_in_the_browser(browser, slug):
+    page, _, _ = _page(browser, 1280, slug=slug)
     assert page.get_attribute("a#email", "href").startswith("mailto:avitanit@")
     assert "[at]" in page.inner_text("a#email")
 
 
-def test_structure_and_alt_text(browser):
-    page, _, _ = _page(browser, 1280)
-    assert page.locator("h1").count() == 1 and page.inner_text("h1").strip() == "Itamar Avitan"
+@pytest.mark.parametrize("slug", SLUGS)
+def test_structure_and_alt_text(browser, slug):
+    page, _, _ = _page(browser, 1280, slug=slug)
+    heading = next(p.get("heading") for p in SITE["pages"] if p["slug"] == slug) or SITE["name"]
+    assert page.locator("h1").count() == 1 and page.inner_text("h1").strip() == heading
     assert page.evaluate("[...document.images].every(i => i.alt && i.complete && i.naturalWidth > 0)")
-    for sec in ("research", "news", "talks", "projects", "quotes", "teaching"):
-        assert page.locator(f"#{sec}").count() == 1
     assert page.evaluate("[...document.querySelectorAll('svg.ico')].every(s => s.getAttribute('aria-hidden') === 'true')")
     assert page.locator("svg.ico").count() == 3       # Email, GitHub, Bluesky, and nothing else
+    assert page.locator("main section").count() >= 1
+
+
+@pytest.mark.parametrize("slug", SLUGS)
+def test_the_navigation_reaches_every_page_without_javascript(browser, slug):
+    """Ordinary links: a browser with scripting off follows them, and each one lands on a page whose own strip
+    marks it as the one you are on."""
+    ctx = browser.new_context(viewport={"width": 1280, "height": 900}, java_script_enabled=False)
+    page = ctx.new_page()
+    page.goto((ROOT / slug / "index.html").as_uri())
+    assert page.locator(".sitenav a").count() == len(NAV) + 1           # the four pages and the CV
+    assert [t.strip() for t in page.locator(".sitenav a").all_inner_texts()] == NAV + ["CV"]
+    current = page.locator('.sitenav a[aria-current="page"]')
+    assert current.count() == 1
+    assert current.inner_text().strip() == next(p["nav"] for p in SITE["pages"] if p["slug"] == slug)
+    for index, other in enumerate(SLUGS):
+        # the address each link resolves to is the folder the page is served from; a server answers it with
+        # that folder's index.html, which a file:// URL does not, so the page itself is opened directly after
+        resolved = page.locator(".sitenav a").nth(index).evaluate("a => a.href")
+        assert resolved == (ROOT / other).as_uri().rstrip("/") + "/", (slug, other)
+        page.goto((ROOT / other / "index.html").as_uri())
+        assert page.locator('.sitenav a[aria-current="page"]').inner_text().strip() == NAV[index]
+        page.goto((ROOT / slug / "index.html").as_uri())
+    ctx.close()
+
+
+@pytest.mark.parametrize("slug", SLUGS)
+def test_the_cv_link_resolves_to_the_file_that_is_published(browser, slug):
+    page, _, _ = _page(browser, 1280, slug=slug)
+    href = page.get_attribute(".sitenav__cv a", "href")
+    assert href == ("cv.pdf" if slug == "" else "../cv.pdf")
+    assert Path(page.evaluate("document.querySelector('.sitenav__cv a').href").removeprefix("file://")).exists()
+
+
+@pytest.mark.parametrize("slug", SLUGS[1:])
+def test_a_deep_landing_still_says_whose_site_it_is(browser, slug):
+    """The name, the role line and the portrait at the top; the address and the profiles in the colophon."""
+    page, _, _ = _page(browser, 1280, slug=slug)
+    assert SITE["name"] in page.inner_text(".byline")
+    assert "PhD candidate" in page.inner_text(".byline .role")
+    assert page.locator(".byline picture img").count() == 1
+    assert page.locator("footer .links-nav").count() == 1
+    assert page.locator(".masthead").count() == 0                       # and the bio is not repeated here
 
 
 def test_no_theme_filters_the_card_figure(browser):
@@ -82,7 +134,7 @@ def test_no_theme_filters_the_card_figure(browser):
     present in the stylesheet, invisible on the page, which left the figure a mounted print in one theme and
     a picture lying straight on the sheet in the other. Both themes mount it now."""
     for scheme in ("light", "dark"):
-        page, _, _ = _page(browser, 1280, scheme)
+        page, _, _ = _page(browser, 1280, scheme, "research/")
         assert page.evaluate("getComputedStyle(document.querySelector('.paper__fig img')).filter") == "none"
         mat, card = page.evaluate("""() => [
             getComputedStyle(document.querySelector('.paper__plot')).backgroundColor,
@@ -91,21 +143,37 @@ def test_no_theme_filters_the_card_figure(browser):
         assert _contrast(mat, card) >= 1.3, (scheme, mat, card)  # and seen, not merely declared
 
 
-@pytest.mark.parametrize("width", [400, 768, 1280])
+HIT_TEST_JS = """
+(selector) => [...document.querySelectorAll(selector)].map(a => {
+  const r = a.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+  const hit = (dx, dy) => { const el = document.elementFromPoint(x + dx, y + dy);
+                            return !!(el && el.closest('a') === a); };
+  return {label: a.textContent.trim(), width: +r.width.toFixed(1), height: +r.height.toFixed(1),
+          covered: [[-11.5, -11.5], [11.5, -11.5], [-11.5, 11.5], [11.5, 11.5]].every(c => hit(...c))};
+})
+"""
+
+
+@pytest.mark.parametrize("width", WIDTHS)
 def test_every_profile_link_is_at_least_a_24px_target(browser, width):
     """WCAG 2.2 SC 2.5.8, at every viewport and not only on a phone: the desktop "X" was an 8.6 by 32 px
     target. A 23px box centred on each link has to land on that link at all four of its corners, which is
     what the overlay gives it without widening its box and opening a hole in the row."""
     page, _, _ = _page(browser, width)
-    links = page.evaluate("""() => [...document.querySelectorAll('.links a')].map(a => {
-      const r = a.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
-      const hit = (dx, dy) => { const el = document.elementFromPoint(x + dx, y + dy);
-                                return !!(el && el.closest('a') === a); };
-      return {label: a.textContent.trim(), width: +r.width.toFixed(1), height: +r.height.toFixed(1),
-              covered: [[-11.5, -11.5], [11.5, -11.5], [-11.5, 11.5], [11.5, 11.5]].every(c => hit(...c))};
-    })""")
-    assert [l["label"] for l in links] == ["CV", "avitanit [at] post.bgu.ac.il", "GitHub", "Bluesky",
+    links = page.evaluate(HIT_TEST_JS, ".links a")
+    assert [l["label"] for l in links] == ["avitanit [at] post.bgu.ac.il", "GitHub", "Bluesky",
                                            "Google Scholar", "LinkedIn", "X", "ORCID"]
+    assert [l for l in links if l["height"] < 24 or not l["covered"]] == []
+
+
+@pytest.mark.parametrize("slug", SLUGS)
+@pytest.mark.parametrize("width", WIDTHS)
+def test_every_navigation_link_is_at_least_a_24px_target(browser, width, slug):
+    """The strip is on every page and is how the site is used, so it is held to the same rule as the profile
+    row: 24 by 24 CSS px, at every width, the CV chip included."""
+    page, _, _ = _page(browser, width, slug=slug)
+    links = page.evaluate(HIT_TEST_JS, ".sitenav a")
+    assert [l["label"] for l in links] == NAV + ["CV"]
     assert [l for l in links if l["height"] < 24 or not l["covered"]] == []
 
 
@@ -123,10 +191,38 @@ def test_the_theme_toggle_is_invisible_until_the_script_unhides_it(browser):
     assert page.locator("#theme-toggle").is_visible()
 
 
+@pytest.mark.parametrize("slug", SLUGS)
+@pytest.mark.parametrize("width", WIDTHS)
+def test_the_current_page_tick_sits_on_the_strip_rule(browser, width, slug):
+    """The tick that marks the page you are on is the section tick of the margin rule, one floor up: 2px of
+    ink lying on the hairline under the strip. That is exactly true while the strip is one line, which it is
+    from about 360px up -- and it is why the strip stacks the toggle above the links rather than beside them.
+    Below that the five items wrap, the tick can no longer reach the hairline, and what it must do instead is
+    stay an underline under its own link and keep off the line beneath it."""
+    page, _, _ = _page(browser, width, slug=slug)
+    measured = page.evaluate("""() => {
+      const a = document.querySelector('.sitenav a[aria-current="page"]');
+      const links = [...document.querySelectorAll('.sitenav a')];
+      const t = getComputedStyle(a, '::before');
+      const r = a.getBoundingClientRect();
+      const bottom = r.bottom - parseFloat(t.bottom) + parseFloat(t.height);
+      const lines = new Set(links.map(l => Math.round(l.getBoundingClientRect().top))).size;
+      const below = links.filter(l => l !== a && l.getBoundingClientRect().top > r.bottom)
+                         .map(l => l.getBoundingClientRect().top);
+      return {bottom: bottom, rule: document.querySelector('.topstrip').getBoundingClientRect().bottom,
+              lines: lines, nextLine: below.length ? Math.min(...below) : null};
+    }""")
+    assert parse_px(page.evaluate("getComputedStyle(document.querySelector('.sitenav a[aria-current=\\'page\\']'), '::before').height")) == 2
+    if measured["lines"] == 1:
+        assert abs(measured["bottom"] - measured["rule"]) <= 1.5, (width, slug, measured)
+    else:
+        assert measured["nextLine"] is None or measured["bottom"] < measured["nextLine"], (width, slug, measured)
+
+
 def test_the_research_card_on_a_phone_puts_the_figure_under_the_title(browser):
     """Beside the title the figure cut the measure to about two dozen characters; above it, it opened the card
     with a picture. Below the byline the title gets the column back and the plate keeps its own width."""
-    page, _, _ = _page(browser, 400)
+    page, _, _ = _page(browser, 400, slug="research/")
     box = page.evaluate("""() => {
       const card = document.querySelector('.paper'), r = s => card.querySelector(s).getBoundingClientRect();
       const pad = parseFloat(getComputedStyle(card).paddingLeft);
@@ -140,17 +236,29 @@ def test_the_research_card_on_a_phone_puts_the_figure_under_the_title(browser):
     assert box["fig"]["left"] == pytest.approx(box["title"]["left"], abs=1)
 
 
-def test_body_text_is_at_least_16px(browser):
-    page, _, _ = _page(browser, 400)
+@pytest.mark.parametrize("slug", SLUGS)
+def test_body_text_is_at_least_16px(browser, slug):
+    page, _, _ = _page(browser, 400, slug=slug)
     assert page.evaluate("parseFloat(getComputedStyle(document.querySelector('main p')).fontSize)") >= 16
+
+
+@pytest.mark.parametrize("slug", SLUGS)
+def test_no_page_is_anywhere_near_as_long_as_the_old_single_page(browser, slug):
+    """The single page stood at 4383px on a laptop and 6548px on a phone, which is what the owner was
+    objecting to. Splitting it is only worth doing if the pieces stay short."""
+    for width, ceiling in ((1280, 3000), (400, 4000)):
+        page, _, _ = _page(browser, width, slug=slug)
+        height = page.evaluate("document.documentElement.scrollHeight")
+        assert height < ceiling, (slug, width, height)
 
 
 # --- Contrast: WCAG AA in both themes ---
 
 # The kinds of text the plan names. Every painted text on the page is measured; each of these must be among them.
 CONTRAST_TARGETS = {
-    "body paragraph": ".bio p",
+    "body paragraph": ".prose p, .page-intro",
     "link": ".links a",
+    "navigation link": ".sitenav a:not(.btn)",
     "muted date": ".log .when, .log .when time",
     "badge": ".tag",
     "filled button": ".btn--primary",
@@ -218,20 +326,44 @@ def test_contrast_refuses_colours_it_cannot_measure(colour):
 
 @pytest.mark.parametrize("theme, by_toggle", [("light", False), ("dark", False), ("light", True), ("dark", True)])
 def test_text_contrast_meets_wcag_aa(browser, theme, by_toggle):
-    """Each theme is reached both ways: from the system setting, and by the toggle from the opposite system setting."""
+    """Each theme is reached both ways: from the system setting, and by the toggle from the opposite system
+    setting -- and on every page, because each page paints a different part of the palette."""
     other = "dark" if theme == "light" else "light"
-    page, _, _ = _page(browser, 1280, other if by_toggle else theme)
-    if by_toggle:
-        page.click("#theme-toggle")
-        page.wait_for_timeout(300)                                              # colour transitions take 120ms
-    chosen = page.evaluate("document.documentElement.getAttribute('data-theme')")
-    assert chosen == (theme if by_toggle else None)                             # no choice is left over from another test
-    assert page.evaluate("getComputedStyle(document.documentElement).colorScheme") == theme   # the theme being measured
-    painted = page.evaluate(PAINTED_TEXT_JS, CONTRAST_TARGETS)
-    too_faint = []
-    for t in painted:
-        ratio, needed = _contrast(t["color"], t["background"]), 4.5 if t["size"] < 24 else 3.0
-        if ratio < needed:
-            too_faint.append(f'{ratio:.2f} < {needed}: {t["what"]} ({t["color"]} on {t["background"]}, {t["size"]}px)')
-    assert too_faint == []
-    assert {kind for t in painted for kind in t["kinds"]} == set(CONTRAST_TARGETS)
+    seen = set()
+    for slug in SLUGS:
+        page, _, _ = _page(browser, 1280, other if by_toggle else theme, slug)
+        if by_toggle:
+            page.click("#theme-toggle")
+            page.wait_for_timeout(300)                                          # colour transitions take 120ms
+        chosen = page.evaluate("document.documentElement.getAttribute('data-theme')")
+        assert chosen == (theme if by_toggle else None), slug                   # no choice left over from another test
+        assert page.evaluate("getComputedStyle(document.documentElement).colorScheme") == theme
+        painted = page.evaluate(PAINTED_TEXT_JS, CONTRAST_TARGETS)
+        too_faint = []
+        for t in painted:
+            ratio, needed = _contrast(t["color"], t["background"]), 4.5 if t["size"] < 24 else 3.0
+            if ratio < needed:
+                too_faint.append(f'{slug} {ratio:.2f} < {needed}: {t["what"]} ({t["color"]} on {t["background"]}, {t["size"]}px)')
+        assert too_faint == []
+        seen |= {kind for t in painted for kind in t["kinds"]}
+    assert seen == set(CONTRAST_TARGETS)            # every kind of text the plan names was actually measured
+
+
+@pytest.mark.parametrize("slug", SLUGS)
+def test_focus_is_visible_on_every_control(browser, slug):
+    """Keyboard use has to be seen. Every link and the toggle draw the same 2px accent ring when focused."""
+    page, _, _ = _page(browser, 1280, slug=slug)
+    outlines = page.evaluate("""() => {
+      const out = [];
+      for (const el of document.querySelectorAll('a, button')) {
+        el.focus();
+        const s = getComputedStyle(el);
+        out.push({what: el.textContent.trim().slice(0, 24), width: s.outlineWidth, style: s.outlineStyle});
+      }
+      return out;
+    }""")
+    assert outlines and [o for o in outlines if o["style"] == "none" or parse_px(o["width"]) < 2] == []
+
+
+def parse_px(value):
+    return float(value.replace("px", "") or 0)

@@ -8,14 +8,36 @@ affiliation: Ben-Gurion University of the Negev
 show_cv: true
 show_ongoing: false
 news_visible: 5
-# How many commonplace lines stand open; the rest wait behind the same expander the news list uses. Every
-# quotation is still on the page and none of them is shortened -- the section was simply the tallest thing
-# here, half again as tall as the news beside it, and a personality note is not what should outweigh the work.
-# Because this list is read forwards, the ones behind the expander are the oldest and it sits above them.
-quotes_visible: 99   # all four stay open. The tightened spacing alone brought the section to 19-21% of page
-                     # height, under the 22% target, so hiding two behind a click was not needed and the owner
-                     # chose all four deliberately. Lower this only if the section grows again.
 portrait: {webp: img/portrait-400.webp, jpg: img/portrait-800.jpg, alt: Itamar Avitan}
+
+# The site is four pages, not one long scroll. The owner asked for that on 2026-09-21: "the phone one column
+# is not fun", "might want to go more tabs", "not make it an online cv but more hey this is me website and
+# some things about me and updates and stuff". Nothing was dropped in the split -- every section of the old
+# page is still here, on the page where a reader would look for it.
+#   slug        the address under site_url, and the folder the page is written into. '' is the home page.
+#               It also names the template: templates/pages/<slug or "home">.html.j2.
+#   nav         the label in the navigation strip, on every page.
+#   heading     the page's <h1>. The home page has none here: its <h1> is the name in the masthead.
+#   intro       one line of framing under the heading (optional).
+#   description the page's meta description; the home page falls back to identity_line.
+pages:
+- slug: ''
+  nav: Home
+- slug: research/
+  nav: Research
+  heading: Research
+  intro: Neural networks can predict human visual judgments, such as which of three images is the odd one out. I ask when that accuracy means a network represents the world as people do. A flexible mapping from model features to human data can make the wrong model look right, so I use model-recovery simulations to test whether a comparison recovers the model that generated the data. Our results argue for experiments that balance predictive accuracy against identifiability.
+  description: The paper, talks and projects of Itamar Avitan, on identifying the right model of human vision rather than the best-fitting one.
+- slug: teaching/
+  nav: Teaching
+  heading: Teaching
+  intro: Courses I help teach at Ben-Gurion University of the Negev, and the students I work with.
+  description: Courses Itamar Avitan teaches at Ben-Gurion University of the Negev, and the students he mentors.
+- slug: commonplace/
+  nav: Commonplace
+  heading: Commonplace
+  description: 'A commonplace book: lines about memory and mind that Itamar Avitan keeps coming back to.'
+
 # Proper nouns and terms of art that must never break across two lines, wherever they occur in the text.
 nobreak:
 - Ben-Gurion
@@ -29,6 +51,8 @@ nobreak:
 - model-recovery
 - odd-one-out
 - five-person
+- go-to-market
+- add-on
 - 1733-34
 
 # --- content (text verbatim from the fact-checked seed) ---
@@ -40,13 +64,29 @@ role:
   url: https://brainsandmachines.org
 - label: Ben-Gurion University of the Negev
 identity_line: I study how to tell which neural network models of human vision are right, not just which ones predict best.
-bio:
-- I am a PhD candidate in the Brains and Machines Lab at Ben-Gurion University of the Negev, advised by Dr. Tal Golan. My department is Industrial Engineering and Management, and I am affiliated with the School of Brain Sciences and Cognition.
-- Neural networks can predict human visual judgments, such as which of three images is the odd one out. I ask when that accuracy means a network represents the world as people do. A flexible mapping from model features to human data can make the wrong model look right, so I use model-recovery simulations to test whether a comparison recovers the model that generated the data. Our results argue for experiments that balance predictive accuracy against identifiability.
-- I have been a teaching assistant for courses on computation, cognition and deep learning, and have built neurotechnology prototypes in teams.
+
+# DRAFT, awaiting the owner's own words. Written on 2026-09-21 in answer to his ask for "a proper about me in
+# your voice" and a "Now / what I'm up to" block. Every clause below is drawn from facts already on this site
+# or given by him -- the direct track, the advisor, the department and school, the two first degrees, the M.Sc.
+# finished inside the direct track in 2026, the question the work asks, the three venues, the teaching, the two
+# students, the EEG speller and the practicum product. Nothing about his life outside that is invented, and
+# nothing should be added here that he has not said. It replaces the old three-paragraph "bio", whose second
+# paragraph is kept verbatim as the Research page's intro above.
+about:
+- I am a PhD candidate in the Brains and Machines Lab at Ben-Gurion University of the Negev, on the direct track, advised by Dr. Tal Golan. My department is Industrial Engineering and Management, and I am affiliated with the School of Brain Sciences and Cognition. I came here through a B.Sc. in Cognitive and Brain Sciences (computational track) and a B.A. in Psychology, and finished my M.Sc. inside the direct track in 2026.
+- What I keep coming back to is a measurement question. When we say that a neural network sees the way people do, can our measures tell us that it is the right model, or only that it is the best-fitting one? It has taken me to NeurIPS 2025, a talk at CCN 2025, and this September to Osnabrück.
+- 'I teach as well: courses on cognition and computation and on deep learning, an academic writing course from next year, and two undergraduate students whose research I mentor. I like building things with other people — an EEG speller that let a person with ALS answer yes or no, and a headphone add-on for the noises that set anxiety off. And I collect lines about the mind.'
+# DRAFT, as above. Short enough to keep true: rewrite it whenever it stops being what you are doing.
+now_as_of: Sep 2026
+now:
+- 'Carrying the NeurIPS 2025 work forward: can an alignment measure identify the right model of human vision, or only the best-fitting one?'
+- Teaching assistant for Introduction to Cognition and Computation, and joining an academic writing course in 2026/27.
+- Mentoring two undergraduate research students.
+- Still collecting lines about the mind for the commonplace page.
+
 # icon: which mark the template draws before the label. The template now holds three, and only three:
 # mail, github, bluesky. The owner ruled on 2026-09-21 that LinkedIn, ORCID, Google Scholar and X carry no
-# mark, for reasons of policy and legibility that are not open to revision; templates/index.html.j2 records
+# mark, for reasons of policy and legibility that are not open to revision; templates/macros.html.j2 records
 # each one beside the marks it still draws. Do not add an icon key to those four: the build has nothing to
 # draw for them, and tests/test_build.py fails if the set changes.
 # The links that carry a mark are listed before the ones that cannot, so the marks are contiguous and do not
@@ -55,6 +95,8 @@ bio:
 # a grouping -- nothing tells a reader that these six addresses are of two kinds, and nothing should, since
 # the split is a licensing accident. The address line leads the block above them with the envelope: it is the
 # one row whose label is not a link, and the mark is drawn here rather than taken from anyone's brand.
+# The CV is the exception: since the site became four pages it is the filled chip at the end of the navigation
+# strip, so it is one click away from every page rather than from the home page alone.
 links:
 - label: Email
   url: null
@@ -79,8 +121,9 @@ links:
 news:
 - date: Sep 2026
   text: Gave a flash talk, “System identification perspective on representational alignment” (with Maya Zach and Tal Golan), at Neuro-AI-Talks (NEAT) 2026 in Osnabrück, Germany.
+# Rewritten 2026-09-21 with the EarBetter entry under "projects"; the note there records why.
 - date: Aug 2026
-  text: Completed the Brown University–Ben-Gurion University Embodied Brain Technology Practicum at Brown University, where our team of five built and pitched EarBetter, a prototype that explores whether physiological signals can drive selective audio attenuation.
+  text: Completed the Brown University–Ben-Gurion University Embodied Brain Technology Practicum at Brown University, where our team of five designed, built and pitched EarBetter, a headphone add-on that filters the sounds that set a person’s anxiety off.
 - date: Dec 2025
   text: 'Presented our paper with Tal Golan, “Model–Behavior Alignment under Flexible Evaluation: When the Best-Fitting Model Isn’t the Right One”, as a poster at the Conference on Neural Information Processing Systems (NeurIPS) 2025 in San Diego.'
 - date: Nov 2025
@@ -165,10 +208,20 @@ talks:
   - Tal Golan
   note: Preliminary version of the NeurIPS 2025 paper.
   url: https://2025.ccneuro.org/contributed-talk/?id=65
+# EarBetter, rewritten on 2026-09-21 from the owner's own account, which supersedes the earlier framing and
+# must not be restored: it read "It explores whether physiological signals can drive selective audio
+# attenuation ... parts of it remain experimental, and it has not been clinically evaluated" -- paper language
+# for what was an entrepreneurship internship, not a study. His words, verbatim: "the idea of the course is
+# internship and we didn't explore, we came out with an idea of having a product that works with any
+# headphones that record biosignals and selectively reduce certain noises to reduce noise-induced anxiety
+# through filtering triggering noises, then we implemented a version of it and we also did the all
+# go-to-market stuff and built a business plan and pitched it"; and, correcting the hardware, "it's an add-on
+# that will process through your phone and get biosignals and stuff" -- so the team did not build headphones.
+# Source: the owner, directly, 2026-09-21. The Aug 2026 news entry carries the same correction.
 projects:
 - title: EarBetter
   period: 24 Jul–6 Aug 2026
-  blurb: Our five-person team’s prototype from the 2026 Brown University–Ben-Gurion University Embodied Brain Technology Practicum at Brown University. It explores whether physiological signals can drive selective audio attenuation. I worked on control software and system integration. The prototype was completed and pitched; parts of it remain experimental, and it has not been clinically evaluated.
+  blurb: 'Our five-person team’s product from the 2026 Brown University–Ben-Gurion University Embodied Brain Technology Practicum at Brown University: an add-on that works with any headphones, reads your biosignals and does its processing on your phone, and selectively filters the particular sounds that set a person’s anxiety off. The aim is simple — less anxiety from noise. We built a working version, did the go-to-market research, wrote a business plan and pitched it. I wrote the control software and put the system together.'
   url: https://github.com/Itamar-Avitan/earbetter-ebt-practicum
 - title: BCI4ALS
   period: 2022–2023
@@ -181,8 +234,41 @@ projects:
 # The quotation marks belong to the text here, not to a CSS rule, so that a reader who copies a line gets the
 # marks with it. The year is a plain date like every other label in the gutter: a date that needs a
 # parenthetical belongs in the attribution, where there is room to say it properly.
+# ORDER: the owner's, chosen on 2026-09-21 -- "the snape quote needs to be first". The list used to run
+# oldest first, so that the years in the gutter only went forward; that rule is dropped, because he cares
+# which line a reader meets first and the gutter can carry 2003 above 1887. A commonplace book is a person's
+# own order, not a chronology. Keep his order when you add to it: say where a new line goes, do not sort.
 quotes_intro: Lines about memory and mind I keep coming back to.
 quotes:
+# The owner was shown that this novel is in copyright and that the single sentence “The mind is not a book…”
+# was the safer extract, and chose the full four-sentence passage anyway on 2026-09-21. It is printed here at
+# his instruction: do not silently shorten it back. The verifier’s two corrections are applied — “mind
+# reading” as two words, and the last sentence carried through to “most minds are” instead of breaking off
+# after “Potter—”.
+- text: “Only Muggles talk of ‘mind reading.’ The mind is not a book, to be opened at will and examined at leisure. Thoughts are not etched on the inside of skulls, to be perused by any invader. The mind is a complex and many-layered thing, Potter—or at least, most minds are.”
+  attribution: Severus Snape, in J.K. Rowling, Harry Potter and the Order of the Phoenix (2003), Chapter 24, “Occlumency”
+  year: '2003'
+  status: corrected
+  evidence: >-
+    The novel is in copyright and no full text is reachable, so wording was triangulated across scanned books
+    via Open Library full-text search (openlibrary.org/search/inside). Six-plus independent works reproduce the
+    passage identically, including Trevarthen, The Seeker’s Guide to Harry Potter (“Snape responds, “Only
+    Muggles talk of ‘mind reading.’ The mind is not a book, to be opened at will and examined at leisure.
+    Thoughts are not etched on the inside of skulls, to be perused by any invader. The mind is a complex and
+    many-layered thing, Potter—or at least, most minds are.”), Baggett & Klein, Harry Potter and Philosophy,
+    Iacoboni, Mirroring People, and Lorrie Kim, Snape: A Definitive Reading. Speaker independently confirmed as
+    Severus Snape by Wikiquote’s Order of the Phoenix page. Chapter confirmed by two reference works citing it
+    directly: Waters, Ultimate Unofficial Guide to the Mysteries of Harry Potter (“that pun in the title of
+    Chapter 24 — ‘Occlumency’”) and Boughey, Unauthorized Harry Potter and the Art of Spying (“Chapter 24,
+    ‘Occlumency,’ understandably focuses on what Muggles…”). Recommended extract was one sentence — the
+    shortest faithful unit that carries the thought — because the work is in copyright; the owner read that
+    recommendation and ruled on 2026-09-21 for the full four-sentence passage, which is what is printed.
+    Two corrections were applied to his wording: “mind reading” is two words in every source consulted, and
+    the closing sentence runs on to “or at least, most minds are” rather than breaking off after “Potter—”.
+  copyright: in-copyright-extended-extract-owner-ruled
+  # The note used to end “after Harry calls Legilimency “mind reading”” — which the first sentence of the
+  # longer extract now says itself, two lines above it. It points back at those words instead of repeating them.
+  note: Snape’s retort in Harry’s first Occlumency lesson, after Harry gives Legilimency that name.
 - text: “I consider that a man’s brain originally is like a little empty attic, and you have to stock it with such furniture as you choose.”
   attribution: Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter II, “The Science of Deduction”
   year: '1887'
@@ -236,35 +322,6 @@ quotes:
     enclosing curly quotation marks are this file’s house convention, not part of the source sentence.
   copyright: public-domain
   note: From the speech in which Holmes first explains his trade — “I suppose I am the only one in the world. I’m a consulting detective” — moments after admitting to Watson that he himself wrote the magazine article on deduction Watson had just ridiculed.
-# The owner was shown that this novel is in copyright and that the single sentence “The mind is not a book…”
-# was the safer extract, and chose the full four-sentence passage anyway on 2026-09-21. It is printed here at
-# his instruction: do not silently shorten it back. The verifier’s two corrections are applied — “mind
-# reading” as two words, and the last sentence carried through to “most minds are” instead of breaking off
-# after “Potter—”.
-- text: “Only Muggles talk of ‘mind reading.’ The mind is not a book, to be opened at will and examined at leisure. Thoughts are not etched on the inside of skulls, to be perused by any invader. The mind is a complex and many-layered thing, Potter—or at least, most minds are.”
-  attribution: Severus Snape, in J.K. Rowling, Harry Potter and the Order of the Phoenix (2003), Chapter 24, “Occlumency”
-  year: '2003'
-  status: corrected
-  evidence: >-
-    The novel is in copyright and no full text is reachable, so wording was triangulated across scanned books
-    via Open Library full-text search (openlibrary.org/search/inside). Six-plus independent works reproduce the
-    passage identically, including Trevarthen, The Seeker’s Guide to Harry Potter (“Snape responds, “Only
-    Muggles talk of ‘mind reading.’ The mind is not a book, to be opened at will and examined at leisure.
-    Thoughts are not etched on the inside of skulls, to be perused by any invader. The mind is a complex and
-    many-layered thing, Potter—or at least, most minds are.”), Baggett & Klein, Harry Potter and Philosophy,
-    Iacoboni, Mirroring People, and Lorrie Kim, Snape: A Definitive Reading. Speaker independently confirmed as
-    Severus Snape by Wikiquote’s Order of the Phoenix page. Chapter confirmed by two reference works citing it
-    directly: Waters, Ultimate Unofficial Guide to the Mysteries of Harry Potter (“that pun in the title of
-    Chapter 24 — ‘Occlumency’”) and Boughey, Unauthorized Harry Potter and the Art of Spying (“Chapter 24,
-    ‘Occlumency,’ understandably focuses on what Muggles…”). Recommended extract was one sentence — the
-    shortest faithful unit that carries the thought — because the work is in copyright; the owner read that
-    recommendation and ruled on 2026-09-21 for the full four-sentence passage, which is what is printed.
-    Two corrections were applied to his wording: “mind reading” is two words in every source consulted, and
-    the closing sentence runs on to “or at least, most minds are” rather than breaking off after “Potter—”.
-  copyright: in-copyright-extended-extract-owner-ruled
-  # The note used to end “after Harry calls Legilimency “mind reading”” — which the first sentence of the
-  # longer extract now says itself, two lines above it. It points back at those words instead of repeating them.
-  note: Snape’s retort in Harry’s first Occlumency lesson, after Harry gives Legilimency that name.
 teaching:
 - 'Teaching assistant, Introduction to Cognition and Computation, Ben-Gurion University of the Negev: 2023/24, 2024/25 and 2025/26.'
 - 'Teaching assistant, Deep Learning for Neuroscience and Cognition, Ben-Gurion University of the Negev: spring 2026.'

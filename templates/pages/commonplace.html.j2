@@ -1,0 +1,20 @@
+{#- The commonplace book, on a page of its own because the owner asked for one: "even put the favorite quotes
+    and its own place". The lines stand in his order -- Snape first -- so the years in the gutter no longer
+    only go forward; a commonplace book is a person's own order, not a chronology. -#}
+{% extends "base.html.j2" %}
+
+{% block main %}
+
+    <section id="quotes" aria-labelledby="quotes-h">
+      <h1 id="quotes-h" class="inset">{{ page.heading }}</h1>
+{% if site.get("quotes_intro") %}
+      <p class="page-intro inset">{{ m.nb(site.quotes_intro) }}</p>
+{% endif %}
+{% if site.get("quotes") %}
+      <ul class="log log--quotes" role="list">
+        {{ m.quote_rows(site.quotes)|trim }}
+      </ul>
+{% endif %}
+    </section>
+
+{% endblock %}

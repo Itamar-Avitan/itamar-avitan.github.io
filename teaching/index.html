@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teaching — Itamar Avitan</title>
+<meta name="description" content="Courses Itamar Avitan teaches at Ben-Gurion University of the Negev, and the students he mentors.">
+<link rel="canonical" href="https://itamar-avitan.github.io/teaching/">
+<meta property="og:title" content="Teaching — Itamar Avitan">
+<meta property="og:description" content="Courses Itamar Avitan teaches at Ben-Gurion University of the Negev, and the students he mentors.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://itamar-avitan.github.io/teaching/">
+<meta property="og:image" content="https://itamar-avitan.github.io/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Itamar Avitan. I study how to tell which neural network models of human vision are right, not just which ones predict best.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2042%2010'%3E%3Cstyle%3Ecircle%7Bfill:%2314212B%7Drect%7Bfill:%230B5F73%7D@media%20(prefers-color-scheme:dark)%7Bcircle%7Bfill:%23E4EBEF%7Drect%7Bfill:%236DB3C4%7D%7D%3C/style%3E%3Ccircle%20cx='5'%20cy='5'%20r='5'/%3E%3Ccircle%20cx='21'%20cy='5'%20r='5'/%3E%3Crect%20x='32'%20width='10'%20height='10'/%3E%3C/svg%3E">
+<script>
+/* Theme toggle. Follows the system setting until the visitor chooses; the choice is remembered. */
+(function () {
+  var root = document.documentElement, KEY = "theme";
+  var mq = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+  try {
+    var saved = localStorage.getItem(KEY);
+    if (saved === "light" || saved === "dark") root.setAttribute("data-theme", saved);
+  } catch (e) {}
+  function current() {
+    return root.getAttribute("data-theme") || (mq && mq.matches ? "dark" : "light");
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    /* The address stays written as "name [at] host" in the markup; the link is built from that text here. */
+    var em = document.getElementById("email");
+    if (em) {
+      var a = document.createElement("a");
+      a.id = "email";
+      a.textContent = em.textContent;
+      a.href = "mailto:" + em.textContent.replace(" [at] ", "@");
+      em.parentNode.replaceChild(a, em);
+    }
+
+    var btn = document.getElementById("theme-toggle");
+    if (!btn) return;
+    var label = btn.querySelector("span");
+    function paint() { label.textContent = "Use " + (current() === "dark" ? "light" : "dark") + " theme"; }
+    btn.hidden = false;
+    paint();
+    btn.addEventListener("click", function () {
+      var next = current() === "dark" ? "light" : "dark";
+      root.setAttribute("data-theme", next);
+      try { localStorage.setItem(KEY, next); } catch (e) {}
+      paint();
+    });
+    if (mq && mq.addEventListener) mq.addEventListener("change", paint);
+  });
+})();
+</script>
+<link rel="stylesheet" href="../style.css">
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Itamar Avitan",
+  "alternateName": "Itamar Amram Avitan",
+  "url": "https://itamar-avitan.github.io/",
+  "description": "I study how to tell which neural network models of human vision are right, not just which ones predict best.",
+  "affiliation": {
+    "@type": "CollegeOrUniversity",
+    "name": "Ben-Gurion University of the Negev"
+  },
+  "sameAs": [
+    "https://scholar.google.com/citations?user=3fynQuAAAAAJ&hl=en",
+    "https://github.com/Itamar-Avitan",
+    "https://www.linkedin.com/in/itamar-avitan/",
+    "https://bsky.app/profile/avitanit.bsky.social",
+    "https://x.com/avitanit",
+    "https://orcid.org/0009-0004-3662-7881"
+  ]
+}</script>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="topstrip">
+      <nav class="sitenav" aria-label="Pages">
+        <ul role="list">
+          <li><a href="../">Home</a></li>
+          <li><a href="../research/">Research</a></li>
+          <li><a href="../teaching/" aria-current="page">Teaching</a></li>
+          <li><a href="../commonplace/">Commonplace</a></li>
+          <li class="sitenav__cv"><a class="btn btn--primary" href="../cv.pdf">CV</a></li>
+        </ul>
+      </nav>
+      <button id="theme-toggle" class="toggle" type="button" hidden>
+        <svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.75a6.25 6.25 0 0 1 0 12.5z" fill="currentColor"/></svg>
+        <span>Use dark theme</span>
+      </button>
+    </div>
+
+    <div class="byline inset">
+      <p class="byline__who">
+        <picture><source srcset="../img/portrait-400.webp" type="image/webp"><img src="../img/portrait-800.jpg" width="36" height="36" alt="Itamar Avitan"></picture>
+        <span>Itamar Avitan</span>
+      </p>
+      <ul class="role" role="list">
+        <li>PhD candidate</li>
+        <li><a href="https://brainsandmachines.org">Brains and Machines Lab</a></li>
+        <li>Ben-Gurion University of the Negev</li>
+      </ul>
+    </div>
+  </header>
+
+  <main class="opens-with-h1">
+
+    <section id="teaching" aria-labelledby="teaching-h">
+      <h1 id="teaching-h" class="inset">Teaching</h1>
+      <p class="page-intro inset">Courses I help teach at <span class="nb">Ben-Gurion</span> University of the Negev, and the students I work with.</p>
+      <ul class="log log--tight log--said" role="list">
+        <li class="row">
+          <p class="what">Teaching assistant, Introduction to Cognition and Computation, <span class="nb">Ben-Gurion</span> University of the Negev<span class="vh">: </span></p>
+          <p class="when">2023/24, 2024/25 and 2025/26<span class="vh">.</span></p>
+        </li>
+        <li class="row">
+          <p class="what">Teaching assistant, Deep Learning for Neuroscience and Cognition, <span class="nb">Ben-Gurion</span> University of the Negev<span class="vh">: </span></p>
+          <p class="when">spring 2026<span class="vh">.</span></p>
+        </li>
+        <li class="row">
+          <p class="what">Tutor in algebra and calculus, Dean of Students Office, <span class="nb">Ben-Gurion</span> University of the Negev<span class="vh">: </span></p>
+          <p class="when"><time datetime="2021">2021</time>–<time datetime="2023">2023</time><span class="vh">.</span></p>
+        </li>
+        <li class="row">
+          <p class="what">Mentoring two undergraduate research students<span class="vh">: </span></p>
+          <p class="when"><time datetime="2025">2025</time>–<time datetime="2026">2026</time><span class="vh">.</span></p>
+        </li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="colophon">
+    <nav class="links-nav" aria-label="Contact and profiles">
+        <ul class="links links--reach" role="list">
+          <li class="links__email"><span class="links__label"><svg class="ico ico--mail" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path d="M4 4.5h16a2 2 0 0 1 2 2v.3l-10 6.1L2 6.8v-.3a2 2 0 0 1 2-2zM2 8.55v8.95a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8.55l-9.48 5.78a1 1 0 0 1-1.04 0z"/></svg>Email</span> <span id="email">avitanit [at] post.bgu.ac.il</span></li>
+        </ul>
+        <div class="links-row">
+          <ul class="links links--marked" role="list">
+            <li><a rel="me" href="https://github.com/Itamar-Avitan"><svg class="ico ico--github" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg><span>GitHub</span></a></li>
+            <li><a rel="me" href="https://bsky.app/profile/avitanit.bsky.social"><svg class="ico ico--bluesky" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path d="M5.202 2.857C7.954 4.922 10.913 9.11 12 11.358c1.087-2.247 4.046-6.436 6.798-8.501C20.783 1.366 24 .213 24 3.883c0 .732-.42 6.156-.667 7.037-.856 3.061-3.978 3.842-6.755 3.37 4.854.826 6.089 3.562 3.422 6.299-5.065 5.196-7.28-1.304-7.847-2.97-.104-.305-.152-.448-.153-.327 0-.121-.05.022-.153.327-.568 1.666-2.782 8.166-7.847 2.97-2.667-2.737-1.432-5.473 3.422-6.3-2.777.473-5.899-.308-6.755-3.369C.42 10.04 0 4.615 0 3.883c0-3.67 3.217-2.517 5.202-1.026"/></svg><span>Bluesky</span></a></li>
+          </ul>
+          <ul class="links links--plain" role="list">
+            <li><a rel="me" href="https://scholar.google.com/citations?user=3fynQuAAAAAJ&amp;hl=en"><span>Google Scholar</span></a></li>
+            <li><a rel="me" href="https://www.linkedin.com/in/itamar-avitan/"><span>LinkedIn</span></a></li>
+            <li><a rel="me" href="https://x.com/avitanit"><span>X</span></a></li>
+            <li><a rel="me" href="https://orcid.org/0009-0004-3662-7881"><span>ORCID</span></a></li>
+          </ul>
+        </div>
+      </nav>
+    <p class="row"><span class="when">Last updated</span> <time class="what" datetime="2026-09">September 2026</time></p>
+    <svg class="mark inset" aria-hidden="true" viewBox="0 0 42 10" width="42" height="10"><circle cx="5" cy="5" r="5"/><circle cx="21" cy="5" r="5"/><rect x="32" width="10" height="10"/></svg>
+  </footer>
+
+</div>
+</body>
+</html>

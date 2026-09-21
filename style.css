@@ -5,6 +5,12 @@
    them and works as a time axis: a 2px ink tick marks each section, a 1px
    accent tick crosses the axis at every dated entry.
 
+   Four pages now, not one scroll (2026-09-21). The navigation strip at the top
+   of every page is the same device one floor up: the page you are on carries a
+   2px ink tick on the strip's hairline, exactly as a section carries one on the
+   margin rule. Moving between pages is the same gesture as moving between
+   sections, and the tick is the only thing that moves.
+
    One visual language for three jobs:
      outlined box   = label only (venue and kind tags), never clickable
      underlined text = link: body sans in the masthead row and in running text,
@@ -163,14 +169,56 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
   padding-inline: var(--pad);
 }
 
-/* ---------- Top bar: theme toggle ---------- */
-.topbar {
+/* ---------- The navigation strip ----------
+   Ordinary links, in the mono face every label on this site is set in, over one hairline that runs the width
+   of the column. The page you are on is the one in ink rather than accent, and it carries a 2px ink tick
+   sitting on that hairline -- the section tick of the margin rule, one floor up. --strip-pad is the distance
+   from the links down to the rule, and the tick is placed by it, so the two stay together if it changes. */
+.topstrip {
+  --strip-pad: 0.625rem;
   display: flex;
-  justify-content: flex-end;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
   min-height: 2rem;
-  padding-block: 1rem 0;
+  padding-block: 1rem var(--strip-pad);
+  border-bottom: 1px solid var(--rule);
 }
+/* The row gap is wider than the tick is long. Below about 360px the five items no longer fit on one line, and
+   the tick under a link on the first line then hangs into the gap under it; 1.125rem of gap against 0.6875rem
+   of overhang keeps it clear of the line below, so it still reads as an underline and never lands on another
+   link. Above that width the strip is one line and the tick lies on the hairline, which is the point of it. */
+.sitenav ul {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.125rem;
+}
+.sitenav a:not(.btn) {
+  position: relative;
+  display: inline-block;
+  padding-block: 0.25rem;
+  font: 500 0.8125rem/1.6 var(--mono);
+  color: var(--accent);
+}
+.sitenav a[aria-current="page"] {
+  color: var(--ink);
+  text-decoration: none;
+}
+.sitenav a[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(-1 * var(--strip-pad) - 1px);
+  height: 2px;
+  background: var(--ink);
+  pointer-events: none;   /* a mark is not a target: it must not take the pointer from the link under it */
+}
+/* the CV keeps the rule it has always kept: one filled element per group, and this group is the whole site */
+.sitenav__cv .btn { padding-block: 0.4375rem; }
 .toggle {
+  margin-left: auto;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -222,7 +270,31 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
-.role, .lede, .bio, .links-nav { grid-column: 1 / -1; }
+.role, .lede, .links-nav { grid-column: 1 / -1; }
+
+/* ---------- The byline: whose site this is, on every page but the home page ----------
+   The name and the role line, under the same portrait, small. The bio is said once, at home; this is only the
+   label on the folder. The name is not a link: "Home" is the first item of the strip directly above it. */
+.byline { margin-top: 1.5rem; }
+.byline__who {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.byline__who picture { display: block; flex: none; }
+.byline__who img {
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  object-fit: cover;
+  border: 1px solid var(--rule-strong);
+  border-radius: 3px;
+  background: var(--surface);
+}
+.byline .role { margin-top: 0.25rem; font-size: 0.9375rem; }
 
 /* where: the scannable line between the name and the claim.
    Items never break inside; the "·" separators are drawn in each item's left
@@ -320,8 +392,7 @@ a:focus-visible > .ico { color: var(--accent-strong); }
 .links-row { display: flex; flex-wrap: wrap; column-gap: 1.25rem; }
 .links-row > .links { flex: none; max-width: 100%; }
 
-.bio { margin-top: 1.75rem; }
-.bio p + p { margin-top: 0.875rem; }
+.prose p + p { margin-top: 0.875rem; }
 
 /* ---------- Tags: outlined, mono, never clickable ---------- */
 .tag {
@@ -376,6 +447,35 @@ h3 { font-size: 1.125rem; line-height: 1.35; }
 h3 a { text-decoration-color: color-mix(in srgb, currentColor 45%, transparent); }
 h3 a:hover { text-decoration-color: currentColor; }
 
+/* The page's own title, on every page but the home page, where the name in the masthead is the h1. It is a
+   step above a section heading and takes the same tick, because it is the first section of its page. */
+main > section > h1 {
+  font-size: 1.625rem;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  margin-bottom: 1.125rem;
+}
+/* a page that opens on its own title needs less air above it: the byline has just said whose site this is */
+main.opens-with-h1 { margin-top: 2.25rem; }
+
+/* one or two lines of framing under a page title, in the text column */
+.page-intro { margin: -0.25rem 0 1.5rem; color: var(--ink-2); }
+
+/* ---------- Now: what he is doing, under one date ----------
+   Not events, so no dates of their own and no ticks of their own; the accent hairline before each line is the
+   minor tick lying down, which is what says these belong to the tick in the gutter above them. */
+.now li { position: relative; padding-left: 1.125rem; }
+.now li + li { margin-top: 0.625rem; }
+.now li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: calc(0.5lh - 1px);
+  width: 0.5rem;
+  height: 1px;
+  background: var(--accent);
+}
+
 /* ---------- Log rows: "when" + "what" ---------- */
 .when {
   display: block;
@@ -402,12 +502,10 @@ h3 a:hover { text-decoration-color: currentColor; }
 /* rows whose sentence runs "what: when." in the markup; shown when-first like the rest */
 .log--said > .row { display: flex; flex-direction: column-reverse; }
 
-/* ---------- The expander: older news, older lines ---------- */
+/* ---------- The expander: the older end of the news list ----------
+   The commonplace had one of these too, while it shared a page with everything else. It has a page of its own
+   now, and all four lines stand open on it: there is nothing to save room for. */
 .older { margin-top: 1rem; }
-/* The commonplace is read forwards, so its older entries are the head of its list and the control that holds
-   them stands above it. Same box, same +/- marker, same behaviour; only the side it opens onto changes, and
-   the step it leaves under itself is the step between two quotations, so an opened list rejoins the run. */
-.older--first { margin-top: 0; padding-bottom: 1.75rem; }
 .older > summary {
   display: inline-flex;
   align-items: center;
@@ -529,11 +627,11 @@ h3 a:hover { text-decoration-color: currentColor; }
 /* and the step between two quotations is larger again than any step inside one */
 .log--quotes > .row + .row { margin-top: 1.75rem; }
 
-/* one line of framing under a section heading, on the text column */
-.section-note { margin: -0.375rem 0 1.125rem; font-size: 1rem; color: var(--muted); }
-
 /* ---------- Footer ---------- */
 .colophon { padding-block: 3.25rem 3rem; }
+/* On every page but the home page the address and the profiles stand here, above the date: the masthead says
+   them at home, the colophon says them everywhere else, and no page says them twice. */
+.colophon .links-nav { margin-bottom: 1.75rem; }
 .colophon .row { font: 400 0.8125rem/1.6 var(--mono); color: var(--muted); }
 .colophon .when { display: inline; margin: 0; }
 .colophon .what { color: var(--ink-2); }
@@ -545,11 +643,16 @@ h3 a:hover { text-decoration-color: currentColor; }
    Phone: the rule moves to the left edge and keeps its ticks
    ========================================================================== */
 @media (max-width: 44.99rem) {
-  .toggle { padding-block: 0.6875rem; }
+  /* The strip stacks: the toggle takes the first line, on the right, and the links take the last one, so the
+     tick that marks the current page still lands on the hairline under them. */
+  .topstrip { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+  .toggle { order: -1; align-self: flex-end; margin-left: 0; padding-block: 0.6875rem; }
 
   /* tap targets: a finger asks for more height than a pointer does. The width is already settled for every
      viewport by the overlay on .links a, so nothing here has to widen a box. */
   .links a:not(.btn) { padding-block: 0.5rem; }
+  .sitenav a:not(.btn) { padding-block: 0.375rem; }
+  .sitenav__cv .btn { padding-block: 0.5rem; }
   .older > summary { padding-block: 0.625rem; }
   .btn { padding-block: 0.875rem; }
 
@@ -567,7 +670,6 @@ h3 a:hover { text-decoration-color: currentColor; }
 
   /* the rule runs on through the expander, whose box sits on it */
   .older { margin-top: 0; padding-top: 1rem; border-left: 1px solid var(--rule); }
-  .older--first { padding-top: 0; }
   .older > summary { margin-left: calc(-0.5rem - 0.5px); gap: 0.40625rem; }
   .older > .log { border-left: 0; }
 
@@ -603,7 +705,11 @@ h3 a:hover { text-decoration-color: currentColor; }
 
   p { text-wrap: pretty; }
 
-  .topbar { padding-top: 1.25rem; }
+  .topstrip { padding-top: 1.25rem; }
+
+  .byline { margin-top: 2.25rem; }
+  .byline__who { font-size: 1.0625rem; }
+  .byline__who img { width: 2.25rem; height: 2.25rem; }
 
   .masthead {
     grid-template-columns: var(--gutter) minmax(0, 1fr);
@@ -614,19 +720,22 @@ h3 a:hover { text-decoration-color: currentColor; }
   /* right-aligned to the rule, like a date; it spans the rows beside it so that none of them stretches */
   .masthead picture { grid-row: 1 / span 4; justify-self: end; width: 7.5rem; }
   .masthead h1 { font-size: 2.75rem; margin-top: -0.12em; }
-  .role, .lede, .bio, .links-nav { grid-column: 2; }
+  .role, .lede, .links-nav { grid-column: 2; }
   .role { margin-top: 0.375rem; }
   .lede { font-size: 1.375rem; margin-top: 1rem; }
 
-  main { position: relative; margin-top: 4.5rem; }
+  main { position: relative; margin-top: 4.5rem; --spine-top: 0.9375rem; }
   section + section { margin-top: 4.5rem; }
+  /* A page headed by its own h1 starts the rule lower, because the rule starts on the first tick and the tick
+     sits at the middle of that heading's first line: half of 2rem at 1.2 rather than half of 1.5rem at 1.25. */
+  main.opens-with-h1 { margin-top: 3.25rem; --spine-top: 1.2rem; }
 
   /* the margin rule: starts on the first section tick, ends on "Last updated" */
   main::before {
     content: "";
     position: absolute;
     z-index: 1;
-    top: 0.9375rem;
+    top: var(--spine-top);
     bottom: 0;
     left: calc(var(--gutter) + var(--gap) / 2);
     width: 1px;
@@ -634,10 +743,13 @@ h3 a:hover { text-decoration-color: currentColor; }
   }
 
   .inset { margin-left: calc(var(--gutter) + var(--gap)); }
+  .colophon .links-nav { margin-left: calc(var(--gutter) + var(--gap)); }
 
-  /* major tick: 2px ink, one per section */
-  h2.inset { position: relative; font-size: 1.5rem; }
-  h2.inset::before {
+  /* major tick: 2px ink, one per section -- and one for the page's own title, which opens its first section */
+  h1.inset, h2.inset { position: relative; }
+  h2.inset { font-size: 1.5rem; }
+  main > section > h1 { font-size: 2rem; }
+  h1.inset::before, h2.inset::before {
     content: "";
     position: absolute;
     z-index: 2;
@@ -744,6 +856,6 @@ h3 a:hover { text-decoration-color: currentColor; }
 }
 
 @media print {
-  .topbar { display: none; }
+  .toggle { display: none; }
   body { background: #fff; }
 }

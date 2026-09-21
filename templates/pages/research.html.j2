@@ -1,0 +1,93 @@
+{#- Research: the question, the paper, the talks that carried it, and the things built in teams. -#}
+{% extends "base.html.j2" %}
+
+{% block main %}
+
+    <section id="research" aria-labelledby="research-h">
+      <h1 id="research-h" class="inset">{{ page.heading }}</h1>
+{% if page.get("intro") %}
+      <p class="page-intro inset">{{ m.nb(page.intro) }}</p>
+{% endif %}
+{% for card in research %}
+      <article class="paper">
+        <div class="paper__aside">
+          <ul class="paper__badges" role="list" aria-label="Venues">
+{# accent = a publication venue; neutral = a presentation ("CCN 2025 · Talk") or a status #}
+  {% for badge in card.get("badges") or [] %}
+            <li><span class="tag{{ "" if " · " in badge else " tag--venue" }}">{{ badge }}</span></li>
+  {% endfor %}
+  {% if card.get("ongoing") %}
+            <li><span class="tag">Ongoing</span></li>
+  {% endif %}
+          </ul>
+{# A figure carries a webp when one was made, and "plot: true" when its colour is data and must keep its hues.
+   A caption appears when it says something the picture does not. #}
+  {% if card.get("figure") %}
+          <figure class="paper__fig {{ "paper__fig--plot" if card.figure.get("plot") else "paper__fig--art" }}">
+            <span class="paper__plot">
+    {% if card.figure.get("webp") %}
+              <picture><source srcset="{{ card.figure.webp|local(base) }}" type="image/webp"><img src="{{ card.figure.src|local(base) }}" alt="{{ card.figure.alt }}" width="272" height="272"></picture>
+    {% else %}
+              <img src="{{ card.figure.src|local(base) }}" alt="{{ card.figure.alt }}" width="272" height="272">
+    {% endif %}
+            </span>
+    {% if card.figure.get("caption") %}
+            <figcaption>{{ card.figure.caption }}</figcaption>
+    {% endif %}
+          </figure>
+  {% endif %}
+        </div>
+        <div class="paper__body">
+          <h3>{{ m.nb(card.title) }}</h3>
+  {% if card.get("authors") %}
+          <p class="authors">{{ m.authors(card.authors, card.get("me") or site.name) }}</p>
+  {% endif %}
+          <p class="tldr"><span class="runin">Summary</span> {{ m.nb(card.tldr) }}</p>
+          <ul class="buttons" role="list">
+  {% for button in card.get("buttons") or [] %}
+            <li><a class="btn{{ " btn--primary" if loop.first else "" }}" href="{{ button.url }}">{{ button.label }}</a></li>
+  {% endfor %}
+          </ul>
+        </div>
+      </article>
+{% endfor %}
+    </section>
+
+    <section id="talks" aria-labelledby="talks-h">
+      <h2 id="talks-h" class="inset">Talks</h2>
+      <ul class="log log--talks" role="list">
+{% for talk in site.talks %}
+        <li class="row">
+          <p class="when">{{ m.dates(talk.date) }}</p>
+          <p class="kind"><span class="tag">{{ talk.kind }}</span></p>
+          <div class="what">
+            <h3>{{ m.nb(talk.title) }}</h3>
+  {% if talk.get("authors") %}
+            <p class="authors">{{ m.authors(talk.authors, site.name) }}</p>
+  {% endif %}
+            <p class="venue">{% if talk.get("url") %}<a href="{{ talk.url }}">{{ m.nb(talk.venue) }}</a>{% else %}{{ m.nb(talk.venue) }}{% endif %}<span class="vh">, </span><span class="place">{{ talk.place }}</span></p>
+  {% if talk.get("note") %}
+            <p class="note">{{ talk.note }}</p>
+  {% endif %}
+          </div>
+        </li>
+{% endfor %}
+      </ul>
+    </section>
+
+    <section id="projects" aria-labelledby="projects-h">
+      <h2 id="projects-h" class="inset">Projects</h2>
+      <ul class="log" role="list">
+{% for project in site.projects %}
+        <li class="row">
+          <p class="when">{{ m.dates(project.period) }}</p>
+          <div class="what">
+            <h3>{% if project.get("url") %}<a href="{{ project.url }}">{{ project.title }}</a>{% else %}{{ project.title }}{% endif %}</h3>
+            <p>{{ m.nb(project.blurb) }}</p>
+          </div>
+        </li>
+{% endfor %}
+      </ul>
+    </section>
+
+{% endblock %}

@@ -82,7 +82,16 @@
 <div class="page">
 
   <header>
-    <div class="topbar">
+    <div class="topstrip">
+      <nav class="sitenav" aria-label="Pages">
+        <ul role="list">
+          <li><a href="./" aria-current="page">Home</a></li>
+          <li><a href="research/">Research</a></li>
+          <li><a href="teaching/">Teaching</a></li>
+          <li><a href="commonplace/">Commonplace</a></li>
+          <li class="sitenav__cv"><a class="btn btn--primary" href="cv.pdf">CV</a></li>
+        </ul>
+      </nav>
       <button id="theme-toggle" class="toggle" type="button" hidden>
         <svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.75a6.25 6.25 0 0 1 0 12.5z" fill="currentColor"/></svg>
         <span>Use dark theme</span>
@@ -100,7 +109,6 @@
       <p class="lede">I study how to tell which neural network models of human vision are right, not just which ones predict best.</p>
       <nav class="links-nav" aria-label="Contact and profiles">
         <ul class="links links--reach" role="list">
-          <li><a class="btn btn--primary" href="cv.pdf">CV</a></li>
           <li class="links__email"><span class="links__label"><svg class="ico ico--mail" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path d="M4 4.5h16a2 2 0 0 1 2 2v.3l-10 6.1L2 6.8v-.3a2 2 0 0 1 2-2zM2 8.55v8.95a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8.55l-9.48 5.78a1 1 0 0 1-1.04 0z"/></svg>Email</span> <span id="email">avitanit [at] post.bgu.ac.il</span></li>
         </ul>
         <div class="links-row">
@@ -116,43 +124,33 @@
           </ul>
         </div>
       </nav>
-      <div class="bio">
-        <p>I am a PhD candidate in the Brains and Machines Lab at <span class="nb">Ben-Gurion</span> University of the Negev, advised by Dr. Tal Golan. My department is Industrial Engineering and Management, and I am affiliated with the School of Brain Sciences and Cognition.</p>
-        <p>Neural networks can predict human visual judgments, such as which of three images is the odd one out. I ask when that accuracy means a network represents the world as people do. A flexible mapping from model features to human data can make the wrong model look right, so I use <span class="nb">model-recovery</span> simulations to test whether a comparison recovers the model that generated the data. Our results argue for experiments that balance predictive accuracy against identifiability.</p>
-        <p>I have been a teaching assistant for courses on computation, cognition and deep learning, and have built neurotechnology prototypes in teams.</p>
-      </div>
     </div>
   </header>
 
   <main>
 
-    <section id="research" aria-labelledby="research-h">
-      <h2 id="research-h" class="inset">Research</h2>
-      <article class="paper">
-        <div class="paper__aside">
-          <ul class="paper__badges" role="list" aria-label="Venues">
-            <li><span class="tag tag--venue">NeurIPS 2025</span></li>
-            <li><span class="tag">CCN 2025 · Talk</span></li>
+    <section id="about" aria-labelledby="about-h">
+      <h2 id="about-h" class="inset">About</h2>
+      <div class="prose inset">
+        <p>I am a PhD candidate in the Brains and Machines Lab at <span class="nb">Ben-Gurion</span> University of the Negev, on the direct track, advised by Dr. Tal Golan. My department is Industrial Engineering and Management, and I am affiliated with the School of Brain Sciences and Cognition. I came here through a B.Sc. in Cognitive and Brain Sciences (computational track) and a B.A. in Psychology, and finished my M.Sc. inside the direct track in 2026.</p>
+        <p>What I keep coming back to is a measurement question. When we say that a neural network sees the way people do, can our measures tell us that it is the right model, or only that it is the best-fitting one? It has taken me to NeurIPS 2025, a talk at CCN 2025, and this September to Osnabrück.</p>
+        <p>I teach as well: courses on cognition and computation and on deep learning, an academic writing course from next year, and two undergraduate students whose research I mentor. I like building things with other people — an EEG speller that let a person with ALS answer yes or no, and a headphone <span class="nb">add-on</span> for the noises that set anxiety off. And I collect lines about the mind.</p>
+      </div>
+    </section>
+
+    <section id="now" aria-labelledby="now-h">
+      <h2 id="now-h" class="inset">Now</h2>
+      <ul class="log" role="list">
+        <li class="row">
+          <time class="when" datetime="2026-09">Sep 2026</time>
+          <ul class="what now" role="list">
+            <li>Carrying the NeurIPS 2025 work forward: can an alignment measure identify the right model of human vision, or only the best-fitting one?</li>
+            <li>Teaching assistant for Introduction to Cognition and Computation, and joining an academic writing course in 2026/27.</li>
+            <li>Mentoring two undergraduate research students.</li>
+            <li>Still collecting lines about the mind for the commonplace page.</li>
           </ul>
-          <figure class="paper__fig paper__fig--art">
-            <span class="paper__plot">
-              <picture><source srcset="img/paper-lab.webp" type="image/webp"><img src="img/paper-lab.jpg" alt="The lab’s illustration for the paper: robots in vests marked DNN race along a running track, one handing a baton marked 011 to the next, under brain-shaped clouds filled with charts and network graphs." width="272" height="272"></picture>
-            </span>
-          </figure>
-        </div>
-        <div class="paper__body">
-          <h3>Model–Behavior Alignment under Flexible Evaluation: When the <span class="nb">Best-Fitting</span> Model Isn’t the Right One</h3>
-          <p class="authors"><span class="me">Itamar Avitan</span>, Tal Golan</p>
-          <p class="tldr"><span class="runin">Summary</span> To test whether a vision model represents images the way people do, researchers often fit a flexible linear mapping from the model’s features to human judgments and compare how well each model predicts. We simulated responses from each of 20 models fitted to 4.5 million <span class="nb">odd-one-out</span> judgments from the THINGS dataset and found that this comparison picked the model that had generated the data less than 80% of the time, even with millions of trials.</p>
-          <ul class="buttons" role="list">
-            <li><a class="btn btn--primary" href="https://proceedings.neurips.cc/paper_files/paper/2025/hash/11e1900e680f5fe1893a8e27362dbe2c-Abstract-Conference.html">Paper</a></li>
-            <li><a class="btn" href="https://arxiv.org/abs/2510.23321">arXiv</a></li>
-            <li><a class="btn" href="https://github.com/brainsandmachines/oddoneout_model_recovery">Code</a></li>
-            <li><a class="btn" href="https://doi.org/10.6084/m9.figshare.30542690.v1">Data</a></li>
-            <li><a class="btn" href="https://www.youtube.com/watch?v=vT-3kV89Rhk&amp;t=715s">CCN 2025 talk video</a></li>
-          </ul>
-        </div>
-      </article>
+        </li>
+      </ul>
     </section>
 
     <section id="news" aria-labelledby="news-h">
@@ -164,7 +162,7 @@
         </li>
         <li class="row">
           <time class="when" datetime="2026-08">Aug 2026</time>
-          <p class="what">Completed the Brown University–<span class="nb">Ben-Gurion</span> University Embodied Brain Technology Practicum at Brown University, where our team of five built and pitched EarBetter, a prototype that explores whether physiological signals can drive selective audio attenuation.</p>
+          <p class="what">Completed the Brown University–<span class="nb">Ben-Gurion</span> University Embodied Brain Technology Practicum at Brown University, where our team of five designed, built and pitched EarBetter, a headphone <span class="nb">add-on</span> that filters the sounds that set a person’s anxiety off.</p>
         </li>
         <li class="row">
           <time class="when" datetime="2025-12">Dec 2025</time>
@@ -192,121 +190,6 @@
         </li>
         </ul>
       </details>
-    </section>
-
-    <section id="talks" aria-labelledby="talks-h">
-      <h2 id="talks-h" class="inset">Talks</h2>
-      <ul class="log log--talks" role="list">
-        <li class="row">
-          <p class="when"><time datetime="2026-09-14">14</time>–<time datetime="2026-09-15">15 Sep 2026</time></p>
-          <p class="kind"><span class="tag">Flash talk</span></p>
-          <div class="what">
-            <h3>System identification perspective on representational alignment</h3>
-            <p class="authors"><span class="me">Itamar Avitan</span>, Maya Zach, Tal Golan</p>
-            <p class="venue"><a href="https://www.kietzmannlab.uni-osnabrueck.de/neat2026/"><span class="nb">Neuro-AI-Talks</span> <span class="nb">(NEAT) 2026</span></a><span class="vh">, </span><span class="place">Innovatorium, Osnabrück, Germany</span></p>
-          </div>
-        </li>
-        <li class="row">
-          <p class="when"><time datetime="2025-12-05">5 Dec 2025</time></p>
-          <p class="kind"><span class="tag">Poster</span></p>
-          <div class="what">
-            <h3>Model–Behavior Alignment under Flexible Evaluation: When the <span class="nb">Best-Fitting</span> Model Isn’t the Right One</h3>
-            <p class="authors"><span class="me">Itamar Avitan</span>, Tal Golan</p>
-            <p class="venue"><a href="https://neurips.cc/virtual/2025/loc/san-diego/poster/116404">Conference on Neural Information Processing Systems <span class="nb">(NeurIPS) 2025</span></a><span class="vh">, </span><span class="place">San Diego, USA</span></p>
-          </div>
-        </li>
-        <li class="row">
-          <p class="when"><time datetime="2025-08-15">15 Aug 2025</time></p>
-          <p class="kind"><span class="tag">Contributed talk and poster</span></p>
-          <div class="what">
-            <h3>Rethinking Representational Alignment: <span class="nb">Linear Probing</span> Fails to Identify the <span class="nb">Ground-Truth</span> Model</h3>
-            <p class="authors"><span class="me">Itamar Avitan</span>, Tal Golan</p>
-            <p class="venue"><a href="https://2025.ccneuro.org/contributed-talk/?id=65">Cognitive Computational Neuroscience <span class="nb">(CCN) 2025</span></a><span class="vh">, </span><span class="place">University of Amsterdam, the Netherlands</span></p>
-            <p class="note">Preliminary version of the NeurIPS 2025 paper.</p>
-          </div>
-        </li>
-      </ul>
-    </section>
-
-    <section id="projects" aria-labelledby="projects-h">
-      <h2 id="projects-h" class="inset">Projects</h2>
-      <ul class="log" role="list">
-        <li class="row">
-          <p class="when"><time datetime="2026-07-24">24 Jul</time>–<time datetime="2026-08-06">6 Aug 2026</time></p>
-          <div class="what">
-            <h3><a href="https://github.com/Itamar-Avitan/earbetter-ebt-practicum">EarBetter</a></h3>
-            <p>Our <span class="nb">five-person</span> team’s prototype from the 2026 Brown University–<span class="nb">Ben-Gurion</span> University Embodied Brain Technology Practicum at Brown University. It explores whether physiological signals can drive selective audio attenuation. I worked on control software and system integration. The prototype was completed and pitched; parts of it remain experimental, and it has not been clinically evaluated.</p>
-          </div>
-        </li>
-        <li class="row">
-          <p class="when"><time datetime="2022">2022</time>–<time datetime="2023">2023</time></p>
-          <div class="what">
-            <h3>BCI4ALS</h3>
-            <p>In a team of five, we built a brain–computer interface (BCI) that let a person with amyotrophic lateral sclerosis (ALS) answer yes/no questions through the P300 brain response measured with electroencephalography (EEG). The patient used it live.</p>
-          </div>
-        </li>
-      </ul>
-    </section>
-
-    <section id="quotes" aria-labelledby="quotes-h">
-      <h2 id="quotes-h" class="inset">Commonplace</h2>
-      <p class="section-note inset">Lines about memory and mind I keep coming back to.</p>
-      <ul class="log log--quotes" role="list">
-        <li class="row">
-          <time class="when" datetime="1887">1887</time>
-          <div class="what quote">
-            <blockquote><p>“I consider that a man’s brain originally is like a little empty attic, and you have to stock it with such furniture as you choose.”</p></blockquote>
-            <p class="quote__by">Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter II, “The Science of Deduction”</p>
-            <p class="quote__note">Holmes says this immediately after learning the earth goes round the sun and replying, “Now that I do know it I shall do my best to forget it.”</p>
-          </div>
-        </li>
-        <li class="row">
-          <time class="when" datetime="1887">1887</time>
-          <div class="what quote">
-            <blockquote><p>“The proper study of mankind is man.”</p></blockquote>
-            <p class="quote__by">Dr John Watson, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter I, “Mr. Sherlock Holmes” — quoting Alexander Pope, An Essay on Man, Epistle II (<span class="nb">1733-34</span>)</p>
-            <p class="quote__note">Doyle prints it in single quotation marks because Watson is himself quoting Pope; Stamford’s reply is “You must study him, then… You’ll find him a knotty problem.”</p>
-          </div>
-        </li>
-        <li class="row">
-          <time class="when" datetime="1887">1887</time>
-          <div class="what quote">
-            <blockquote><p>“There is a strong family resemblance about misdeeds, and if you have all the details of a thousand at your finger ends, it is odd if you can’t unravel the thousand and first.”</p></blockquote>
-            <p class="quote__by">Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter II, “The Science of Deduction”</p>
-            <p class="quote__note">From the speech in which Holmes first explains his trade — “I suppose I am the only one in the world. I’m a consulting detective” — moments after admitting to Watson that he himself wrote the magazine article on deduction Watson had just ridiculed.</p>
-          </div>
-        </li>
-        <li class="row">
-          <time class="when" datetime="2003">2003</time>
-          <div class="what quote">
-            <blockquote><p>“Only Muggles talk of ‘mind reading.’ The mind is not a book, to be opened at will and examined at leisure. Thoughts are not etched on the inside of skulls, to be perused by any invader. The mind is a complex and many-layered thing, Potter—or at least, most minds are.”</p></blockquote>
-            <p class="quote__by">Severus Snape, in J.K. Rowling, Harry Potter and the Order of the Phoenix (2003), Chapter 24, “Occlumency”</p>
-            <p class="quote__note">Snape’s retort in Harry’s first Occlumency lesson, after Harry gives Legilimency that name.</p>
-          </div>
-        </li>
-      </ul>
-    </section>
-
-    <section id="teaching" aria-labelledby="teaching-h">
-      <h2 id="teaching-h" class="inset">Teaching</h2>
-      <ul class="log log--tight log--said" role="list">
-        <li class="row">
-          <p class="what">Teaching assistant, Introduction to Cognition and Computation, <span class="nb">Ben-Gurion</span> University of the Negev<span class="vh">: </span></p>
-          <p class="when">2023/24, 2024/25 and 2025/26<span class="vh">.</span></p>
-        </li>
-        <li class="row">
-          <p class="what">Teaching assistant, Deep Learning for Neuroscience and Cognition, <span class="nb">Ben-Gurion</span> University of the Negev<span class="vh">: </span></p>
-          <p class="when">spring 2026<span class="vh">.</span></p>
-        </li>
-        <li class="row">
-          <p class="what">Tutor in algebra and calculus, Dean of Students Office, <span class="nb">Ben-Gurion</span> University of the Negev<span class="vh">: </span></p>
-          <p class="when"><time datetime="2021">2021</time>–<time datetime="2023">2023</time><span class="vh">.</span></p>
-        </li>
-        <li class="row">
-          <p class="what">Mentoring two undergraduate research students<span class="vh">: </span></p>
-          <p class="when"><time datetime="2025">2025</time>–<time datetime="2026">2026</time><span class="vh">.</span></p>
-        </li>
-      </ul>
     </section>
 
   </main>

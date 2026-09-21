@@ -1,0 +1,29 @@
+{#- Teaching. Each line is one sentence from site.yaml, kept whole and in order in the markup. When it ends in
+    ": <dates>." the layout lifts the dates into the gutter; the colon and the full stop are then visually
+    hidden, because the grid does their job. A sentence that does not end in a date is left as it is. -#}
+{% extends "base.html.j2" %}
+
+{% block main %}
+
+    <section id="teaching" aria-labelledby="teaching-h">
+      <h1 id="teaching-h" class="inset">{{ page.heading }}</h1>
+{% if page.get("intro") %}
+      <p class="page-intro inset">{{ m.nb(page.intro) }}</p>
+{% endif %}
+      <ul class="log log--tight log--said" role="list">
+{% for line in site.teaching %}
+  {% set what, colon, tail = line.rpartition(": ") %}
+  {% set when = tail[:-1] %}
+        <li class="row">
+  {% if what and tail.endswith(".") and when and when[-1] in "0123456789" %}
+          <p class="what">{{ m.nb(what) }}<span class="vh">: </span></p>
+          <p class="when">{{ m.dates(when) }}<span class="vh">.</span></p>
+  {% else %}
+          <p class="what">{{ m.nb(line) }}</p>
+  {% endif %}
+        </li>
+{% endfor %}
+      </ul>
+    </section>
+
+{% endblock %}

@@ -1,0 +1,57 @@
+{#- Home: who he is, what he is doing now, and the news feed. The front door, not a CV. -#}
+{% extends "base.html.j2" %}
+
+{% block identity %}
+    <div class="masthead">
+      <picture><source srcset="{{ site.portrait.webp|local(base) }}" type="image/webp"><img src="{{ site.portrait.jpg|local(base) }}" width="120" height="120" alt="{{ site.portrait.alt }}"></picture>
+      <h1>{{ site.name }}</h1>
+      {{ m.role_line()|trim }}
+      <p class="lede">{{ site.identity_line }}</p>
+      {{ m.contact("Contact and profiles")|trim }}
+    </div>
+{% endblock %}
+
+{% block main %}
+
+    <section id="about" aria-labelledby="about-h">
+      <h2 id="about-h" class="inset">About</h2>
+      <div class="prose inset">
+{% for paragraph in site.about %}
+        <p>{{ m.nb(paragraph) }}</p>
+{% endfor %}
+      </div>
+    </section>
+
+{# What he is doing at the moment, dated, so it is read as a snapshot and not as a standing claim. The date
+   takes the gutter and its tick like every other date on the site; the lines themselves are one list in the
+   text column, because none of them is an event with a date of its own. #}
+    <section id="now" aria-labelledby="now-h">
+      <h2 id="now-h" class="inset">Now</h2>
+      <ul class="log" role="list">
+        <li class="row">
+          {{ m.dates(site.now_as_of, "when") }}
+          <ul class="what now" role="list">
+{% for line in site.now %}
+            <li>{{ m.nb(line) }}</li>
+{% endfor %}
+          </ul>
+        </li>
+      </ul>
+    </section>
+
+    <section id="news" aria-labelledby="news-h">
+      <h2 id="news-h" class="inset">News</h2>
+      <ul class="log log--tight" role="list">
+        {{ m.news_rows(news_shown)|trim }}
+      </ul>
+{% if news_older %}
+      <details class="older">
+        <summary><span>Older news ({{ news_older|length }})</span></summary>
+        <ul class="log log--tight" role="list">
+          {{ m.news_rows(news_older)|trim }}
+        </ul>
+      </details>
+{% endif %}
+    </section>
+
+{% endblock %}
