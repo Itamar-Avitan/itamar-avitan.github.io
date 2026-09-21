@@ -15,6 +15,19 @@ Source of Itamar Avitan's personal academic website, served by GitHub Pages at
 If the name or the identity line changed, also run `python3 tools/make_og.py`: it redraws the social-media
 card `img/og.png` from `site.yaml`.
 
+The research card's thumbnail is chosen by one line. `site.yaml` holds both pictures under `figure_options`,
+and the card points at one of them:
+
+```yaml
+  figure: *lab_illustration     # the lab's illustration for the paper (live)
+  figure: *recovery_matrix      # the paper's own Figure 1D
+```
+
+Change that line, run `python3 build.py`, and the card swaps. A picture that is line work on white carries
+`invert: true`, which lets the dark theme turn it inside out; a photograph or a colour illustration must not.
+To prepare another one, run `python3 tools/make_paper_thumb.py <image> <name>`: it writes `img/<name>.webp`
+and a `.jpg` fallback, square and stripped of metadata, and prints their sizes.
+
 Two more checks, run by hand:
 
 - `python3 tools/shots.py` rebuilds the page and writes `shots/desktop-light.png`, `shots/desktop-dark.png`

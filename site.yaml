@@ -22,6 +22,7 @@ nobreak:
 - model-recovery
 - odd-one-out
 - five-person
+- 1733-34
 
 # --- content (text verbatim from the fact-checked seed) ---
 name: Itamar Avitan
@@ -36,22 +37,31 @@ bio:
 - I am a PhD candidate in the Brains and Machines Lab at Ben-Gurion University of the Negev, advised by Dr. Tal Golan. My department is Industrial Engineering and Management, and I am affiliated with the School of Brain Sciences and Cognition.
 - Neural networks can predict human visual judgments, such as which of three images is the odd one out. I ask when that accuracy means a network represents the world as people do. A flexible mapping from model features to human data can make the wrong model look right, so I use model-recovery simulations to test whether a comparison recovers the model that generated the data. Our results argue for experiments that balance predictive accuracy against identifiability.
 - I have been a teaching assistant for courses on computation, cognition and deep learning, and have built neurotechnology prototypes in teams.
+# icon: which mark the template draws before the label. Known names: mail, scholar, github, linkedin,
+# bluesky, x, orcid. Leave it out and the link shows its label alone.
 links:
 - label: Email
   url: null
   text: avitanit [at] post.bgu.ac.il
+  icon: mail
 - label: Google Scholar
   url: https://scholar.google.com/citations?user=3fynQuAAAAAJ&hl=en
+  icon: scholar
 - label: GitHub
   url: https://github.com/Itamar-Avitan
+  icon: github
 - label: LinkedIn
   url: https://www.linkedin.com/in/itamar-avitan/
+  icon: linkedin
 - label: Bluesky
   url: https://bsky.app/profile/avitanit.bsky.social
+  icon: bluesky
 - label: X
   url: https://x.com/avitanit
+  icon: x
 - label: ORCID
   url: https://orcid.org/0009-0004-3662-7881
+  icon: orcid
 - label: CV
   url: cv.pdf
 news:
@@ -69,6 +79,23 @@ news:
   text: Gave a contributed talk and presented a poster at the Cognitive Computational Neuroscience (CCN) 2025 conference in Amsterdam, on a preliminary version of what became our NeurIPS 2025 paper.
 - date: Nov 2024
   text: Started my PhD in the Brains and Machines Lab at Ben-Gurion University of the Negev.
+# The two thumbnails prepared for the research card below. To swap one for the other, change the single line
+# "figure: *lab_illustration" to "figure: *recovery_matrix" (or back) and run python3 build.py.
+#   invert: true  marks a line drawing on white that the dark theme may turn inside out; a photograph or a
+#   colour illustration must never carry it.
+figure_options:
+  lab_illustration: &lab_illustration
+    webp: img/paper-lab.webp
+    src: img/paper-lab.jpg
+    alt: 'The lab’s illustration for the paper: robots in vests marked DNN race along a running track, one
+      handing a baton marked 011 to the next, under brain-shaped clouds filled with charts and network graphs.'
+  recovery_matrix: &recovery_matrix
+    src: img/model-recovery.svg
+    alt: 'Figure 1D of the paper: a 20-by-20 confusion matrix of data-generating model (rows) against recovered
+      model (columns) at 1.6 million training triplets. Most rows fall on the diagonal, but seven are mostly or
+      entirely attributed to one model in the last column.'
+    caption: Fig. 1D
+    invert: true
 research:
 - title: 'Model–Behavior Alignment under Flexible Evaluation: When the Best-Fitting Model Isn’t the Right One'
   authors:
@@ -79,10 +106,7 @@ research:
   badges:
   - NeurIPS 2025
   - CCN 2025 · Talk
-  figure:
-    src: img/model-recovery.svg
-    alt: 'Figure 1D of the paper: a 20-by-20 confusion matrix of data-generating model (rows) against recovered model (columns) at 1.6 million training triplets. Most rows fall on the diagonal, but seven are mostly or entirely attributed to one model in the last column.'
-    caption: Fig. 1D
+  figure: *lab_illustration
   buttons:
   - label: Paper
     url: https://proceedings.neurips.cc/paper_files/paper/2025/hash/11e1900e680f5fe1893a8e27362dbe2c-Abstract-Conference.html
@@ -132,10 +156,64 @@ projects:
 - title: BCI4ALS
   period: 2022–2023
   blurb: In a team of five, we built a brain–computer interface (BCI) that let a person with amyotrophic lateral sclerosis (ALS) answer yes/no questions through the P300 brain response measured with electroencephalography (EEG). The patient used it live.
+# Lines about the mind, collected. text, attribution and note are printed; year is the gutter label; status,
+# evidence and copyright are the provenance record and are not rendered. Keep a quotation from a work that is
+# still in copyright to a single sentence, and always name its source.
+quotes:
+- text: I consider that a man’s brain originally is like a little empty attic, and you have to stock it with such furniture as you choose.
+  attribution: Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter II, “The Science of Deduction”
+  year: '1887'
+  status: verified
+  evidence: >-
+    Project Gutenberg ebook #244 (https://www.gutenberg.org/cache/epub/244/pg244.txt), downloaded in full and
+    grepped. Passage at lines 493-495, which falls between the CHAPTER II heading (line 407, title “THE SCIENCE
+    OF DEDUCTION”) and CHAPTER III (line 787), inside PART I (line 69) — so Part I, Chapter II is correct.
+    Extracted character-for-character; note the apostrophe in “man’s” is a curly U+2019. In the novel the
+    sentence opens ‘“You see,” he explained, “I consider that a man’s brain…”’, so starting the quote at “I
+    consider” is a faithful extract. The owner’s “skilful workman” gloss is also confirmed verbatim at lines
+    499-501: “Now the skilful workman is very careful indeed as to what he takes into his brain-attic. He will
+    have nothing but the tools which may help him in doing his work…” (British single-l “skilful”).
+  copyright: public-domain
+  note: Holmes says this immediately after learning the earth goes round the sun and replying, “Now that I do know it I shall do my best to forget it.”
+- text: The proper study of mankind is man.
+  attribution: Dr John Watson, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter I, “Mr. Sherlock Holmes” — quoting Alexander Pope, An Essay on Man, Epistle II (1733-34)
+  year: 1887 (Pope’s line, 1733-34)
+  status: verified
+  evidence: >-
+    Project Gutenberg ebook #244, lines 393-395. Exact source text: ‘“Oh! a mystery is it?” I cried, rubbing my
+    hands. “This is very piquant. I am much obliged to you for bringing us together. ‘The proper study of
+    mankind is man,’ you know.”’ The line sits between CHAPTER I (line 78, title “MR. SHERLOCK HOLMES”) and
+    CHAPTER II (line 407), confirming Part I, Chapter I. Speaker is the first-person narrator Watson,
+    addressing Stamford. Pope verified independently in two public-domain editions: Gutenberg ebook #2428 (An
+    Essay on Man; Moral Essays and Satires), Epistle II lines 1-2 — “Know, then, thyself, presume not God to
+    scan; / The proper study of mankind is man.” — and the Wikisource transcription of the 1751 edition
+    (en.wikisource.org/wiki/An_Essay_on_Man/Chapter_4), which reads identically apart from period spelling
+    (“Plac’d on this isthmus”).
+  copyright: public-domain
+  note: Doyle prints it in single quotation marks because Watson is himself quoting Pope; Stamford’s reply is “You must study him, then… You’ll find him a knotty problem.”
+- text: The mind is not a book, to be opened at will and examined at leisure.
+  attribution: Severus Snape, in J.K. Rowling, Harry Potter and the Order of the Phoenix (2003), Chapter 24, “Occlumency”
+  year: '2003'
+  status: corrected
+  evidence: >-
+    The novel is in copyright and no full text is reachable, so wording was triangulated across scanned books
+    via Open Library full-text search (openlibrary.org/search/inside). Six-plus independent works reproduce the
+    passage identically, including Trevarthen, The Seeker’s Guide to Harry Potter (“Snape responds, “Only
+    Muggles talk of ‘mind reading.’ The mind is not a book, to be opened at will and examined at leisure.
+    Thoughts are not etched on the inside of skulls, to be perused by any invader. The mind is a complex and
+    many-layered thing, Potter—or at least, most minds are.”), Baggett & Klein, Harry Potter and Philosophy,
+    Iacoboni, Mirroring People, and Lorrie Kim, Snape: A Definitive Reading. Speaker independently confirmed as
+    Severus Snape by Wikiquote’s Order of the Phoenix page. Chapter confirmed by two reference works citing it
+    directly: Waters, Ultimate Unofficial Guide to the Mysteries of Harry Potter (“that pun in the title of
+    Chapter 24 — ‘Occlumency’”) and Boughey, Unauthorized Harry Potter and the Art of Spying (“Chapter 24,
+    ‘Occlumency,’ understandably focuses on what Muggles…”). Recommended extract is one sentence — the shortest
+    faithful unit that carries the thought — because the work is in copyright.
+  copyright: in-copyright-short-quotation
+  note: Snape’s retort in Harry’s first Occlumency lesson, after Harry calls Legilimency “mind reading”.
 teaching:
 - 'Teaching assistant, Introduction to Cognition and Computation, Ben-Gurion University of the Negev: 2023/24, 2024/25 and 2025/26.'
 - 'Teaching assistant, Deep Learning for Neuroscience and Cognition, Ben-Gurion University of the Negev: spring 2026.'
 - 'Tutor in algebra and calculus, Dean of Students Office, Ben-Gurion University of the Negev: 2021–2023.'
-- 'Mentoring: two undergraduate research students.'
+- 'Mentoring two undergraduate research students: 2025–2026.'
 footer:
   updated: September 2026

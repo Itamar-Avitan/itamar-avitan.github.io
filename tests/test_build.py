@@ -177,8 +177,9 @@ def test_open_graph_points_at_the_site_and_its_card():
 
 def test_section_ids_and_script_hooks():
     html = build.render(SITE)
-    for sec in ("research", "news", "talks", "projects", "teaching"):
+    for sec in ("research", "news", "talks", "projects", "quotes", "teaching"):
         assert html.count(f'<section id="{sec}"') == 1
+    assert html.index('id="projects"') < html.index('id="quotes"') < html.index('id="teaching"')
     assert html.count('id="theme-toggle"') == 1
     assert '<span id="email">avitanit [at] post.bgu.ac.il</span>' in html
 
@@ -186,14 +187,29 @@ def test_section_ids_and_script_hooks():
 def test_research_card_shows_every_field():
     html = build.render(SITE)
     text, card = _visible_text(html), SITE["research"][0]
-    shown = [card["title"], card["tldr"], card["figure"]["caption"], *card["authors"], *card["badges"],
-             *(b["label"] for b in card["buttons"])]
+    shown = [card["title"], card["tldr"], *filter(None, [card["figure"].get("caption")]), *card["authors"],
+             *card["badges"], *(b["label"] for b in card["buttons"])]
     assert [s for s in shown if " ".join(s.split()) not in text] == []
     assert all(f'href="{b["url"]}"' in html for b in card["buttons"])
     assert f'<img src="{card["figure"]["src"]}" alt="{card["figure"]["alt"]}"' in html
     assert '<span class="me">Itamar Avitan</span>, Tal Golan' in html
     assert html.count("btn btn--primary") == 1              # Paper; the CV button is hidden for now
     assert '<span class="tag tag--venue">NeurIPS 2025</span>' in html and '<span class="tag">CCN 2025 · Talk</span>' in html
+
+
+def test_the_card_figure_is_swapped_by_one_line_and_only_line_work_is_inverted():
+    """site.yaml keeps both thumbnails; research[0].figure points at one of them by YAML alias."""
+    lab, plot = SITE["figure_options"]["lab_illustration"], SITE["figure_options"]["recovery_matrix"]
+    html = build.render(SITE)
+    assert SITE["research"][0]["figure"] is lab                              # the lab illustration is live
+    assert f'<picture><source srcset="{lab["webp"]}" type="image/webp"><img src="{lab["src"]}"' in html
+    assert "paper__fig--invert" not in html and "<figcaption" not in html    # a colour picture: no inversion
+    site = copy.deepcopy(SITE)
+    site["research"][0]["figure"] = site["figure_options"]["recovery_matrix"]
+    other = build.render(site)
+    assert f'<img src="{plot["src"]}" alt="{plot["alt"]}" width="272" height="272">' in other
+    assert lab["webp"] not in other and lab["src"] not in other
+    assert '<figure class="paper__fig paper__fig--invert">' in other and "<figcaption>Fig. 1D</figcaption>" in other
 
 
 def test_ongoing_card_gets_an_ongoing_badge_only_when_shown():
@@ -273,7 +289,42 @@ def test_teaching_sentences_stay_whole_and_lift_their_dates():
     assert ('University of the Negev<span class="vh">: </span></p>' in html
             and '<p class="when">spring 2026<span class="vh">.</span></p>' in html)
     assert '<p class="when"><time datetime="2021">2021</time>–<time datetime="2023">2023</time><span class="vh">.</span></p>' in html
-    assert '<p class="what">Mentoring: two undergraduate research students.</p>' in html
+    # every teaching row is dated, the mentoring one included: none of them sits in the list without a tick
+    assert ('<p class="what">Mentoring two undergraduate research students<span class="vh">: </span></p>' in html
+            and '<p class="when"><time datetime="2025">2025</time>–<time datetime="2026">2026</time><span class="vh">.</span></p>' in html)
+    teaching = html.partition('<section id="teaching"')[2].partition("</section>")[0]
+    assert teaching.count('<li class="row">') == teaching.count('<p class="when">') == len(SITE["teaching"])
+
+
+def test_a_sentence_without_a_date_still_renders_whole():
+    site = copy.deepcopy(SITE)
+    site["teaching"] = ["Mentoring: two undergraduate research students."]
+    assert '<p class="what">Mentoring: two undergraduate research students.</p>' in build.render(site)
+
+
+def test_quotes_print_the_line_its_attribution_and_its_context_and_nothing_else():
+    html = build.render(SITE)
+    section = html.partition('<section id="quotes"')[2].partition("</section>")[0]
+    shown = _visible_text(section)
+    assert section.count("<blockquote>") == section.count("<cite>") == len(SITE["quotes"]) == 3
+    for quote in SITE["quotes"]:
+        assert f'<blockquote><p>{quote["text"]}</p></blockquote>' in section         # printed exactly as verified
+        assert quote["attribution"] in shown and quote["note"] in shown
+        for private in ("evidence", "status", "copyright"):                          # provenance, not page text
+            assert quote[private] not in shown
+    assert '<time class="when" datetime="1887">1887</time>' in section               # the year takes its tick
+    assert '<time class="when" datetime="2003">2003</time>' in section
+    # a year that is not a plain date stays the words it was written as, and is still a gutter label
+    assert '<span class="when">1887 (Pope’s line, 1733-34)</span>' in section
+    # the borrowed line keeps its own date in the attribution, where it cannot break at the hyphen
+    assert 'Epistle II (<span class="nb">1733-34</span>)</cite>' in section
+
+
+def test_the_quotes_section_is_absent_when_there_are_no_quotes():
+    site = copy.deepcopy(SITE)
+    del site["quotes"]
+    html = build.render(site)
+    assert '<section id="quotes"' not in html and "<blockquote" not in html and "<cite" not in html
 
 
 def test_terms_of_art_do_not_break_and_stay_escaped():
@@ -292,18 +343,35 @@ def test_role_line_keeps_the_lab_link():
     assert '<li><a href="https://brainsandmachines.org">Brains and Machines Lab</a></li>' in html
 
 
-def test_portrait_and_one_calm_row_of_links():
+def test_portrait_and_two_calm_rows_of_links():
     html = build.render(SITE)
     assert ('<picture><source srcset="img/portrait-400.webp" type="image/webp">'
             '<img src="img/portrait-800.jpg" width="120" height="120" alt="Itamar Avitan"></picture>') in html
-    assert html.count('<ul class="links"') == 1 and "monogram" not in html
+    assert html.count('<ul class="links ') == 2 and "monogram" not in html      # the address, then the profiles
     page = unescape(html)
     for link in SITE["links"]:
         if link["label"] not in ("Email", "CV"):
-            assert page.count(f'<a rel="me" href="{link["url"]}">{link["label"]}</a>') == 1
+            assert page.count(f'<a rel="me" href="{link["url"]}">') == 1
+            assert page.count(f'<span>{link["label"]}</span></a>') == 1
     site = copy.deepcopy(SITE)
     site["show_cv"] = True
     assert build.render(site).count('<a class="btn btn--primary" href="cv.pdf">CV</a>') == 1
+
+
+def test_each_profile_link_carries_a_silent_mark_beside_its_visible_label():
+    page = unescape(build.render(SITE))
+    marked = [link for link in SITE["links"] if link.get("icon")]
+    assert len(marked) == 7
+    assert page.count('<svg class="ico" aria-hidden="true"') == 7             # every mark, and nothing else
+    for link in marked:
+        opens = f'href="{link["url"]}">' if link.get("url") else 'class="links__label">'
+        after = page.partition(opens)[2]
+        assert after.startswith('<svg class="ico" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path d="')
+        assert link["label"] in after.partition("</svg>")[2].partition("</li>")[0]   # the label stays, beside the mark
+    bare = copy.deepcopy(SITE)
+    for link in bare["links"]:
+        link.pop("icon", None)
+    assert 'class="ico"' not in build.render(bare)
 
 
 def test_favicon_is_the_mark():
@@ -316,8 +384,11 @@ def test_favicon_is_the_mark():
 
 
 def test_images_carry_no_metadata_and_the_social_card_is_1200x630():
-    for name in ("portrait-400.webp", "portrait-800.jpg", "og.png"):
+    for name in ("portrait-400.webp", "portrait-800.jpg", "og.png", "paper-lab.webp", "paper-lab.jpg"):
         with Image.open(build.ROOT / "img" / name) as im:
             assert len(im.getexif()) == 0 and not getattr(im, "text", None), name
+    for name in ("paper-lab.webp", "paper-lab.jpg"):                 # square, and twice the 272px it is laid out at
+        with Image.open(build.ROOT / "img" / name) as im:
+            assert im.size == (544, 544), name
     with Image.open(build.ROOT / "img" / "og.png") as im:
         assert im.size == (1200, 630)

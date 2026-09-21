@@ -69,8 +69,10 @@ def test_structure_and_alt_text(browser):
     page, _, _ = _page(browser, 1280)
     assert page.locator("h1").count() == 1 and page.inner_text("h1").strip() == "Itamar Avitan"
     assert page.evaluate("[...document.images].every(i => i.alt && i.complete && i.naturalWidth > 0)")
-    for sec in ("research", "news", "talks", "projects", "teaching"):
+    for sec in ("research", "news", "talks", "projects", "quotes", "teaching"):
         assert page.locator(f"#{sec}").count() == 1
+    assert page.evaluate("[...document.querySelectorAll('svg.ico')].every(s => s.getAttribute('aria-hidden') === 'true')")
+    assert page.locator("svg.ico").count() == 7
 
 
 def test_body_text_is_at_least_16px(browser):
