@@ -117,3 +117,14 @@ def test_the_request_looks_like_a_browser_and_names_nobody():
     headers = " ".join(f"{k}: {v}" for k, v in check_links.HEADERS.items())
     assert headers.startswith("User-Agent: Mozilla/5.0") and "@" not in headers and "From" not in check_links.HEADERS
     assert check_links.TIMEOUT == 20
+
+def test_a_bracket_a_sentence_left_on_a_url_is_not_part_of_the_address():
+    """The evidence notes cite their sources in brackets -- "(https://gutenberg.org/ebooks/244)" -- and the
+    checker read the closing bracket as part of the address, reporting two live Project Gutenberg pages as
+    404. Only unbalanced brackets are trimmed, so a Wikipedia-style URL that contains a real pair survives."""
+    from check_links import _tidy
+    assert _tidy("https://www.gutenberg.org/ebooks/244)") == "https://www.gutenberg.org/ebooks/244"
+    assert _tidy("https://example.org/a),") == "https://example.org/a"
+    assert _tidy("https://example.org/a.") == "https://example.org/a"
+    assert _tidy("https://en.wikipedia.org/wiki/Foo_(bar)") == "https://en.wikipedia.org/wiki/Foo_(bar)"
+    assert _tidy("https://example.org/a") == "https://example.org/a"

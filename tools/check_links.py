@@ -43,13 +43,26 @@ BOT_WALLS = {
 }
 
 
+def _tidy(u: str) -> str:
+    """Trim trailing punctuation that prose leaves on a URL.
+
+    Evidence notes in site.yaml cite their sources parenthetically -- "(https://example.org/x)" -- and the
+    closing bracket is not part of the address. Brackets are trimmed only when unbalanced, so a URL that
+    legitimately contains a pair, as Wikipedia titles do, survives intact.
+    """
+    u = u.rstrip(".,;:")
+    while u.endswith(")") and u.count(")") > u.count("("):
+        u = u[:-1].rstrip(".,;:")
+    return u
+
+
 def collect_urls(node) -> list[str]:
     """Every http(s) address in the strings of a YAML structure: in order of appearance, each one once."""
     found: list[str] = []
 
     def walk(n) -> None:
         if isinstance(n, str):
-            found.extend(u.rstrip(".,;:") for u in URL.findall(n))
+            found.extend(_tidy(u) for u in URL.findall(n))
         elif isinstance(n, dict):
             for v in n.values():
                 walk(v)
