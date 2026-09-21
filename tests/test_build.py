@@ -416,33 +416,42 @@ def test_every_gutter_label_in_the_quotes_section_is_a_plain_date():
     assert all(re.fullmatch(r"\d{4}", label) for label in labels), labels
 
 
-def test_the_commonplace_stands_two_lines_open_and_keeps_the_older_ones_behind_the_same_expander():
-    """The section was the tallest on the page -- 30.1% of it against Research's 14.2%, and 1.73 times the
-    news beside it -- which is a personality note outweighing the work. Not one line was cut or shortened to
-    fix it: the two oldest wait behind the control the news list already uses. It stands ABOVE the open list,
-    because this list is read forwards and opening it must add its entries at the top, or the gutter's dates
-    would run backwards."""
+def test_every_commonplace_line_stands_open():
+    """All four lines are visible on load. The section had grown to 30.1% of the page against Research's
+    14.2%, so its spacing and its context notes were tightened; measured after, it sits at 19-21% of page
+    height, under the 22% the ruling set. An expander was built as the fallback and is deliberately NOT in
+    use: the owner chose these four quotations himself, and hiding half of them behind a click was not
+    needed to meet the target. split_quotes and the template keep that fallback working if the section ever
+    grows again -- lower quotes_visible and the control returns."""
     older, shown = build.split_quotes(SITE["quotes"], SITE["quotes_visible"])
-    assert len(shown) == 2 and older + shown == SITE["quotes"]              # every line kept, in its order
+    assert older == [] and shown == SITE["quotes"] and len(shown) == 4
     section = build.render(SITE).partition('<section id="quotes"')[2].partition("</section>")[0]
-    assert section.count("<blockquote>") == len(SITE["quotes"]) == 4        # all four are still on the page
-    head, _, tail = section.partition("</details>")
-    assert '<details class="older older--first">' in head
-    assert f"Older lines ({len(older)})" in _visible_text(head)
-    assert all(q["text"] in head for q in older) and not any(q["text"] in head for q in shown)
-    assert all(q["text"] in tail for q in shown)
-    years = re.findall(r'<time class="when" datetime="(\d{4})">', section)  # the axis still only goes forward
+    assert section.count("<blockquote>") == 4
+    assert "<details" not in section                      # nothing about the commonplace is behind a click
+    text = _visible_text(section)          # compare rendered text: the template wraps "1733-34" in a
+    for q in SITE["quotes"]:               # no-break span, so the raw attribution string is not in the HTML
+        assert " ".join(q["text"].split()) in text
+        assert " ".join(q["attribution"].split()) in text
+    years = re.findall(r'<time class="when" datetime="(\d{4})">', section)
     assert years == sorted(years) == [q["year"] for q in SITE["quotes"]]
 
 
-def test_the_commonplace_expander_matches_the_news_one_and_disappears_when_it_holds_nothing():
-    html = build.render(SITE)
-    summaries = re.findall(r'<details class="older[^"]*">\s*<summary><span>([^<]+)</span></summary>', html)
-    assert summaries == ["Older news (2)", "Older lines (2)"]               # same control, same wording
+def test_the_commonplace_expander_still_works_if_it_is_ever_needed_again():
+    """The fallback is kept tested rather than deleted, so a future editor who lowers quotes_visible gets the
+    same control the news list uses, with its entries above the open ones (this list reads oldest-first, so
+    opening it must add at the top or the gutter's years would run backwards)."""
     site = copy.deepcopy(SITE)
-    site["quotes_visible"] = 99
-    quotes = build.render(site).partition('<section id="quotes"')[2].partition("</section>")[0]
-    assert "<details" not in quotes and quotes.count("<blockquote>") == 4
+    site["quotes_visible"] = 2
+    section = build.render(site).partition('<section id="quotes"')[2].partition("</section>")[0]
+    head, sep, tail = section.partition("</details>")
+    assert sep and '<details class="older older--first">' in head
+    assert "Older lines (2)" in _visible_text(head)
+    assert section.count("<blockquote>") == 4            # still every line, none cut or shortened
+    older, shown = build.split_quotes(SITE["quotes"], 2)
+    assert all(q["text"] in head for q in older) and all(q["text"] in tail for q in shown)
+    news_and_lines = re.findall(r'<details class="older[^"]*">\s*<summary><span>([^<]+)</span></summary>',
+                                build.render(site))
+    assert news_and_lines == ["Older news (2)", "Older lines (2)"]   # same control, same wording
 
 
 def test_the_talk_video_opens_where_his_own_talk_starts():

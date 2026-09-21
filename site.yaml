@@ -12,7 +12,9 @@ news_visible: 5
 # quotation is still on the page and none of them is shortened -- the section was simply the tallest thing
 # here, half again as tall as the news beside it, and a personality note is not what should outweigh the work.
 # Because this list is read forwards, the ones behind the expander are the oldest and it sits above them.
-quotes_visible: 2
+quotes_visible: 99   # all four stay open. The tightened spacing alone brought the section to 19-21% of page
+                     # height, under the 22% target, so hiding two behind a click was not needed and the owner
+                     # chose all four deliberately. Lower this only if the section grows again.
 portrait: {webp: img/portrait-400.webp, jpg: img/portrait-800.jpg, alt: Itamar Avitan}
 # Proper nouns and terms of art that must never break across two lines, wherever they occur in the text.
 nobreak:
