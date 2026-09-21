@@ -1,0 +1,118 @@
+# Content and settings for the personal site. Edit this file, then run: python3 build.py
+# This repository is public: never add private information here.
+
+# --- settings ---
+site_url: https://itamar-avitan.github.io/
+alternate_name: Itamar Amram Avitan
+affiliation: Ben-Gurion University of the Negev
+show_cv: false
+show_ongoing: false
+news_visible: 5
+portrait: {webp: img/portrait-400.webp, jpg: img/portrait-800.jpg, alt: Itamar Avitan}
+
+# --- content (text verbatim from the fact-checked seed) ---
+name: Itamar Avitan
+identity_line: I study how to tell which neural network models of human vision are right, not just which ones predict best.
+bio:
+- I am a PhD candidate in the Brains and Machines Lab at Ben-Gurion University of the Negev, advised by Dr. Tal Golan. My department is Industrial Engineering and Management, and I am affiliated with the School of Brain Sciences and Cognition.
+- Neural networks can predict human visual judgments, such as which of three images is the odd one out. I ask when that accuracy means a network represents the world as people do. A flexible mapping from model features to human data can make the wrong model look right, so I use model-recovery simulations to test whether a comparison recovers the model that generated the data. Our results argue for experiments that balance predictive accuracy against identifiability.
+- I have been a teaching assistant for courses on computation, cognition and deep learning, and have built neurotechnology prototypes in teams.
+links:
+- label: Email
+  url: null
+  text: avitanit [at] post.bgu.ac.il
+- label: Google Scholar
+  url: https://scholar.google.com/citations?user=3fynQuAAAAAJ&hl=en
+- label: GitHub
+  url: https://github.com/Itamar-Avitan
+- label: LinkedIn
+  url: https://www.linkedin.com/in/itamar-avitan/
+- label: Bluesky
+  url: https://bsky.app/profile/avitanit.bsky.social
+- label: X
+  url: https://x.com/avitanit
+- label: ORCID
+  url: https://orcid.org/0009-0004-3662-7881
+- label: CV
+  url: cv.pdf
+news:
+- date: Sep 2026
+  text: Gave a flash talk, “System identification perspective on representational alignment” (with Maya Zach and Tal Golan), at Neuro-AI-Talks (NEAT) 2026 in Osnabrück, Germany.
+- date: Aug 2026
+  text: Completed the Brown University–Ben-Gurion University Embodied Brain Technology Practicum at Brown University, where our team of five built and pitched EarBetter, a prototype that explores whether physiological signals can drive selective audio attenuation.
+- date: Dec 2025
+  text: 'Presented our paper with Tal Golan, “Model–Behavior Alignment under Flexible Evaluation: When the Best-Fitting Model Isn’t the Right One”, as a poster at the Conference on Neural Information Processing Systems (NeurIPS) 2025 in San Diego.'
+- date: Nov 2025
+  text: Released the code and data for our NeurIPS 2025 paper.
+- date: Oct 2025
+  text: Posted the arXiv preprint of our model-recovery paper, accepted to the NeurIPS 2025 main track.
+- date: Aug 2025
+  text: Gave a contributed talk and presented a poster at the Cognitive Computational Neuroscience (CCN) 2025 conference in Amsterdam, on a preliminary version of what became our NeurIPS 2025 paper.
+- date: Nov 2024
+  text: Started my PhD in the Brains and Machines Lab at Ben-Gurion University of the Negev.
+research:
+- title: 'Model–Behavior Alignment under Flexible Evaluation: When the Best-Fitting Model Isn’t the Right One'
+  authors:
+  - Itamar Avitan
+  - Tal Golan
+  me: Itamar Avitan
+  tldr: To test whether a vision model represents images the way people do, researchers often fit a flexible linear mapping from the model’s features to human judgments and compare how well each model predicts. We simulated responses from each of 20 models fitted to 4.5 million odd-one-out judgments from the THINGS dataset and found that this comparison picked the model that had generated the data less than 80% of the time, even with millions of trials.
+  badges:
+  - NeurIPS 2025
+  - CCN 2025 · Talk
+  buttons:
+  - label: Paper
+    url: https://proceedings.neurips.cc/paper_files/paper/2025/hash/11e1900e680f5fe1893a8e27362dbe2c-Abstract-Conference.html
+  - label: arXiv
+    url: https://arxiv.org/abs/2510.23321
+  - label: Code
+    url: https://github.com/brainsandmachines/oddoneout_model_recovery
+  - label: Data
+    url: https://doi.org/10.6084/m9.figshare.30542690.v1
+  - label: CCN 2025 talk video
+    url: https://www.youtube.com/watch?v=vT-3kV89Rhk
+talks:
+- date: 14–15 Sep 2026
+  kind: Flash talk
+  venue: Neuro-AI-Talks (NEAT) 2026
+  place: Innovatorium, Osnabrück, Germany
+  title: System identification perspective on representational alignment
+  authors:
+  - Itamar Avitan
+  - Maya Zach
+  - Tal Golan
+  url: https://www.kietzmannlab.uni-osnabrueck.de/neat2026/
+- date: 5 Dec 2025
+  kind: Poster
+  venue: Conference on Neural Information Processing Systems (NeurIPS) 2025
+  place: San Diego, USA
+  title: 'Model–Behavior Alignment under Flexible Evaluation: When the Best-Fitting Model Isn’t the Right One'
+  authors:
+  - Itamar Avitan
+  - Tal Golan
+  url: https://neurips.cc/virtual/2025/loc/san-diego/poster/116404
+- date: 15 Aug 2025
+  kind: Contributed talk and poster
+  venue: Cognitive Computational Neuroscience (CCN) 2025
+  place: University of Amsterdam, the Netherlands
+  title: 'Rethinking Representational Alignment: Linear Probing Fails to Identify the Ground-Truth Model'
+  authors:
+  - Itamar Avitan
+  - Tal Golan
+  note: Preliminary version of the NeurIPS 2025 paper.
+  url: https://2025.ccneuro.org/contributed-talk/?id=65
+projects:
+- title: EarBetter
+  period: 24 Jul–6 Aug 2026
+  blurb: Our five-person team’s prototype from the 2026 Brown University–Ben-Gurion University Embodied Brain Technology Practicum at Brown University. It explores whether physiological signals can drive selective audio attenuation. I worked on control software and system integration. The prototype was completed and pitched; parts of it remain experimental, and it has not been clinically evaluated.
+  url: https://github.com/Itamar-Avitan/earbetter-ebt-practicum
+- title: BCI4ALS
+  period: 2022–2023
+  blurb: In a team of five, we built a brain–computer interface (BCI) that let a person with amyotrophic lateral sclerosis (ALS) answer yes/no questions through the P300 brain response measured with electroencephalography (EEG). The patient used it live.
+teaching:
+- 'Teaching assistant, Introduction to Computation and Cognition, Ben-Gurion University of the Negev: 2023/24, 2024/25 and 2025/26.'
+- 'Teaching assistant, Deep Learning for Neuroscience and Cognition, Ben-Gurion University of the Negev: spring 2026.'
+- 'Tutor in algebra and calculus, Dean of Students Office, Ben-Gurion University of the Negev: 2021–2023.'
+- 'Mentoring: two undergraduate research students.'
+footer:
+  updated: September 2026

@@ -1,0 +1,4 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>{{ site.name }}</title>
+<script type="application/ld+json">{{ jsonld|safe }}</script></head><body><h1>{{ site.name }}</h1>
+{% if site.show_cv %}<a href="cv.pdf">CV</a>{% endif %}
+{% for n in news_shown %}<p>{{ n.text }}</p>{% endfor %}</body></html>
