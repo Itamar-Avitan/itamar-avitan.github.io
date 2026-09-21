@@ -46,7 +46,14 @@ def validate(site: dict) -> list[str]:
 
 
 def split_news(news: list[dict], visible: int = 5) -> tuple[list[dict], list[dict]]:
+    """News runs newest first: the first `visible` items stay open, the older tail goes behind the expander."""
     return news[:visible], news[visible:]
+
+
+def split_quotes(quotes: list[dict], visible: int = 2) -> tuple[list[dict], list[dict]]:
+    """The commonplace runs the other way -- oldest line first, because its gutter is a historical axis -- so
+    the older entries are its head, not its tail. Returns (older, shown) in the order they are printed."""
+    return (quotes[:-visible], quotes[-visible:]) if 0 < visible < len(quotes) else ([], quotes)
 
 
 def visible_research(site: dict) -> list[dict]:
@@ -67,8 +74,10 @@ def render(site: dict) -> str:
     env = Environment(loader=FileSystemLoader(ROOT / "templates"), undefined=StrictUndefined,
                       autoescape=select_autoescape(["html", "j2"]), trim_blocks=True, lstrip_blocks=True)
     shown, older = split_news(site["news"], site.get("news_visible", 5))
+    quotes_older, quotes_shown = split_quotes(site.get("quotes") or [], site.get("quotes_visible", 2))
     return env.get_template("index.html.j2").render(
         site=site, news_shown=shown, news_older=older,
+        quotes_older=quotes_older, quotes_shown=quotes_shown,
         research=visible_research(site), jsonld=person_jsonld(site))
 
 

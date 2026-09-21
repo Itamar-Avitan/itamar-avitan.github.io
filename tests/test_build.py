@@ -63,6 +63,15 @@ def test_split_news_keeps_order_and_counts():
     assert [n["text"] for n in shown] == list("01234") and [n["text"] for n in older] == ["5", "6"]
 
 
+@pytest.mark.parametrize("visible, older, shown", [(2, ["a", "b"], ["c", "d"]), (1, ["a", "b", "c"], ["d"]),
+                                                   (4, [], ["a", "b", "c", "d"]), (9, [], ["a", "b", "c", "d"]),
+                                                   (0, [], ["a", "b", "c", "d"])])
+def test_split_quotes_puts_away_the_head_of_the_list_not_its_tail(visible, older, shown):
+    """News runs newest first, so its older items are its tail. A commonplace book is read forwards, so its
+    older lines are its head. Nothing is dropped either way: the two lists always add back up to the whole."""
+    assert build.split_quotes(["a", "b", "c", "d"], visible) == (older, shown)
+
+
 def test_ongoing_research_is_hidden_unless_flag_set():
     site = copy.deepcopy(SITE)
     site["research"].append({**site["research"][0], "title": "FIXTURE ONGOING", "ongoing": True})
@@ -190,7 +199,8 @@ def test_research_card_shows_every_field():
     shown = [card["title"], card["tldr"], *filter(None, [card["figure"].get("caption")]), *card["authors"],
              *card["badges"], *(b["label"] for b in card["buttons"])]
     assert [s for s in shown if " ".join(s.split()) not in text] == []
-    assert all(f'href="{b["url"]}"' in html for b in card["buttons"])
+    # unescaped, because an address with two query parameters carries "&", which a document writes "&amp;"
+    assert all(f'href="{b["url"]}"' in unescape(html) for b in card["buttons"])
     assert f'<img src="{card["figure"]["src"]}" alt="{card["figure"]["alt"]}"' in html
     assert '<span class="me">Itamar Avitan</span>, Tal Golan' in html
     assert html.count("btn btn--primary") == 1              # Paper; the CV button is hidden for now
@@ -257,7 +267,8 @@ def test_news_is_split_between_the_list_and_the_details_element():
     assert all(n["text"] in inside for n in older) and f"Older news ({len(older)})" in inside
     site = copy.deepcopy(SITE)
     site["news_visible"] = 99
-    assert "<details" not in build.render(site)
+    news = build.render(site).partition('<section id="news"')[2].partition("</section>")[0]
+    assert "<details" not in news          # the commonplace keeps an expander of its own, further down
 
 
 def test_talks_link_the_venue_and_show_the_note():
@@ -405,6 +416,83 @@ def test_every_gutter_label_in_the_quotes_section_is_a_plain_date():
     assert all(re.fullmatch(r"\d{4}", label) for label in labels), labels
 
 
+def test_the_commonplace_stands_two_lines_open_and_keeps_the_older_ones_behind_the_same_expander():
+    """The section was the tallest on the page -- 30.1% of it against Research's 14.2%, and 1.73 times the
+    news beside it -- which is a personality note outweighing the work. Not one line was cut or shortened to
+    fix it: the two oldest wait behind the control the news list already uses. It stands ABOVE the open list,
+    because this list is read forwards and opening it must add its entries at the top, or the gutter's dates
+    would run backwards."""
+    older, shown = build.split_quotes(SITE["quotes"], SITE["quotes_visible"])
+    assert len(shown) == 2 and older + shown == SITE["quotes"]              # every line kept, in its order
+    section = build.render(SITE).partition('<section id="quotes"')[2].partition("</section>")[0]
+    assert section.count("<blockquote>") == len(SITE["quotes"]) == 4        # all four are still on the page
+    head, _, tail = section.partition("</details>")
+    assert '<details class="older older--first">' in head
+    assert f"Older lines ({len(older)})" in _visible_text(head)
+    assert all(q["text"] in head for q in older) and not any(q["text"] in head for q in shown)
+    assert all(q["text"] in tail for q in shown)
+    years = re.findall(r'<time class="when" datetime="(\d{4})">', section)  # the axis still only goes forward
+    assert years == sorted(years) == [q["year"] for q in SITE["quotes"]]
+
+
+def test_the_commonplace_expander_matches_the_news_one_and_disappears_when_it_holds_nothing():
+    html = build.render(SITE)
+    summaries = re.findall(r'<details class="older[^"]*">\s*<summary><span>([^<]+)</span></summary>', html)
+    assert summaries == ["Older news (2)", "Older lines (2)"]               # same control, same wording
+    site = copy.deepcopy(SITE)
+    site["quotes_visible"] = 99
+    quotes = build.render(site).partition('<section id="quotes"')[2].partition("</section>")[0]
+    assert "<details" not in quotes and quotes.count("<blockquote>") == 4
+
+
+def test_the_talk_video_opens_where_his_own_talk_starts():
+    """The recording is one five-talk session with no chapter markers, so the address carries a start time:
+    t=715s is 11:55 (the owner's ruling of 2026-09-21, and the timestamp already committed on his CV)."""
+    button = next(b for b in SITE["research"][0]["buttons"] if b["label"] == "CCN 2025 talk video")
+    assert button["url"] == "https://www.youtube.com/watch?v=vT-3kV89Rhk&t=715s"
+    html = build.render(SITE)
+    assert 'href="https://www.youtube.com/watch?v=vT-3kV89Rhk&amp;t=715s"' in html
+    assert "&t=715s" not in html                                            # never the bare ampersand
+    assert unescape(re.search(r'href="([^"]*vT-3kV89Rhk[^"]*)"', html).group(1)) == button["url"]
+
+
+def _css() -> str:
+    return (build.ROOT / "style.css").read_text(encoding="utf-8")
+
+
+def test_the_theme_toggle_is_not_painted_when_the_script_has_not_run():
+    """The markup writes the button hidden and the script unhides it, so a visitor whose browser ran no
+    JavaScript is not shown a control that does nothing. .toggle sets display from a class, which outranks the
+    browser's own [hidden] rule, so the attribute has to be honoured in the stylesheet in so many words."""
+    assert '<button id="theme-toggle" class="toggle" type="button" hidden>' in build.render(SITE)
+    assert re.search(r"\.toggle\[hidden\] \{[^}]*display: none", _css())
+    assert "btn.hidden = false" in (build.ROOT / "templates" / "index.html.j2").read_text(encoding="utf-8")
+
+
+def test_the_figure_caption_is_set_once_and_turns_with_its_gutter():
+    """It was styled twice: right in the base rule, and left again in the phone block under a comment about a
+    caption this build does not print at all. The type is set once now and the alignment once, where the rest
+    of the gutter is turned -- labels follow the page's left edge on a phone, the margin rule on a desktop."""
+    base, _, rest = _css().partition("Phone: the rule moves")
+    phone, _, desktop = rest.partition("Desktop: the gutter")
+    caption = re.search(r"\.paper__fig figcaption \{[^}]*\}", base)
+    assert base.count(".paper__fig figcaption") == 1 and "text-align" not in caption.group(0)
+    assert ".paper__fig figcaption" not in phone                            # the phone keeps the left edge
+    assert ".paper__fig figcaption { text-align: right; }" in desktop
+    assert "hangs under the left edge" not in _css()                        # and the misleading comment is gone
+
+
+def test_a_profile_link_is_widened_by_an_overlay_rather_than_by_its_box():
+    """WCAG 2.2 SC 2.5.8 asks for 24 by 24 CSS px. Widening the box would push "X"'s neighbours apart and open
+    a hole in the row exactly where the shortest label is, so the target is an overlay that takes the pointer
+    and leaves the layout alone. The phone block no longer needs a minimum width of its own."""
+    css = _css()
+    overlay = re.search(r"\.links a:not\(\.btn\)::after \{[^}]*\}", css).group(0)
+    assert "position: absolute" in overlay and "width: 1.5rem" in overlay
+    assert re.search(r"\.links a:not\(\.btn\) \{[^}]*position: relative", css)
+    assert "min-width: 1.5rem" not in css and "justify-content: center" not in css
+
+
 def test_the_quotes_section_says_why_it_is_there():
     html = build.render(SITE)
     assert f'<p class="section-note inset">{SITE["quotes_intro"]}</p>' in html
@@ -490,8 +578,11 @@ def test_only_the_safe_subset_of_marks_exists_at_all():
 
 
 def test_the_marks_sit_with_the_marks_and_the_plain_links_with_the_plain_ones():
-    """Three marks among seven labels in one row read as four icons that failed to load. The template renders
-    two lists instead, and the stylesheet steps between them more than twice as far as it steps inside one."""
+    """Three marks among seven labels scattered through one row read as four icons that failed to load, so the
+    links that carry a mark are still set before the ones that cannot. What the order must not do is open a
+    hole: a 3rem step between the groups against a 1.25rem step inside one read at 1280px as a missing item,
+    not as two groups -- nothing on the page tells a reader that these six addresses are of two kinds, because
+    the split is a licensing accident. One step, one row; the contiguous marks do the grouping."""
     html = build.render(SITE)
     row = html.partition('<div class="links-row">')[2].partition("</div>")[0]
     order = re.findall(r'<span>([^<]+)</span>', row)
@@ -501,7 +592,7 @@ def test_the_marks_sit_with_the_marks_and_the_plain_links_with_the_plain_ones():
     css = (build.ROOT / "style.css").read_text(encoding="utf-8")
     between = float(re.search(r"\.links-row \{[^}]*column-gap: ([\d.]+)rem", css).group(1))
     inside = float(re.search(r"^\.links \{[^}]*gap: 0 ([\d.]+)rem", css, re.M).group(1))
-    assert between >= 2 * inside
+    assert between == inside
 
 
 def test_the_marks_are_sized_one_by_one_so_they_read_as_one_set():

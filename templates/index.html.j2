@@ -111,6 +111,21 @@
 {% endfor %}
 {% endmacro -%}
 
+{%- macro quote_rows(items) %}
+{% for quote in items %}
+        <li class="row">
+          {{ dates(quote.year, "when") }}
+          <div class="what quote">
+            <blockquote><p>{{ nb(quote.text) }}</p></blockquote>
+            <p class="quote__by">{{ nb(quote.attribution) }}</p>
+  {% if quote.get("note") %}
+            <p class="quote__note">{{ nb(quote.note) }}</p>
+  {% endif %}
+          </div>
+        </li>
+{% endfor %}
+{% endmacro -%}
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -196,11 +211,12 @@
       <p class="lede">{{ site.identity_line }}</p>
 {# Three lists, in this order: how to reach him, the profiles this page may mark, the profiles it may not.
    The split is the answer to a design problem, not a ranking. Only three of the seven destinations allow
-   their mark to be drawn here (see the note over ICONS), and a single row in which three items out of seven
-   carry one looks like four icons failed to load. Kept apart, the marked links read as one deliberate group
-   and the plain ones as another: every label in a group is set the same way as its neighbours, and the two
-   groups sit on one line while they fit and stack when they do not. The envelope on the address above them
-   gives the block a mark on its first line as well, so the left edge is the same shape all the way down. #}
+   their mark to be drawn here (see the note over ICONS), and a row in which three items out of seven carry
+   one, scattered, looks like four icons failed to load. Listing the marked ones first puts the marks side by
+   side, which is what settles that; the stylesheet then sets one step between every pair of links, marked or
+   plain, because a wider step between the two lists read at desktop width as a missing item rather than as
+   two groups. The lists stay separate so that they wrap as whole groups. The envelope on the address above
+   them gives the block a mark on its first line as well, so the left edge is the same shape all the way down. #}
       <nav class="links-nav" aria-label="Contact and profiles">
         <ul class="links links--reach" role="list">
 {# The CV button leads the row and is its only filled element; it appears once show_cv is switched on. #}
@@ -343,19 +359,21 @@
   {% if site.get("quotes_intro") %}
       <p class="section-note inset">{{ nb(site.quotes_intro) }}</p>
   {% endif %}
+{# The same expander as "Older news", and it holds the same thing: the older end of the list. It stands above
+   the lines rather than below them because this list runs the other way -- news is newest first, a
+   commonplace book is read forwards, 1887 before 2003 -- so opening it must add its entries at the top, or
+   the gutter's dates would run backwards. Not a quotation was cut to get here: all four are still on the
+   page, two of them one click away. #}
+  {% if quotes_older %}
+      <details class="older older--first">
+        <summary><span>Older lines ({{ quotes_older|length }})</span></summary>
+        <ul class="log log--quotes" role="list">
+          {{ quote_rows(quotes_older)|trim }}
+        </ul>
+      </details>
+  {% endif %}
       <ul class="log log--quotes" role="list">
-  {% for quote in site.quotes %}
-        <li class="row">
-          {{ dates(quote.year, "when") }}
-          <div class="what quote">
-            <blockquote><p>{{ nb(quote.text) }}</p></blockquote>
-            <p class="quote__by">{{ nb(quote.attribution) }}</p>
-    {% if quote.get("note") %}
-            <p class="quote__note">{{ nb(quote.note) }}</p>
-    {% endif %}
-          </div>
-        </li>
-  {% endfor %}
+        {{ quote_rows(quotes_shown)|trim }}
       </ul>
     </section>
 {% endif %}

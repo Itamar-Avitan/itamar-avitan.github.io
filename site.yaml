@@ -8,6 +8,11 @@ affiliation: Ben-Gurion University of the Negev
 show_cv: false
 show_ongoing: false
 news_visible: 5
+# How many commonplace lines stand open; the rest wait behind the same expander the news list uses. Every
+# quotation is still on the page and none of them is shortened -- the section was simply the tallest thing
+# here, half again as tall as the news beside it, and a personality note is not what should outweigh the work.
+# Because this list is read forwards, the ones behind the expander are the oldest and it sits above them.
+quotes_visible: 2
 portrait: {webp: img/portrait-400.webp, jpg: img/portrait-800.jpg, alt: Itamar Avitan}
 # Proper nouns and terms of art that must never break across two lines, wherever they occur in the text.
 nobreak:
@@ -42,9 +47,12 @@ bio:
 # mark, for reasons of policy and legibility that are not open to revision; templates/index.html.j2 records
 # each one beside the marks it still draws. Do not add an icon key to those four: the build has nothing to
 # draw for them, and tests/test_build.py fails if the set changes.
-# A marked link and a plain one are two groups, not one ragged row, and the template renders them as two
-# lists in that order. The address line leads the group above them with the envelope: it is the one row
-# whose label is not a link, and the mark is drawn here rather than taken from anyone's brand.
+# The links that carry a mark are listed before the ones that cannot, so the marks are contiguous and do not
+# read as four icons that failed to load. They are two lists in the markup and one even row on the page: the
+# step between the groups is the step inside them, because a wider step there read as a hole rather than as
+# a grouping -- nothing tells a reader that these six addresses are of two kinds, and nothing should, since
+# the split is a licensing accident. The address line leads the block above them with the envelope: it is the
+# one row whose label is not a link, and the mark is drawn here rather than taken from anyone's brand.
 links:
 - label: Email
   url: null
@@ -119,8 +127,12 @@ research:
     url: https://github.com/brainsandmachines/oddoneout_model_recovery
   - label: Data
     url: https://doi.org/10.6084/m9.figshare.30542690.v1
+  # The recording is one five-talk session with no chapter markers, so the address carries the start of his
+  # own talk: t=715s is 11:55, confirmed by the owner on 2026-09-21. The same timestamp is on his CV. The "&"
+  # before it is a literal ampersand here; the template escapes it to "&amp;" in the HTML, which is how an
+  # address with two query parameters is written in a document. Do not "fix" it to &amp; in this file.
   - label: CCN 2025 talk video
-    url: https://www.youtube.com/watch?v=vT-3kV89Rhk
+    url: https://www.youtube.com/watch?v=vT-3kV89Rhk&t=715s
 talks:
 - date: 14–15 Sep 2026
   kind: Flash talk

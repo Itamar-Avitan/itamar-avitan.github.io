@@ -78,15 +78,49 @@ def test_structure_and_alt_text(browser):
 def test_no_theme_filters_the_card_figure(browser):
     """A figure is printed as it is, in both themes. What answers the dark page is the mount: a light card
     behind the print, which has to stay light in either theme and has to be told apart from the sheet it is
-    pasted on, or there is no mount to see."""
+    pasted on, or there is no mount to see. The light theme's mount used to be 1.18:1 against its white card:
+    present in the stylesheet, invisible on the page, which left the figure a mounted print in one theme and
+    a picture lying straight on the sheet in the other. Both themes mount it now."""
     for scheme in ("light", "dark"):
         page, _, _ = _page(browser, 1280, scheme)
         assert page.evaluate("getComputedStyle(document.querySelector('.paper__fig img')).filter") == "none"
         mat, card = page.evaluate("""() => [
             getComputedStyle(document.querySelector('.paper__plot')).backgroundColor,
             getComputedStyle(document.querySelector('.paper')).backgroundColor]""")
-        assert _luminance(mat) > 0.45, (scheme, mat)            # a light mount, not a dark one
-        assert _contrast(mat, card) >= 1.1, (scheme, mat, card)  # and visibly not the sheet
+        assert _luminance(mat) > 0.45, (scheme, mat)             # a light mount, not a dark one
+        assert _contrast(mat, card) >= 1.3, (scheme, mat, card)  # and seen, not merely declared
+
+
+@pytest.mark.parametrize("width", [400, 768, 1280])
+def test_every_profile_link_is_at_least_a_24px_target(browser, width):
+    """WCAG 2.2 SC 2.5.8, at every viewport and not only on a phone: the desktop "X" was an 8.6 by 32 px
+    target. A 23px box centred on each link has to land on that link at all four of its corners, which is
+    what the overlay gives it without widening its box and opening a hole in the row."""
+    page, _, _ = _page(browser, width)
+    links = page.evaluate("""() => [...document.querySelectorAll('.links a')].map(a => {
+      const r = a.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+      const hit = (dx, dy) => { const el = document.elementFromPoint(x + dx, y + dy);
+                                return !!(el && el.closest('a') === a); };
+      return {label: a.textContent.trim(), width: +r.width.toFixed(1), height: +r.height.toFixed(1),
+              covered: [[-11.5, -11.5], [11.5, -11.5], [-11.5, 11.5], [11.5, 11.5]].every(c => hit(...c))};
+    })""")
+    assert [l["label"] for l in links] == ["avitanit [at] post.bgu.ac.il", "GitHub", "Bluesky",
+                                           "Google Scholar", "LinkedIn", "X", "ORCID"]
+    assert [l for l in links if l["height"] < 24 or not l["covered"]] == []
+
+
+def test_the_theme_toggle_is_invisible_until_the_script_unhides_it(browser):
+    """A visible control that does nothing is worse than no control. The button is written hidden and the
+    script unhides it, so a page whose script never ran simply does not offer it."""
+    ctx = browser.new_context(viewport={"width": 1280, "height": 900}, java_script_enabled=False)
+    page = ctx.new_page()
+    page.goto((ROOT / "index.html").as_uri())
+    assert page.locator("#theme-toggle").count() == 1
+    assert not page.locator("#theme-toggle").is_visible()      # in the markup, not on the page
+    assert page.locator("span#email").is_visible()             # and the address is still readable as text
+    ctx.close()
+    page, _, _ = _page(browser, 1280)                          # with the script, the control arrives
+    assert page.locator("#theme-toggle").is_visible()
 
 
 def test_the_research_card_on_a_phone_puts_the_figure_under_the_title(browser):

@@ -54,7 +54,13 @@
      in the open, rather than quietly inside a rule. */
   --plot-filter: none;
   --art-filter: none;
-  --mat: #E7EDF0;        /* the mount the figure is pasted onto: a shade off the sheet it sits on */
+  /* The mount the figure is pasted onto. It has to be seen, or the figure is one object in the dark theme --
+     a print on a mount -- and a different one in the light theme, a picture lying straight on the sheet.
+     #E7EDF0 stood here and was 1.18:1 against the white card: present in the file, invisible on the page. The
+     page's own hairline tone is 1.39:1 against the card and reads as the mount it is, under the darker border
+     that frames it. The dark theme keeps a light mount, which is what stops a pale print reading as a hole
+     cut in the sheet; the two themes now agree that a figure is mounted, each in its own register. */
+  --mat: #D3DCE1;
   --ico: var(--muted);   /* link marks; set it to var(--ink) for the strict black-or-white of the brand guides */
 }
 
@@ -177,6 +183,11 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
   cursor: pointer;
   transition: color 120ms ease, border-color 120ms ease;
 }
+/* The button is written hidden and the script unhides it, so a visitor whose browser ran no JavaScript is
+   never shown a control that cannot do anything. The rule above sets display from a class, which outranks the
+   browser's own [hidden] rule, so the attribute has to be honoured here in so many words: without this line
+   the dead button is painted. The topbar keeps its height either way, so nothing moves when the script runs. */
+.toggle[hidden] { display: none; }
 .toggle:hover { color: var(--ink); border-color: var(--tag-line); }
 
 /* ---------- Masthead ---------- */
@@ -258,7 +269,22 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
   align-items: center;
   gap: 0.4375rem;
 }
-.links a:not(.btn) { padding-block: 0.25rem; }
+.links a:not(.btn) { position: relative; padding-block: 0.25rem; }
+
+/* Tap target, WCAG 2.2 SC 2.5.8: every profile link must be at least 24 by 24 CSS px to point at. The box is
+   32px tall already; "X" sets one letter and is 8.6px wide, so it is widened by an overlay rather than by a
+   minimum width, because a wider box would push its neighbours apart and open a hole in the row exactly where
+   the shortest label is. The overlay belongs to the link, so it takes the pointer; the row's rhythm is the
+   rhythm of the words. It reaches 7.7px past "X" on each side, well inside the 20px gap, so no two targets
+   overlap. */
+.links a:not(.btn)::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: 50%;
+  width: 1.5rem;
+  transform: translateX(-50%);
+}
 
 /* the mark before a label says where the link leads; the label is still the link. So a mark takes the colour
    of dates and labels, not of links, and lifts to the link colour when the link is hovered or focused. */
@@ -283,13 +309,15 @@ a:focus-visible > .ico { color: var(--accent-strong); }
    circle has to have -- while the envelope (3.00 to 12.88) and the butterfly (1.00 to 14.88) sit inside it,
    which is where a flat-topped shape belongs. Their ink centroids agree to within 0.7px. */
 
-/* Two groups, not one ragged row. Only three of the seven destinations allow their mark to be drawn here, so
-   a single row would show three marks among seven labels and read as four icons that failed to load. The
-   marked links are set together and the plain ones together, and the step between the groups (3rem) is more
-   than twice the step between two links inside one (1.25rem), which is what makes the split visible before
-   it is worked out. Each group keeps its own width: side by side while both fit, whole groups stacking when
-   they do not, and a group wrapping inside itself only when it alone is wider than the page. */
-.links-row { display: flex; flex-wrap: wrap; column-gap: 3rem; }
+/* One rhythm, marks first. Only three of the seven destinations allow their mark to be drawn here, so the
+   links that carry one are kept together and set before the ones that cannot: the marks are contiguous, which
+   is what stops them reading as four icons that failed to load. What the split must NOT do is open a hole.
+   A 3rem step between the groups against a 1.25rem step inside one did exactly that at desktop width: it read
+   as a missing item rather than as two groups, since nothing on the page tells a reader why these six
+   addresses fall into two kinds -- it is a licensing accident, not a ranking. So the step between the groups
+   is the step inside them, and the row is one even run of links. The lists stay apart in the markup because
+   they still wrap as whole groups: side by side while both fit, stacking when they do not. */
+.links-row { display: flex; flex-wrap: wrap; column-gap: 1.25rem; }
 .links-row > .links { flex: none; max-width: 100%; }
 
 .bio { margin-top: 1.75rem; }
@@ -374,8 +402,12 @@ h3 a:hover { text-decoration-color: currentColor; }
 /* rows whose sentence runs "what: when." in the markup; shown when-first like the rest */
 .log--said > .row { display: flex; flex-direction: column-reverse; }
 
-/* ---------- Older news ---------- */
+/* ---------- The expander: older news, older lines ---------- */
 .older { margin-top: 1rem; }
+/* The commonplace is read forwards, so its older entries are the head of its list and the control that holds
+   them stands above it. Same box, same +/- marker, same behaviour; only the side it opens onto changes, and
+   the step it leaves under itself is the step between two quotations, so an opened list rejoins the run. */
+.older--first { margin-top: 0; padding-bottom: 1.75rem; }
 .older > summary {
   display: inline-flex;
   align-items: center;
@@ -439,11 +471,13 @@ h3 a:hover { text-decoration-color: currentColor; }
    the three channels together is the one operation that leaves every hue and saturation where it was. */
 .paper__fig--plot img { filter: var(--plot-filter); }
 .paper__fig--art img { filter: var(--art-filter); }
+/* The caption is a gutter label and is set like the others there: it follows the gutter's own alignment,
+   which is the page's left edge on a phone and the margin rule on a desktop. So it takes no alignment of its
+   own here, and the desktop block turns it with the badges and the dates it sits under. */
 .paper__fig figcaption {
   margin-top: 0.375rem;
   font: 400 0.75rem/1.4 var(--mono);
   color: var(--muted);
-  text-align: right;
 }
 .paper h3 {
   font-size: 1.25rem;
@@ -472,10 +506,13 @@ h3 a:hover { text-decoration-color: currentColor; }
 .quote blockquote p { text-indent: -0.42em; }
 
 /* Then the source, then the context. Each is a step down in size and a step lighter in colour, and the step
-   away from the line above it is larger than the leading inside it, so the change of voice is visible before
-   it is read. */
+   away from the block above it is wider than the space its own lines leave between themselves, so the change
+   of voice is visible before it is read: 10px over 7.5px for the source, 8px over 6.3px for the context.
+   The context note used to set at the size of the source, which made it a step lighter but not a step
+   smaller, and left the two of them taller than the quotation they stand under. At 14px on tighter leading
+   it still reads as prose, takes its third place in the order, and stops outweighing the words it places. */
 .quote__by {
-  margin-top: 0.75rem;
+  margin-top: 0.625rem;
   font-size: 0.9375rem;
   line-height: 1.5;
   color: var(--ink-2);
@@ -484,16 +521,16 @@ h3 a:hover { text-decoration-color: currentColor; }
 .quote__by::before { content: "\2014\00A0"; }
 .quote__note {
   margin-top: 0.5rem;
-  font-size: 0.9375rem;
-  line-height: 1.5;
+  font-size: 0.875rem;
+  line-height: 1.45;
   color: var(--muted);
   text-wrap: pretty;
 }
 /* and the step between two quotations is larger again than any step inside one */
-.log--quotes > .row + .row { margin-top: 2.5rem; }
+.log--quotes > .row + .row { margin-top: 1.75rem; }
 
 /* one line of framing under a section heading, on the text column */
-.section-note { margin: -0.375rem 0 1.5rem; font-size: 1rem; color: var(--muted); }
+.section-note { margin: -0.375rem 0 1.125rem; font-size: 1rem; color: var(--muted); }
 
 /* ---------- Footer ---------- */
 .colophon { padding-block: 3.25rem 3rem; }
@@ -510,10 +547,9 @@ h3 a:hover { text-decoration-color: currentColor; }
 @media (max-width: 44.99rem) {
   .toggle { padding-block: 0.6875rem; }
 
-  /* tap targets. The one-letter label is the only one narrower than the 24px a finger needs, so it is the
-     only one whose box is wider than its word: centre the content, or "X" sits against its left edge and
-     opens a gap on its right that reads as a missing item. */
-  .links a:not(.btn) { min-width: 1.5rem; padding-block: 0.5rem; justify-content: center; }
+  /* tap targets: a finger asks for more height than a pointer does. The width is already settled for every
+     viewport by the overlay on .links a, so nothing here has to widen a box. */
+  .links a:not(.btn) { padding-block: 0.5rem; }
   .older > summary { padding-block: 0.625rem; }
   .btn { padding-block: 0.875rem; }
 
@@ -531,6 +567,7 @@ h3 a:hover { text-decoration-color: currentColor; }
 
   /* the rule runs on through the expander, whose box sits on it */
   .older { margin-top: 0; padding-top: 1rem; border-left: 1px solid var(--rule); }
+  .older--first { padding-top: 0; }
   .older > summary { margin-left: calc(-0.5rem - 0.5px); gap: 0.40625rem; }
   .older > .log { border-left: 0; }
 
@@ -556,8 +593,6 @@ h3 a:hover { text-decoration-color: currentColor; }
   .paper__fig { order: 4; float: none; width: 13rem; max-width: 100%; margin: 1.125rem 0 0; }
   .paper .tldr { order: 5; }
   .paper .buttons { order: 6; }
-  /* the caption hangs under the left edge of the plate, like every other label on a phone */
-  .paper__fig figcaption { text-align: left; }
 }
 
 /* ==========================================================================
@@ -684,6 +719,8 @@ h3 a:hover { text-decoration-color: currentColor; }
     margin: 0.1875rem 0 0;
   }
   .paper__fig { margin: 0.875rem 0 0; }
+  /* in the gutter every label is set against the margin rule, the caption under its plate included */
+  .paper__fig figcaption { text-align: right; }
   .paper__body { grid-column: 2; }
 
   /* the rule ends at the last tick: "Last updated" */
