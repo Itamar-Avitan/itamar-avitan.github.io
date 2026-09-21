@@ -1,0 +1,600 @@
+/* ==========================================================================
+   Itamar Avitan: direction 2, "Lab notebook"
+   Grid: a narrow left gutter holds "when" (dates, kind tags, the paper's
+   figure); the column to its right holds "what". A margin rule runs between
+   them and works as a time axis: a 2px ink tick marks each section, a 1px
+   accent tick crosses the axis at every dated entry.
+
+   One visual language for three jobs:
+     outlined box   = label only (venue and kind tags), never clickable
+     underlined text = link: body sans in the masthead row and in running text,
+                       mono for a card's link labels
+     filled box     = the one primary action in its group (CV, Paper)
+   ========================================================================== */
+
+/* ---------- Fonts: self-hosted, SIL Open Font License 1.1 (see fonts/) ---------- */
+@font-face { font-family: "Fira Sans"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("fonts/fira-sans-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Fira Sans"; font-style: normal; font-weight: 600; font-display: swap;
+  src: url("fonts/fira-sans-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Fira Mono"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("fonts/fira-mono-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Fira Mono"; font-style: normal; font-weight: 500; font-display: swap;
+  src: url("fonts/fira-mono-latin-500-normal.woff2") format("woff2"); }
+
+/* ---------- Tokens ---------- */
+:root {
+  --sans: "Fira Sans", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "Fira Mono", ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+
+  --col: 47.5rem;      /* 760px main column = gutter + gap + text */
+  --gutter: 8.5rem;    /* 136px: fits "14–15 Sep 2026" in 13px mono */
+  --gap: 2rem;         /* the margin rule runs down the middle of this */
+  --pad: 1.25rem;      /* page side padding */
+  --card-pad: 1.25rem;
+
+  color-scheme: light;
+  --bg: #F4F7F8;            /* cool paper */
+  --surface: #FFFFFF;       /* pasted-in sheet */
+  --ink: #14212B;           /* blue-black */
+  --ink-2: #41525D;         /* secondary text */
+  --muted: #52636E;         /* dates, labels */
+  --rule: #D3DCE1;          /* margin rule */
+  --rule-strong: #B7C4CC;   /* card border */
+  --tag-line: #7D8F9A;      /* neutral tag outline */
+  --accent: #0B5F73;        /* petrol ink */
+  --accent-strong: #084A5A;
+  --accent-tint: #E2EEF1;
+  --btn-fill: #0B5F73;      /* the one filled control per group */
+  --btn-fill-hover: #084A5A;
+  --btn-ink: #FFFFFF;
+  --fig-filter: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0F171C;
+    --surface: #162129;
+    --ink: #E4EBEF;
+    --ink-2: #B5C3CB;
+    --muted: #97A8B2;
+    --rule: #2C3C46;
+    --rule-strong: #3A4B55;
+    --tag-line: #6A7E8A;
+    --accent: #6DB3C4;        /* about 7.7:1 on the ground; quieter than the h1 */
+    --accent-strong: #8FD0DE;
+    --accent-tint: #14313A;
+    --btn-fill: #1C6678;      /* a filled button must not out-shine the name */
+    --btn-fill-hover: #217387;
+    --btn-ink: #F2FAFC;
+    --fig-filter: invert(1) hue-rotate(180deg) saturate(0.8);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0F171C;
+  --surface: #162129;
+  --ink: #E4EBEF;
+  --ink-2: #B5C3CB;
+  --muted: #97A8B2;
+  --rule: #2C3C46;
+  --rule-strong: #3A4B55;
+  --tag-line: #6A7E8A;
+  --accent: #6DB3C4;
+  --accent-strong: #8FD0DE;
+  --accent-tint: #14313A;
+  --btn-fill: #1C6678;
+  --btn-fill-hover: #217387;
+  --btn-ink: #F2FAFC;
+  --fig-filter: invert(1) hue-rotate(180deg) saturate(0.8);
+}
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 1.0625rem/1.6 var(--sans);   /* 17px, never lighter than 400 */
+  font-synthesis: none;
+}
+
+h1, h2, h3, p, ul, figure { margin: 0; }
+ul { padding: 0; list-style: none; }
+h3 { text-wrap: balance; }
+
+h1, h2, h3 { font-weight: 600; color: var(--ink); }
+
+a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  transition: color 120ms ease, background-color 120ms ease, border-color 120ms ease;
+}
+a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* proper nouns and terms of art never break at their hyphen or space */
+.nb { white-space: nowrap; }
+
+/* kept in the markup (the sentence stays whole for readers and copy-paste), not painted */
+.vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* in-page links land with some air above them */
+[id] { scroll-margin-top: 1.5rem; }
+
+.page {
+  max-width: calc(var(--col) + 2 * var(--pad));
+  margin-inline: auto;
+  padding-inline: var(--pad);
+}
+
+/* ---------- Top bar: theme toggle ---------- */
+.topbar {
+  display: flex;
+  justify-content: flex-end;
+  min-height: 2rem;
+  padding-block: 1rem 0;
+}
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4375rem 0.625rem;
+  font: 500 0.75rem/1 var(--mono);
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--rule-strong);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+.toggle:hover { color: var(--ink); border-color: var(--tag-line); }
+
+/* ---------- Masthead ---------- */
+.masthead {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr);
+  column-gap: 1rem;
+  align-items: center;
+  margin-top: 1.75rem;
+}
+/* the portrait sits where a date would: in the gutter, squared off like a print pasted into the notebook */
+.masthead picture {
+  grid-column: 1;
+  grid-row: 1;
+  display: block;
+  width: 5rem;
+}
+.masthead picture img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+  background: var(--surface);
+}
+.masthead h1 {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: 2rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.role, .lede, .bio, .links-nav { grid-column: 1 / -1; }
+
+/* where: the scannable line between the name and the claim.
+   Items never break inside; the "·" separators are drawn in each item's left
+   padding, and one that would start a line falls outside the clip and vanishes. */
+.role {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+  margin-left: -1.25em;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+  clip-path: inset(-6px -6px -6px calc(1.25em - 6px));   /* room for the focus ring */
+}
+.role li { position: relative; padding-left: 1.25em; white-space: nowrap; }
+.role li::before {
+  content: "\00B7";
+  position: absolute;
+  left: 0.625em;
+  transform: translateX(-50%);
+}
+
+.lede {
+  margin-top: 1.25rem;
+  font-size: 1.25rem;
+  line-height: 1.45;
+  text-wrap: balance;
+}
+
+/* how to reach him: one quiet row of text links in the body face; the CV button is its only filled element */
+.links-nav { margin-top: 1.25rem; }
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 1.25rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.links__label { color: var(--muted); margin-right: 0.375rem; }
+.links a:not(.btn) { display: inline-block; padding-block: 0.25rem; }
+
+.bio { margin-top: 1.75rem; }
+.bio p + p { margin-top: 0.875rem; }
+
+/* ---------- Tags: outlined, mono, never clickable ---------- */
+.tag {
+  display: inline-block;
+  max-width: 100%;
+  padding: 0.25rem 0.4375rem;
+  font: 500 0.75rem/1.2 var(--mono);
+  letter-spacing: 0.01em;
+  color: var(--ink-2);
+  border: 1px solid var(--tag-line);
+  border-radius: 3px;
+}
+/* accent = peer-reviewed publication venue; neutral = presentation */
+.tag--venue {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-tint);
+}
+
+/* ---------- Link labels: underlined mono; the primary one is filled ---------- */
+.btn {
+  display: inline-block;
+  padding: 0.5625rem 0;
+  font: 500 0.8125rem/1 var(--mono);
+  text-underline-offset: 0.25em;
+}
+.btn--primary {
+  padding: 0.5625rem 0.75rem;
+  color: var(--btn-ink);
+  text-decoration: none;
+  background: var(--btn-fill);
+  border: 1px solid var(--btn-fill);
+  border-radius: 3px;
+}
+.btn--primary:hover {
+  color: var(--btn-ink);
+  background: var(--btn-fill-hover);
+  border-color: var(--btn-fill-hover);
+}
+
+/* ---------- Sections ---------- */
+main { margin-top: 3.25rem; }
+section + section { margin-top: 3.25rem; }
+
+h2 {
+  font-size: 1.375rem;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  margin-bottom: 1.125rem;
+}
+h3 { font-size: 1.125rem; line-height: 1.35; }
+h3 a { text-decoration-color: color-mix(in srgb, currentColor 45%, transparent); }
+h3 a:hover { text-decoration-color: currentColor; }
+
+/* ---------- Log rows: "when" + "what" ---------- */
+.when {
+  display: block;
+  margin-bottom: 0.125rem;
+  font: 400 0.8125rem/1.6 var(--mono);
+  color: var(--muted);
+}
+.when::first-letter { text-transform: uppercase; }
+.log > .row + .row { margin-top: 1.75rem; }
+.log--tight > .row + .row { margin-top: 1rem; }
+
+.kind { line-height: 1; margin-bottom: 0.5rem; }
+.log--talks .when { float: left; margin: 0 0.625rem 0 0; line-height: 1.5rem; }
+.log--talks .kind { min-height: 1.5rem; }
+.log--talks .what { clear: left; }
+.log--talks h3 { font-size: 1.0625rem; }   /* the paper card keeps the only large title */
+.authors { color: var(--ink-2); font-size: 1rem; margin-top: 0.25rem; }
+.me { color: var(--ink); font-weight: 600; }
+.venue { font-size: 1rem; margin-top: 0.125rem; }
+.place { display: block; color: var(--ink-2); }   /* line 1 the event, line 2 the place */
+.note { color: var(--ink-2); font-size: 1rem; margin-top: 0.375rem; }
+.what > h3 + p:not([class]) { margin-top: 0.375rem; }
+
+/* rows whose sentence runs "what: when." in the markup; shown when-first like the rest */
+.log--said > .row { display: flex; flex-direction: column-reverse; }
+
+/* ---------- Older news ---------- */
+.older { margin-top: 1rem; }
+.older > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding-block: 0.375rem;
+  font: 500 0.8125rem/1.6 var(--mono);
+  color: var(--accent);
+  cursor: pointer;
+  list-style: none;
+}
+.older > summary::-webkit-details-marker { display: none; }
+.older > summary::before {
+  content: "+";
+  display: grid;
+  place-items: center;
+  width: 1rem;
+  height: 1rem;
+  font: 500 0.75rem/1 var(--mono);
+  color: var(--accent);
+  background: var(--bg);
+  border: 1px solid var(--tag-line);
+  border-radius: 2px;
+}
+.older[open] > summary::before { content: "\2212"; }
+.older > summary:hover span { text-decoration: underline; text-underline-offset: 0.2em; }
+.older > .log { margin-top: 0.625rem; }
+
+/* ---------- Paper card ---------- */
+.paper {
+  padding: 1.25rem 1rem 1.375rem;
+  background: var(--surface);
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+}
+.paper + .paper { margin-top: 1.5rem; }
+.paper__badges { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-bottom: 0.75rem; }
+.paper__badges li { display: flex; }
+.paper__plot {
+  display: block;
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.paper__fig img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: var(--fig-filter);
+}
+.paper__fig figcaption {
+  margin-top: 0.375rem;
+  font: 400 0.75rem/1.4 var(--mono);
+  color: var(--muted);
+  text-align: right;
+}
+.paper h3 {
+  font-size: 1.25rem;
+  line-height: 1.3;
+  letter-spacing: -0.008em;
+  text-wrap: balance;
+}
+.paper .authors { margin-top: 0.5rem; }
+.tldr { margin-top: 0.875rem; }
+.runin {
+  margin-right: 0.375rem;
+  font: 500 0.75rem/1 var(--mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.buttons { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 1.125rem; margin-top: 1.125rem; }
+.buttons li { display: flex; }
+
+/* ---------- Footer ---------- */
+.colophon { padding-block: 3.25rem 3rem; }
+.colophon .row { font: 400 0.8125rem/1.6 var(--mono); color: var(--muted); }
+.colophon .when { display: inline; margin: 0; }
+.colophon .what { color: var(--ink-2); }
+/* the mark: two of a kind and the odd one out, the task behind the paper above */
+.mark { display: block; margin-top: 1.5rem; fill: var(--ink); }
+.mark rect { fill: var(--accent); }
+
+/* ==========================================================================
+   Phone: the rule moves to the left edge and keeps its ticks
+   ========================================================================== */
+@media (max-width: 44.99rem) {
+  .toggle { padding-block: 0.6875rem; }
+
+  /* tap targets */
+  .links a:not(.btn) { min-width: 1.5rem; padding-block: 0.5rem; }
+  .older > summary { padding-block: 0.625rem; }
+  .btn { padding-block: 0.875rem; }
+
+  .log { border-left: 1px solid var(--rule); padding-left: 0.875rem; }
+  .log .when { position: relative; }
+  .log .when::before {
+    content: "";
+    position: absolute;
+    left: calc(-0.875rem - 5px);      /* crosses the rule, as on desktop */
+    top: calc(0.5lh - 1px);
+    width: 0.75rem;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  /* the rule runs on through the expander, whose box sits on it */
+  .older { margin-top: 0; padding-top: 1rem; border-left: 1px solid var(--rule); }
+  .older > summary { margin-left: calc(-0.5rem - 0.5px); gap: 0.40625rem; }
+  .older > .log { border-left: 0; }
+
+  /* full-bleed sheet: the card's text stays on the page's left edge */
+  .paper {
+    margin-inline: calc(-1 * var(--pad));
+    padding-inline: var(--pad);
+    border-inline: 0;
+    border-radius: 0;
+  }
+  .paper__fig { float: right; width: 6rem; margin: 0 0 0.5rem 0.75rem; }
+  .paper__body::after { content: ""; display: block; clear: both; }
+}
+
+/* ==========================================================================
+   Desktop: the gutter, the margin rule and its ticks
+   ========================================================================== */
+@media (min-width: 45rem) {
+  :root { --pad: 2rem; }
+
+  p { text-wrap: pretty; }
+
+  .topbar { padding-top: 1.25rem; }
+
+  .masthead {
+    grid-template-columns: var(--gutter) minmax(0, 1fr);
+    column-gap: var(--gap);
+    align-items: start;
+    margin-top: 2.5rem;
+  }
+  /* right-aligned to the rule, like a date; it spans the rows beside it so that none of them stretches */
+  .masthead picture { grid-row: 1 / span 4; justify-self: end; width: 7.5rem; }
+  .masthead h1 { font-size: 2.75rem; margin-top: -0.12em; }
+  .role, .lede, .bio, .links-nav { grid-column: 2; }
+  .role { margin-top: 0.375rem; }
+  .lede { font-size: 1.375rem; margin-top: 1rem; }
+
+  main { position: relative; margin-top: 4.5rem; }
+  section + section { margin-top: 4.5rem; }
+
+  /* the margin rule: starts on the first section tick, ends on "Last updated" */
+  main::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    top: 0.9375rem;
+    bottom: 0;
+    left: calc(var(--gutter) + var(--gap) / 2);
+    width: 1px;
+    background: var(--rule);
+  }
+
+  .inset { margin-left: calc(var(--gutter) + var(--gap)); }
+
+  /* major tick: 2px ink, one per section */
+  h2.inset { position: relative; font-size: 1.5rem; }
+  h2.inset::before {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    left: calc(var(--gap) / -2 - 0.5rem);
+    top: calc(0.5lh - 1px);
+    width: 1rem;
+    height: 2px;
+    background: var(--ink);
+  }
+
+  .row, .log--said > .row {
+    display: grid;
+    grid-template-columns: var(--gutter) minmax(0, 1fr);
+    column-gap: var(--gap);
+    align-items: baseline;
+  }
+  .row > .when {
+    grid-column: 1;
+    grid-row: 1;
+    position: relative;
+    float: none;
+    margin: 0;
+    line-height: 1.6;
+    text-align: right;
+  }
+  .row > .what { grid-column: 2; grid-row: 1; }
+
+  /* minor tick: 1px accent, crossing the axis at every dated entry */
+  .row > .when::after {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    right: calc(var(--gap) / -2 - 4px);
+    top: 0.75em;
+    top: calc(0.5lh - 1px);
+    width: 0.75rem;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  /* talks: the kind tag lives in the gutter under its date, as in the paper card */
+  .log--talks > .row { grid-template-rows: auto 1fr; }
+  .row > .kind {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: end;
+    min-height: 0;
+    margin: 0.25rem 0 0;
+    text-align: right;
+  }
+  .log--talks > .row > .what { grid-row: 1 / span 2; clear: none; }
+
+  /* expander sits on the rule */
+  .older > summary {
+    position: relative;
+    margin-left: calc(var(--gutter) + var(--gap));
+  }
+  .older > summary::before {
+    position: absolute;
+    z-index: 2;
+    left: calc(var(--gap) / -2 - 0.5rem + 0.5px);
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  /* the card hangs out by its own padding so its text stays on the grid */
+  .paper {
+    display: grid;
+    grid-template-columns: var(--gutter) minmax(0, 1fr);
+    column-gap: var(--gap);
+    align-items: start;
+    margin-inline: calc(-1 * var(--card-pad) - 1px);
+    padding: 1.5rem var(--card-pad) 1.625rem;
+  }
+  .paper__aside { grid-column: 1; }
+  .paper__badges {
+    flex-direction: column;
+    align-items: flex-end;
+    margin: 0.1875rem 0 0;
+  }
+  .paper__fig { margin: 0.875rem 0 0; }
+  .paper__body { grid-column: 2; }
+
+  /* the rule ends at the last tick: "Last updated" */
+  .colophon { padding-block: 4.5rem 4rem; }
+  .colophon .row { position: relative; }
+  .colophon .row::before {
+    content: "";
+    position: absolute;
+    left: calc(var(--gutter) + var(--gap) / 2);
+    top: -4.5rem;
+    height: calc(4.5rem + 0.5lh);
+    width: 1px;
+    background: var(--rule);
+  }
+  .colophon .when { display: block; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+  html { scroll-behavior: auto; }
+}
+
+@media print {
+  .topbar { display: none; }
+  body { background: #fff; }
+}

@@ -1,4 +1,62 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Itamar Avitan</title>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Itamar Avitan</title>
+<meta name="description" content="I study how to tell which neural network models of human vision are right, not just which ones predict best.">
+<link rel="canonical" href="https://itamar-avitan.github.io/">
+<meta property="og:title" content="Itamar Avitan">
+<meta property="og:description" content="I study how to tell which neural network models of human vision are right, not just which ones predict best.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://itamar-avitan.github.io/">
+<meta property="og:image" content="https://itamar-avitan.github.io/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Itamar Avitan. I study how to tell which neural network models of human vision are right, not just which ones predict best.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2042%2010'%3E%3Cstyle%3Ecircle%7Bfill:%2314212B%7Drect%7Bfill:%230B5F73%7D@media%20(prefers-color-scheme:dark)%7Bcircle%7Bfill:%23E4EBEF%7Drect%7Bfill:%236DB3C4%7D%7D%3C/style%3E%3Ccircle%20cx='5'%20cy='5'%20r='5'/%3E%3Ccircle%20cx='21'%20cy='5'%20r='5'/%3E%3Crect%20x='32'%20width='10'%20height='10'/%3E%3C/svg%3E">
+<script>
+/* Theme toggle. Follows the system setting until the visitor chooses; the choice is remembered. */
+(function () {
+  var root = document.documentElement, KEY = "theme";
+  var mq = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+  try {
+    var saved = localStorage.getItem(KEY);
+    if (saved === "light" || saved === "dark") root.setAttribute("data-theme", saved);
+  } catch (e) {}
+  function current() {
+    return root.getAttribute("data-theme") || (mq && mq.matches ? "dark" : "light");
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    /* The address stays written as "name [at] host" in the markup; the link is built from that text here. */
+    var em = document.getElementById("email");
+    if (em) {
+      var a = document.createElement("a");
+      a.id = "email";
+      a.textContent = em.textContent;
+      a.href = "mailto:" + em.textContent.replace(" [at] ", "@");
+      em.parentNode.replaceChild(a, em);
+    }
+
+    var btn = document.getElementById("theme-toggle");
+    if (!btn) return;
+    var label = btn.querySelector("span");
+    function paint() { label.textContent = "Use " + (current() === "dark" ? "light" : "dark") + " theme"; }
+    btn.hidden = false;
+    paint();
+    btn.addEventListener("click", function () {
+      var next = current() === "dark" ? "light" : "dark";
+      root.setAttribute("data-theme", next);
+      try { localStorage.setItem(KEY, next); } catch (e) {}
+      paint();
+    });
+    if (mq && mq.addEventListener) mq.addEventListener("change", paint);
+  });
+})();
+</script>
+<link rel="stylesheet" href="style.css">
 <script type="application/ld+json">{
   "@context": "https://schema.org",
   "@type": "Person",
@@ -18,5 +76,198 @@
     "https://x.com/avitanit",
     "https://orcid.org/0009-0004-3662-7881"
   ]
-}</script></head><body><h1>Itamar Avitan</h1>
-<p>Gave a flash talk, “System identification perspective on representational alignment” (with Maya Zach and Tal Golan), at Neuro-AI-Talks (NEAT) 2026 in Osnabrück, Germany.</p><p>Completed the Brown University–Ben-Gurion University Embodied Brain Technology Practicum at Brown University, where our team of five built and pitched EarBetter, a prototype that explores whether physiological signals can drive selective audio attenuation.</p><p>Presented our paper with Tal Golan, “Model–Behavior Alignment under Flexible Evaluation: When the Best-Fitting Model Isn’t the Right One”, as a poster at the Conference on Neural Information Processing Systems (NeurIPS) 2025 in San Diego.</p><p>Released the code and data for our NeurIPS 2025 paper.</p><p>Posted the arXiv preprint of our model-recovery paper, accepted to the NeurIPS 2025 main track.</p></body></html>
+}</script>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="topbar">
+      <button id="theme-toggle" class="toggle" type="button" hidden>
+        <svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.75a6.25 6.25 0 0 1 0 12.5z" fill="currentColor"/></svg>
+        <span>Use dark theme</span>
+      </button>
+    </div>
+
+    <div class="masthead">
+      <picture><source srcset="img/portrait-400.webp" type="image/webp"><img src="img/portrait-800.jpg" width="120" height="120" alt="Itamar Avitan"></picture>
+      <h1>Itamar Avitan</h1>
+      <ul class="role" role="list">
+        <li>PhD candidate</li>
+        <li><a href="https://brainsandmachines.org">Brains and Machines Lab</a></li>
+        <li>Ben-Gurion University of the Negev</li>
+      </ul>
+      <p class="lede">I study how to tell which neural network models of human vision are right, not just which ones predict best.</p>
+      <nav class="links-nav" aria-label="Contact and profiles">
+        <ul class="links" role="list">
+          <li class="links__email"><span class="links__label">Email</span> <span id="email">avitanit [at] post.bgu.ac.il</span></li>
+          <li><a rel="me" href="https://scholar.google.com/citations?user=3fynQuAAAAAJ&amp;hl=en">Google Scholar</a></li>
+          <li><a rel="me" href="https://github.com/Itamar-Avitan">GitHub</a></li>
+          <li><a rel="me" href="https://www.linkedin.com/in/itamar-avitan/">LinkedIn</a></li>
+          <li><a rel="me" href="https://bsky.app/profile/avitanit.bsky.social">Bluesky</a></li>
+          <li><a rel="me" href="https://x.com/avitanit">X</a></li>
+          <li><a rel="me" href="https://orcid.org/0009-0004-3662-7881">ORCID</a></li>
+        </ul>
+      </nav>
+      <div class="bio">
+        <p>I am a PhD candidate in the Brains and Machines Lab at <span class="nb">Ben-Gurion</span> University of the Negev, advised by Dr. Tal Golan. My department is Industrial Engineering and Management, and I am affiliated with the School of Brain Sciences and Cognition.</p>
+        <p>Neural networks can predict human visual judgments, such as which of three images is the odd one out. I ask when that accuracy means a network represents the world as people do. A flexible mapping from model features to human data can make the wrong model look right, so I use <span class="nb">model-recovery</span> simulations to test whether a comparison recovers the model that generated the data. Our results argue for experiments that balance predictive accuracy against identifiability.</p>
+        <p>I have been a teaching assistant for courses on computation, cognition and deep learning, and have built neurotechnology prototypes in teams.</p>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <section id="research" aria-labelledby="research-h">
+      <h2 id="research-h" class="inset">Research</h2>
+      <article class="paper">
+        <div class="paper__aside">
+          <ul class="paper__badges" role="list" aria-label="Venues">
+            <li><span class="tag tag--venue">NeurIPS 2025</span></li>
+            <li><span class="tag">CCN 2025 · Talk</span></li>
+          </ul>
+          <figure class="paper__fig">
+            <span class="paper__plot"><img src="img/model-recovery.svg" alt="Figure 1D of the paper: a 20-by-20 confusion matrix of data-generating model (rows) against recovered model (columns) at 1.6 million training triplets. Most rows fall on the diagonal, but seven are mostly or entirely attributed to one model in the last column." width="272" height="272"></span>
+            <figcaption>Fig. 1D</figcaption>
+          </figure>
+        </div>
+        <div class="paper__body">
+          <h3>Model–Behavior Alignment under Flexible Evaluation: When the <span class="nb">Best-Fitting</span> Model Isn’t the Right One</h3>
+          <p class="authors"><span class="me">Itamar Avitan</span>, Tal Golan</p>
+          <p class="tldr"><span class="runin">Summary</span> To test whether a vision model represents images the way people do, researchers often fit a flexible linear mapping from the model’s features to human judgments and compare how well each model predicts. We simulated responses from each of 20 models fitted to 4.5 million <span class="nb">odd-one-out</span> judgments from the THINGS dataset and found that this comparison picked the model that had generated the data less than 80% of the time, even with millions of trials.</p>
+          <ul class="buttons" role="list">
+            <li><a class="btn btn--primary" href="https://proceedings.neurips.cc/paper_files/paper/2025/hash/11e1900e680f5fe1893a8e27362dbe2c-Abstract-Conference.html">Paper</a></li>
+            <li><a class="btn" href="https://arxiv.org/abs/2510.23321">arXiv</a></li>
+            <li><a class="btn" href="https://github.com/brainsandmachines/oddoneout_model_recovery">Code</a></li>
+            <li><a class="btn" href="https://doi.org/10.6084/m9.figshare.30542690.v1">Data</a></li>
+            <li><a class="btn" href="https://www.youtube.com/watch?v=vT-3kV89Rhk">CCN 2025 talk video</a></li>
+          </ul>
+        </div>
+      </article>
+    </section>
+
+    <section id="news" aria-labelledby="news-h">
+      <h2 id="news-h" class="inset">News</h2>
+      <ul class="log log--tight" role="list">
+        <li class="row">
+          <time class="when" datetime="2026-09">Sep 2026</time>
+          <p class="what">Gave a flash talk, “System identification perspective on representational alignment” (with Maya Zach and Tal Golan), at <span class="nb">Neuro-AI-Talks</span> <span class="nb">(NEAT) 2026</span> in Osnabrück, Germany.</p>
+        </li>
+        <li class="row">
+          <time class="when" datetime="2026-08">Aug 2026</time>
+          <p class="what">Completed the Brown University–<span class="nb">Ben-Gurion</span> University Embodied Brain Technology Practicum at Brown University, where our team of five built and pitched EarBetter, a prototype that explores whether physiological signals can drive selective audio attenuation.</p>
+        </li>
+        <li class="row">
+          <time class="when" datetime="2025-12">Dec 2025</time>
+          <p class="what">Presented our paper with Tal Golan, “Model–Behavior Alignment under Flexible Evaluation: When the <span class="nb">Best-Fitting</span> Model Isn’t the Right One”, as a poster at the Conference on Neural Information Processing Systems <span class="nb">(NeurIPS) 2025</span> in San Diego.</p>
+        </li>
+        <li class="row">
+          <time class="when" datetime="2025-11">Nov 2025</time>
+          <p class="what">Released the code and data for our NeurIPS 2025 paper.</p>
+        </li>
+        <li class="row">
+          <time class="when" datetime="2025-10">Oct 2025</time>
+          <p class="what">Posted the arXiv preprint of our <span class="nb">model-recovery</span> paper, accepted to the NeurIPS 2025 main track.</p>
+        </li>
+      </ul>
+      <details class="older">
+        <summary><span>Older news (2)</span></summary>
+        <ul class="log log--tight" role="list">
+          <li class="row">
+          <time class="when" datetime="2025-08">Aug 2025</time>
+          <p class="what">Gave a contributed talk and presented a poster at the Cognitive Computational Neuroscience <span class="nb">(CCN) 2025</span> conference in Amsterdam, on a preliminary version of what became our NeurIPS 2025 paper.</p>
+        </li>
+        <li class="row">
+          <time class="when" datetime="2024-11">Nov 2024</time>
+          <p class="what">Started my PhD in the Brains and Machines Lab at <span class="nb">Ben-Gurion</span> University of the Negev.</p>
+        </li>
+        </ul>
+      </details>
+    </section>
+
+    <section id="talks" aria-labelledby="talks-h">
+      <h2 id="talks-h" class="inset">Talks</h2>
+      <ul class="log log--talks" role="list">
+        <li class="row">
+          <p class="when"><time datetime="2026-09-14">14</time>–<time datetime="2026-09-15">15 Sep 2026</time></p>
+          <p class="kind"><span class="tag">Flash talk</span></p>
+          <div class="what">
+            <h3>System identification perspective on representational alignment</h3>
+            <p class="authors"><span class="me">Itamar Avitan</span>, Maya Zach, Tal Golan</p>
+            <p class="venue"><a href="https://www.kietzmannlab.uni-osnabrueck.de/neat2026/"><span class="nb">Neuro-AI-Talks</span> <span class="nb">(NEAT) 2026</span></a><span class="vh">, </span><span class="place">Innovatorium, Osnabrück, Germany</span></p>
+          </div>
+        </li>
+        <li class="row">
+          <p class="when"><time datetime="2025-12-05">5 Dec 2025</time></p>
+          <p class="kind"><span class="tag">Poster</span></p>
+          <div class="what">
+            <h3>Model–Behavior Alignment under Flexible Evaluation: When the <span class="nb">Best-Fitting</span> Model Isn’t the Right One</h3>
+            <p class="authors"><span class="me">Itamar Avitan</span>, Tal Golan</p>
+            <p class="venue"><a href="https://neurips.cc/virtual/2025/loc/san-diego/poster/116404">Conference on Neural Information Processing Systems <span class="nb">(NeurIPS) 2025</span></a><span class="vh">, </span><span class="place">San Diego, USA</span></p>
+          </div>
+        </li>
+        <li class="row">
+          <p class="when"><time datetime="2025-08-15">15 Aug 2025</time></p>
+          <p class="kind"><span class="tag">Contributed talk and poster</span></p>
+          <div class="what">
+            <h3>Rethinking Representational Alignment: <span class="nb">Linear Probing</span> Fails to Identify the <span class="nb">Ground-Truth</span> Model</h3>
+            <p class="authors"><span class="me">Itamar Avitan</span>, Tal Golan</p>
+            <p class="venue"><a href="https://2025.ccneuro.org/contributed-talk/?id=65">Cognitive Computational Neuroscience <span class="nb">(CCN) 2025</span></a><span class="vh">, </span><span class="place">University of Amsterdam, the Netherlands</span></p>
+            <p class="note">Preliminary version of the NeurIPS 2025 paper.</p>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section id="projects" aria-labelledby="projects-h">
+      <h2 id="projects-h" class="inset">Projects</h2>
+      <ul class="log" role="list">
+        <li class="row">
+          <p class="when"><time datetime="2026-07-24">24 Jul</time>–<time datetime="2026-08-06">6 Aug 2026</time></p>
+          <div class="what">
+            <h3><a href="https://github.com/Itamar-Avitan/earbetter-ebt-practicum">EarBetter</a></h3>
+            <p>Our <span class="nb">five-person</span> team’s prototype from the 2026 Brown University–<span class="nb">Ben-Gurion</span> University Embodied Brain Technology Practicum at Brown University. It explores whether physiological signals can drive selective audio attenuation. I worked on control software and system integration. The prototype was completed and pitched; parts of it remain experimental, and it has not been clinically evaluated.</p>
+          </div>
+        </li>
+        <li class="row">
+          <p class="when"><time datetime="2022">2022</time>–<time datetime="2023">2023</time></p>
+          <div class="what">
+            <h3>BCI4ALS</h3>
+            <p>In a team of five, we built a brain–computer interface (BCI) that let a person with amyotrophic lateral sclerosis (ALS) answer yes/no questions through the P300 brain response measured with electroencephalography (EEG). The patient used it live.</p>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section id="teaching" aria-labelledby="teaching-h">
+      <h2 id="teaching-h" class="inset">Teaching</h2>
+      <ul class="log log--tight log--said" role="list">
+        <li class="row">
+          <p class="what">Teaching assistant, Introduction to Computation and Cognition, <span class="nb">Ben-Gurion</span> University of the Negev<span class="vh">: </span></p>
+          <p class="when">2023/24, 2024/25 and 2025/26<span class="vh">.</span></p>
+        </li>
+        <li class="row">
+          <p class="what">Teaching assistant, Deep Learning for Neuroscience and Cognition, <span class="nb">Ben-Gurion</span> University of the Negev<span class="vh">: </span></p>
+          <p class="when">spring 2026<span class="vh">.</span></p>
+        </li>
+        <li class="row">
+          <p class="what">Tutor in algebra and calculus, Dean of Students Office, <span class="nb">Ben-Gurion</span> University of the Negev<span class="vh">: </span></p>
+          <p class="when"><time datetime="2021">2021</time>–<time datetime="2023">2023</time><span class="vh">.</span></p>
+        </li>
+        <li class="row">
+          <p class="what">Mentoring: two undergraduate research students.</p>
+        </li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="colophon">
+    <p class="row"><span class="when">Last updated</span> <time class="what" datetime="2026-09">September 2026</time></p>
+    <svg class="mark inset" aria-hidden="true" viewBox="0 0 42 10" width="42" height="10"><circle cx="5" cy="5" r="5"/><circle cx="21" cy="5" r="5"/><rect x="32" width="10" height="10"/></svg>
+  </footer>
+
+</div>
+</body>
+</html>

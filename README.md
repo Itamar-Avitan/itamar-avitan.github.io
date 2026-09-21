@@ -12,6 +12,9 @@ Source of Itamar Avitan's personal academic website, served by GitHub Pages at
 3. Run `python3 -m pytest -q`.
 4. Commit the rebuilt files together with `site.yaml`.
 
+If the name or the identity line changed, also run `python3 tools/make_og.py`: it redraws the social-media
+card `img/og.png` from `site.yaml`.
+
 One-time setup: `python3 -m pip install -r requirements.txt`.
 
 ## Never add private information: this repository is public
