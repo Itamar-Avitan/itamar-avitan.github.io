@@ -197,19 +197,33 @@ def test_research_card_shows_every_field():
     assert '<span class="tag tag--venue">NeurIPS 2025</span>' in html and '<span class="tag">CCN 2025 · Talk</span>' in html
 
 
-def test_the_card_figure_is_swapped_by_one_line_and_only_line_work_is_inverted():
+def test_the_card_figure_is_swapped_by_one_line_and_only_a_plot_is_marked_as_one():
     """site.yaml keeps both thumbnails; research[0].figure points at one of them by YAML alias."""
     lab, plot = SITE["figure_options"]["lab_illustration"], SITE["figure_options"]["recovery_matrix"]
     html = build.render(SITE)
     assert SITE["research"][0]["figure"] is lab                              # the lab illustration is live
     assert f'<picture><source srcset="{lab["webp"]}" type="image/webp"><img src="{lab["src"]}"' in html
-    assert "paper__fig--invert" not in html and "<figcaption" not in html    # a colour picture: no inversion
+    assert '<figure class="paper__fig paper__fig--art">' in html             # a picture, not a plot
+    assert "paper__fig--plot" not in html and "<figcaption" not in html
     site = copy.deepcopy(SITE)
     site["research"][0]["figure"] = site["figure_options"]["recovery_matrix"]
     other = build.render(site)
     assert f'<img src="{plot["src"]}" alt="{plot["alt"]}" width="272" height="272">' in other
     assert lab["webp"] not in other and lab["src"] not in other
-    assert '<figure class="paper__fig paper__fig--invert">' in other and "<figcaption>Fig. 1D</figcaption>" in other
+    assert '<figure class="paper__fig paper__fig--plot">' in other and "<figcaption>Fig. 1D</figcaption>" in other
+    assert "paper__fig--art" not in other
+
+
+def test_a_figure_whose_colour_is_data_is_never_hue_shifted():
+    """The dark theme may dim a figure, but a plot's colours are its data: only a brightness scale may touch
+    them, because scaling the three channels together leaves every hue and saturation where it was."""
+    css = (build.ROOT / "style.css").read_text(encoding="utf-8")
+    assert ".paper__fig--plot img { filter: var(--plot-filter); }" in css
+    assert ".paper__fig--art img { filter: var(--art-filter); }" in css
+    values = re.findall(r"--plot-filter:\s*([^;]+);", css)
+    assert len(values) == 3                                                  # light, and both dark blocks
+    assert all(re.fullmatch(r"none|brightness\(0?\.\d+\)", v.strip()) for v in values), values
+    assert "invert(" not in css and "hue-rotate(" not in css
 
 
 def test_ongoing_card_gets_an_ongoing_badge_only_when_shown():
@@ -306,25 +320,58 @@ def test_quotes_print_the_line_its_attribution_and_its_context_and_nothing_else(
     html = build.render(SITE)
     section = html.partition('<section id="quotes"')[2].partition("</section>")[0]
     shown = _visible_text(section)
-    assert section.count("<blockquote>") == section.count("<cite>") == len(SITE["quotes"]) == 3
+    assert section.count("<blockquote>") == len(SITE["quotes"]) == 3
     for quote in SITE["quotes"]:
         assert f'<blockquote><p>{quote["text"]}</p></blockquote>' in section         # printed exactly as verified
-        assert quote["attribution"] in shown and quote["note"] in shown
+        assert quote["attribution"] in shown and quote.get("note", "") in shown
         for private in ("evidence", "status", "copyright"):                          # provenance, not page text
             assert quote[private] not in shown
-    assert '<time class="when" datetime="1887">1887</time>' in section               # the year takes its tick
+    assert section.count('<time class="when" datetime="1887">1887</time>') == 2      # the year takes its tick
     assert '<time class="when" datetime="2003">2003</time>' in section
-    # a year that is not a plain date stays the words it was written as, and is still a gutter label
-    assert '<span class="when">1887 (Pope’s line, 1733-34)</span>' in section
     # the borrowed line keeps its own date in the attribution, where it cannot break at the hyphen
-    assert 'Epistle II (<span class="nb">1733-34</span>)</cite>' in section
+    assert 'Epistle II (<span class="nb">1733-34</span>)</p>' in section
+
+
+def test_a_quotation_carries_its_own_quotation_marks():
+    """Generated content cannot be selected or copied. On a page of quotations the marks are part of the text,
+    so a reader who copies a line gets the line as it is printed."""
+    section = build.render(SITE).partition('<section id="quotes"')[2].partition("</section>")[0]
+    for quote in SITE["quotes"]:
+        assert quote["text"].startswith("“") and quote["text"].endswith("”"), quote["text"]
+    css = (build.ROOT / "style.css").read_text(encoding="utf-8")
+    assert "\\201C" not in css and "\\201D" not in css
+    assert section.count("“") >= 3 and section.count("”") >= 3
+
+
+def test_the_attribution_is_a_paragraph_not_a_cite():
+    """<cite> is for the title of a work and must not mark up a person's name; every attribution here opens
+    with the speaker."""
+    html = build.render(SITE)
+    assert "<cite" not in html
+    assert html.count('<p class="quote__by">') == len(SITE["quotes"])
+
+
+def test_every_gutter_label_in_the_quotes_section_is_a_plain_date():
+    """The gutter is the page's time axis. A date that needs a parenthetical belongs in the attribution."""
+    section = build.render(SITE).partition('<section id="quotes"')[2].partition("</section>")[0]
+    labels = re.findall(r'<(?:time|span) class="when"[^>]*>([^<]*)</(?:time|span)>', section)
+    assert len(labels) == len(SITE["quotes"])
+    assert all(re.fullmatch(r"\d{4}", label) for label in labels), labels
+
+
+def test_the_quotes_section_says_why_it_is_there():
+    html = build.render(SITE)
+    assert f'<p class="section-note inset">{SITE["quotes_intro"]}</p>' in html
+    site = copy.deepcopy(SITE)
+    del site["quotes_intro"]
+    assert "section-note" not in build.render(site)
 
 
 def test_the_quotes_section_is_absent_when_there_are_no_quotes():
     site = copy.deepcopy(SITE)
     del site["quotes"]
     html = build.render(site)
-    assert '<section id="quotes"' not in html and "<blockquote" not in html and "<cite" not in html
+    assert '<section id="quotes"' not in html and "<blockquote" not in html and "quote__by" not in html
 
 
 def test_terms_of_art_do_not_break_and_stay_escaped():
@@ -361,17 +408,42 @@ def test_portrait_and_two_calm_rows_of_links():
 def test_each_profile_link_carries_a_silent_mark_beside_its_visible_label():
     page = unescape(build.render(SITE))
     marked = [link for link in SITE["links"] if link.get("icon")]
-    assert len(marked) == 7
-    assert page.count('<svg class="ico" aria-hidden="true"') == 7             # every mark, and nothing else
+    assert len(marked) == 6
+    assert page.count('<svg class="ico ') == 6                                # every mark, and nothing else
     for link in marked:
         opens = f'href="{link["url"]}">' if link.get("url") else 'class="links__label">'
         after = page.partition(opens)[2]
-        assert after.startswith('<svg class="ico" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path d="')
+        assert after.startswith(f'<svg class="ico ico--{link["icon"]}" aria-hidden="true" '
+                                'viewBox="0 0 24 24" width="16" height="16"><path d="')
         assert link["label"] in after.partition("</svg>")[2].partition("</li>")[0]   # the label stays, beside the mark
     bare = copy.deepcopy(SITE)
     for link in bare["links"]:
         link.pop("icon", None)
-    assert 'class="ico"' not in build.render(bare)
+    assert 'class="ico' not in build.render(bare)
+
+
+def test_every_mark_is_a_brand_mark_of_the_place_its_link_leads():
+    """The marks say where a link goes, which is the whole reason they are there. So the address line, whose
+    label is not a link, carries none: an envelope beside the word "Email" would only say "Email" twice."""
+    marked = {link["label"]: link.get("icon") for link in SITE["links"] if link.get("icon")}
+    assert marked == {"Google Scholar": "scholar", "GitHub": "github", "LinkedIn": "linkedin",
+                      "Bluesky": "bluesky", "X": "x", "ORCID": "orcid"}
+    assert all(link.get("url") for link in SITE["links"] if link.get("icon"))
+    html = build.render(SITE)
+    email_row = html.partition('<li class="links__email">')[2].partition("</li>")[0]
+    assert "<svg" not in email_row and '<span class="links__label">Email</span>' in email_row
+
+
+def test_the_marks_are_sized_one_by_one_so_the_row_reads_as_one_set():
+    """A row of equal boxes is not a row of equal weights: measured ink at 16px runs from 9.1 (X, two thin
+    strokes) to 28.1 (the solid LinkedIn square). Only the two heaviest come down; ORCID keeps the 16px its
+    brand guide sets as the floor."""
+    css = (build.ROOT / "style.css").read_text(encoding="utf-8")
+    sized = dict(re.findall(r"\.ico--(\w+) \{ width: ([\d.]+rem);", css))
+    assert sized == {"linkedin": "0.875rem", "bluesky": "0.9375rem"}
+    assert re.search(r"\.ico \{[^}]*width: 1rem;", css)                       # the rest keep the full 16px
+    marks = re.findall(r"\.ico(?:--\w+)?[^{}]*\{[^}]*\}", css)                # sizing settled the alignment:
+    assert marks and not any("transform" in rule for rule in marks)           # no mark is nudged by hand
 
 
 def test_favicon_is_the_mark():

@@ -23,8 +23,10 @@ and the card points at one of them:
   figure: *recovery_matrix      # the paper's own Figure 1D
 ```
 
-Change that line, run `python3 build.py`, and the card swaps. A picture that is line work on white carries
-`invert: true`, which lets the dark theme turn it inside out; a photograph or a colour illustration must not.
+Change that line, run `python3 build.py`, and the card swaps. A figure whose colour is the data — a heat map,
+a colour-coded plot — carries `plot: true`, and the dark theme then only dims it, so that its hues still match
+the ones printed in the paper. A figure without the flag is treated as artwork and dimmed a little further, so
+that it cannot become the brightest thing on a dark page.
 To prepare another one, run `python3 tools/make_paper_thumb.py <image> <name>`: it writes `img/<name>.webp`
 and a `.jpg` fallback, square and stripped of metadata, and prints their sizes.
 

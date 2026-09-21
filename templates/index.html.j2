@@ -66,8 +66,10 @@
     Scholar mark. "github", "bluesky", "orcid" and "x" are the marks published by Simple Icons 16.32.0
     (CC0-1.0, https://github.com/simple-icons/simple-icons); "linkedin" is the [in] mark from Simple Icons
     13.21.0, its last release to carry it. CC0 asks for no attribution; it is recorded here because a brand
-    mark is a trademark whatever its file licence says. Each is used unaltered, at 16px (the smallest size
-    ORCID permits), only as a link to the owner's own page -- the use every one of those brand guides allows.
+    mark is a trademark whatever its file licence says. Each is used unaltered and only as a link to the
+    owner's own page -- the use every one of those brand guides allows. The ORCID iD mark keeps the full 16px,
+    the smallest size ORCID permits; the marks that fill more of their box than the rest are set one or two
+    pixels smaller, which is what makes the row read as one weight rather than six.
     Their colour rules ask for black or white; these follow the page instead, in the grey of its dates and
     labels, which is the one point where this falls short of the letter of the guides. -#}
 {%- set ICONS = {
@@ -80,9 +82,11 @@
   "x": "M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z",
 } -%}
 
+{#- Each mark also carries its own class, because the six brand marks fill their 24x24 box very differently:
+    the stylesheet sizes them one by one so the row reads as one set rather than as six weights. -#}
 {%- macro icon(name) -%}
   {%- if name and ICONS.get(name) -%}
-    <svg class="ico" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path d="{{ ICONS[name] }}"/></svg>
+    <svg class="ico ico--{{ name }}" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path d="{{ ICONS[name] }}"/></svg>
   {%- endif -%}
 {%- endmacro -%}
 
@@ -227,10 +231,10 @@
             <li><span class="tag">Ongoing</span></li>
   {% endif %}
           </ul>
-{# A figure carries a webp when one was made, and "invert: true" only when it is line work on white that the
-   dark theme may turn inside out. A caption appears when it says something the picture does not. #}
+{# A figure carries a webp when one was made, and "plot: true" when its colour is data and must keep its hues.
+   A caption appears when it says something the picture does not. #}
   {% if card.get("figure") %}
-          <figure class="paper__fig{{ " paper__fig--invert" if card.figure.get("invert") else "" }}">
+          <figure class="paper__fig {{ "paper__fig--plot" if card.figure.get("plot") else "paper__fig--art" }}">
             <span class="paper__plot">
     {% if card.figure.get("webp") %}
               <picture><source srcset="{{ card.figure.webp }}" type="image/webp"><img src="{{ card.figure.src }}" alt="{{ card.figure.alt }}" width="272" height="272"></picture>
@@ -312,19 +316,23 @@
       </ul>
     </section>
 
-{# Lines he has copied out, on the same time axis as everything else: the year sits in the gutter and takes its
-   tick, so a quotation is dated like a talk. The attribution stands outside the blockquote, as the quoting
-   rules ask; the note after it is the one sentence of context that tells you where the line falls. #}
+{# A commonplace book: lines he has copied out, on the same time axis as everything else, so the year sits in
+   the gutter and takes its tick like a talk. The attribution stands outside the blockquote, as the quoting
+   rules ask, and is a paragraph rather than a <cite>, because it opens with a person and <cite> marks the
+   title of a work; the note after it is the one sentence of context that tells you where the line falls. #}
 {% if site.get("quotes") %}
     <section id="quotes" aria-labelledby="quotes-h">
-      <h2 id="quotes-h" class="inset">Quotes</h2>
-      <ul class="log" role="list">
+      <h2 id="quotes-h" class="inset">Commonplace</h2>
+  {% if site.get("quotes_intro") %}
+      <p class="section-note inset">{{ nb(site.quotes_intro) }}</p>
+  {% endif %}
+      <ul class="log log--quotes" role="list">
   {% for quote in site.quotes %}
         <li class="row">
           {{ dates(quote.year, "when") }}
           <div class="what quote">
             <blockquote><p>{{ nb(quote.text) }}</p></blockquote>
-            <p class="quote__by"><cite>{{ nb(quote.attribution) }}</cite></p>
+            <p class="quote__by">{{ nb(quote.attribution) }}</p>
     {% if quote.get("note") %}
             <p class="quote__note">{{ nb(quote.note) }}</p>
     {% endif %}

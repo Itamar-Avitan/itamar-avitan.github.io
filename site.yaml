@@ -39,11 +39,13 @@ bio:
 - I have been a teaching assistant for courses on computation, cognition and deep learning, and have built neurotechnology prototypes in teams.
 # icon: which mark the template draws before the label. Known names: mail, scholar, github, linkedin,
 # bluesky, x, orcid. Leave it out and the link shows its label alone.
+# Every mark on this row is the destination's own brand mark, so it says where the link goes. The address
+# line carries none: an envelope beside the word "Email" would only say "Email" twice, and it is the one
+# row whose label is not a link. Add "icon: mail" back here to draw it again.
 links:
 - label: Email
   url: null
   text: avitanit [at] post.bgu.ac.il
-  icon: mail
 - label: Google Scholar
   url: https://scholar.google.com/citations?user=3fynQuAAAAAJ&hl=en
   icon: scholar
@@ -81,8 +83,9 @@ news:
   text: Started my PhD in the Brains and Machines Lab at Ben-Gurion University of the Negev.
 # The two thumbnails prepared for the research card below. To swap one for the other, change the single line
 # "figure: *lab_illustration" to "figure: *recovery_matrix" (or back) and run python3 build.py.
-#   invert: true  marks a line drawing on white that the dark theme may turn inside out; a photograph or a
-#   colour illustration must never carry it.
+#   plot: true  marks a figure whose colour is data (a heat map, a colour-coded plot). The dark theme may dim
+#   it, but never shifts its hues, so the colours still match the ones printed in the paper. A picture without
+#   the flag is treated as artwork and is dimmed a little further, so it cannot outshine the page in the dark.
 figure_options:
   lab_illustration: &lab_illustration
     webp: img/paper-lab.webp
@@ -95,7 +98,7 @@ figure_options:
       model (columns) at 1.6 million training triplets. Most rows fall on the diagonal, but seven are mostly or
       entirely attributed to one model in the last column.'
     caption: Fig. 1D
-    invert: true
+    plot: true
 research:
 - title: 'Model–Behavior Alignment under Flexible Evaluation: When the Best-Fitting Model Isn’t the Right One'
   authors:
@@ -159,8 +162,12 @@ projects:
 # Lines about the mind, collected. text, attribution and note are printed; year is the gutter label; status,
 # evidence and copyright are the provenance record and are not rendered. Keep a quotation from a work that is
 # still in copyright to a single sentence, and always name its source.
+# The quotation marks belong to the text here, not to a CSS rule, so that a reader who copies a line gets the
+# marks with it. The year is a plain date like every other label in the gutter: a date that needs a
+# parenthetical belongs in the attribution, where there is room to say it properly.
+quotes_intro: Lines about memory and mind I keep coming back to.
 quotes:
-- text: I consider that a man’s brain originally is like a little empty attic, and you have to stock it with such furniture as you choose.
+- text: “I consider that a man’s brain originally is like a little empty attic, and you have to stock it with such furniture as you choose.”
   attribution: Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter II, “The Science of Deduction”
   year: '1887'
   status: verified
@@ -175,9 +182,9 @@ quotes:
     have nothing but the tools which may help him in doing his work…” (British single-l “skilful”).
   copyright: public-domain
   note: Holmes says this immediately after learning the earth goes round the sun and replying, “Now that I do know it I shall do my best to forget it.”
-- text: The proper study of mankind is man.
+- text: “The proper study of mankind is man.”
   attribution: Dr John Watson, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter I, “Mr. Sherlock Holmes” — quoting Alexander Pope, An Essay on Man, Epistle II (1733-34)
-  year: 1887 (Pope’s line, 1733-34)
+  year: '1887'
   status: verified
   evidence: >-
     Project Gutenberg ebook #244, lines 393-395. Exact source text: ‘“Oh! a mystery is it?” I cried, rubbing my
@@ -191,7 +198,7 @@ quotes:
     (“Plac’d on this isthmus”).
   copyright: public-domain
   note: Doyle prints it in single quotation marks because Watson is himself quoting Pope; Stamford’s reply is “You must study him, then… You’ll find him a knotty problem.”
-- text: The mind is not a book, to be opened at will and examined at leisure.
+- text: “The mind is not a book, to be opened at will and examined at leisure.”
   attribution: Severus Snape, in J.K. Rowling, Harry Potter and the Order of the Phoenix (2003), Chapter 24, “Occlumency”
   year: '2003'
   status: corrected

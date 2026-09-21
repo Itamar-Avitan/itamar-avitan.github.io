@@ -72,7 +72,7 @@ def test_structure_and_alt_text(browser):
     for sec in ("research", "news", "talks", "projects", "quotes", "teaching"):
         assert page.locator(f"#{sec}").count() == 1
     assert page.evaluate("[...document.querySelectorAll('svg.ico')].every(s => s.getAttribute('aria-hidden') === 'true')")
-    assert page.locator("svg.ico").count() == 7
+    assert page.locator("svg.ico").count() == 6
 
 
 def test_body_text_is_at_least_16px(browser):
