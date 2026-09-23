@@ -608,7 +608,11 @@ def test_teaching_is_two_sections_and_every_row_is_dated_and_titled():
         assert f'<section id="{section}" aria-labelledby="{section}-h">' in html, section
         assert f'<h2 id="{section}-h" class="inset">{heading}</h2>' in html, section
     rows = html.count('<li class="row">')
-    assert rows == html.count('<p class="when">') == html.count('<p class="kind">') == 5
+    # The literal is deliberate and has to be raised by hand when a row is added: the assertion under it
+    # derives the same number from site.yaml, so on its own it would wave through a row silently deleted.
+    # 6 = four courses (the fourth, Computational Approaches to Neuroimaging, added so this page matches the
+    # CV the nav strip opens) + the two student rows.
+    assert rows == html.count('<p class="when">') == html.count('<p class="kind">') == 6
     assert rows == len(SITE["teaching"]["courses"]) + len(SITE["teaching"]["students"])
     for entry in SITE["teaching"]["courses"] + SITE["teaching"]["students"]:
         assert f'<span class="tag">{entry["kind"]}</span>' in html, entry["title"]
@@ -652,7 +656,7 @@ def test_quotes_print_the_line_its_attribution_and_its_context_and_nothing_else(
     assert section.count('<time class="when" datetime="1887">1887</time>') == 3      # the year takes its tick
     assert '<time class="when" datetime="2003">2003</time>' in section
     # the borrowed line keeps its own date in the attribution, where it cannot break at the hyphen
-    assert 'Epistle II (<span class="nb">1733-34</span>)</p>' in section
+    assert 'Epistle II (<span class="nb">1733–34</span>)</p>' in section
 
 
 def test_a_quotation_carries_its_own_quotation_marks():
@@ -994,11 +998,17 @@ def test_the_statement_neither_claims_conformance_nor_cites_a_law():
         assert word.lower() not in text.lower(), word
 
 
-def test_the_published_cv_carries_the_wording_the_site_carries():
+def test_the_published_cv_is_the_public_build_and_obeys_the_programme_ruling():
     """cv.pdf is linked from the strip of every page, so it is part of what this site says. The owner's
     programme-first ruling deleted his personal contribution, the sensor inventory and the business-plan
     detail from the CVs; if the published PDF still held them, the site would contradict its own project
-    entry from its own navigation bar. It is the public build (no phone number) of the cv repository."""
+    entry from its own navigation bar. It is the public build (no phone number) of the cv repository.
+
+    This checks what the file says, not how fresh it is: a cv.pdf ten commits stale would pass every line
+    below, because none of these phrases would have moved. Freshness is guarded where the drift is caused
+    and where both sides can be built -- `make check-published` in the cv repository, which is part of its
+    `make test`. Do not turn this into an agreement check against site.yaml: it would need an allow-list
+    covering nearly half the claims and would still miss the drift that guard catches."""
     pdf = build.ROOT / "cv.pdf"
     assert pdf.exists()
     out = subprocess.run(["pdftotext", str(pdf), "-"], capture_output=True, text=True)

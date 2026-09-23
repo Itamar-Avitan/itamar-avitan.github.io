@@ -130,6 +130,12 @@ h1, h2, h3, p, ul, figure { margin: 0; }
 ul { padding: 0; list-style: none; }
 h3 { text-wrap: balance; }
 
+/* A word too long for its column breaks instead of pushing the page. At 175% text on a 320px screen
+   "Commonplace", "electroencephalography" and "Itamar Avitan" are each wider than the measure, and with
+   nothing set here each of them scrolled the whole page sideways. break-word, not anywhere: it breaks only
+   a word that would otherwise overflow, so ordinary lines are set exactly as they were. */
+h1, h2, h3, p, li, blockquote { overflow-wrap: break-word; }
+
 h1, h2, h3 { font-weight: 600; color: var(--ink); }
 
 a {
@@ -238,11 +244,15 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
 .toggle[hidden] { display: none; }
 .toggle:hover { color: var(--ink); border-color: var(--tag-line); }
 
-/* ---------- Masthead ---------- */
+/* ---------- Masthead ----------
+   The portrait column is set in px, not rem, and that is deliberate: the portrait is a photograph, not text.
+   WCAG 1.4.4 governs text, and a picture that doubles with the text size eats the name's column -- at 200% a
+   5rem portrait is 160px of a 320px screen and the name has nowhere to go. The >= 45rem block below overrides
+   both of these with var(--gutter), so the laptop composition is untouched. */
 .masthead {
   display: grid;
-  grid-template-columns: 5rem minmax(0, 1fr);
-  column-gap: 1rem;
+  grid-template-columns: 80px minmax(0, 1fr);
+  column-gap: 16px;
   align-items: center;
   margin-top: 1.75rem;
 }
@@ -251,7 +261,7 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
   grid-column: 1;
   grid-row: 1;
   display: block;
-  width: 5rem;
+  width: 80px;                /* px for the same reason as the column above: this is a photograph, not text */
 }
 .masthead picture img {
   display: block;
@@ -266,7 +276,11 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
 .masthead h1 {
   grid-column: 2;
   grid-row: 1;
-  font-size: 2rem;
+  /* A cap, never a grow: min() takes the smaller of the two, so the name is 2rem everywhere it fits and only
+     gives way on a narrow screen at a large text size, where 2rem would otherwise be wider than its column
+     and push the page sideways. 15vw is the measured ceiling that still holds two lines with no overflow at
+     every width; 13vw is a deliberate margin under it. The >= 45rem block overrides this on the laptop. */
+  font-size: min(2rem, 13vw);
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
@@ -309,7 +323,10 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
   color: var(--ink-2);
   clip-path: inset(-6px -6px -6px calc(1.25em - 6px));   /* room for the focus ring */
 }
-.role li { position: relative; padding-left: 1.25em; white-space: nowrap; }
+/* No nowrap here. "Ben-Gurion University of the Negev" set as one unbreakable box is 344px wide at 125% text
+   and pushes a 320px page sideways; the proper noun is kept whole by the nb() span the macro now wraps it in,
+   which protects the hyphen without making the whole phrase rigid. */
+.role li { position: relative; padding-left: 1.25em; }
 .role li::before {
   content: "\00B7";
   position: absolute;
@@ -341,6 +358,9 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
   align-items: center;
   gap: 0.4375rem;
 }
+/* the address falls under its own label rather than dragging the page sideways when the text is enlarged:
+   an inline-flex box cannot break between "Email" and the address unless it is allowed to wrap */
+.links__email { flex-wrap: wrap; }
 .links a:not(.btn) { position: relative; padding-block: 0.25rem; }
 
 /* Tap target, WCAG 2.2 SC 2.5.8: every profile link must be at least 24 by 24 CSS px to point at. The box is
@@ -915,13 +935,28 @@ main.opens-with-h1 { margin-top: 2.25rem; }
 
   /* the rule ends at the last tick: "Last updated" */
   .colophon { padding-block: 4.5rem 4rem; }
+  /* The rule runs unbroken from main's foot down to that last tick. The colophon is two blocks -- the links
+     and the row -- so it takes two segments, one each; a single segment reaching back 4.5rem assumed the row
+     was the first thing here, which it stopped being when the links moved in, and the rule then broke over
+     the links and restarted in mid-air. The numbers below are .colophon's own padding-top and .links-nav's
+     own margins: the segment has to agree with all three, and that agreement is what drifted apart before. */
+  .colophon .links-nav { position: relative; }
+  .colophon .links-nav::before {
+    content: "";
+    position: absolute;
+    left: calc(var(--gap) / -2);          /* .links-nav is inset by gutter+gap, so this lands on the rule's column */
+    top: calc(-1 * (4.5rem + 1.25rem));   /* .colophon padding-top + .links-nav margin-top -> main's foot */
+    bottom: -1.75rem;                     /* .colophon .links-nav margin-bottom -> the row's top */
+    width: 1px;
+    background: var(--rule);
+  }
   .colophon .row { position: relative; }
   .colophon .row::before {
     content: "";
     position: absolute;
     left: calc(var(--gutter) + var(--gap) / 2);
-    top: -4.5rem;
-    height: calc(4.5rem + 0.5lh);
+    top: 0;
+    height: 0.5lh;                        /* was: top: -4.5rem; height: calc(4.5rem + 0.5lh) */
     width: 1px;
     background: var(--rule);
   }

@@ -12,6 +12,15 @@ are committed, so no continuous-integration build is needed.
 2. Run `python3 build.py`.
 3. Run `python3 -m pytest -q`.
 4. Commit the rebuilt files together with `site.yaml`.
+5. If the CV changed, run `make publish` in the cv repository and commit the refreshed `cv.pdf` with the rest.
+
+Step 5 names the command rather than the copy on purpose, so this file and the cv repository's `Makefile`
+cannot drift apart. `cv.pdf` here is `build/cv-public.pdf` there; this repository can neither build it nor
+tell whether it has gone stale, so that alarm lives in the cv repository, where `make check-published` (run
+as part of its `make test`) compares the published PDF's text against a fresh build and fails when they
+differ. The test here, `test_the_published_cv_is_the_public_build_and_obeys_the_programme_ruling`, checks
+only what this repository can check: that the file published is the phone-free public variant and that it
+obeys the owner's wording rulings.
 
 If the name or the identity line changed, also run `python3 tools/make_og.py`: it redraws the social-media
 card `img/og.png` from `site.yaml`.

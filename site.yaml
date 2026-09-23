@@ -30,7 +30,12 @@ pages:
 - slug: research/
   nav: Research
   heading: Research
-  intro: Neural networks can predict human visual judgments, such as which of three images is the odd one out. I ask when that accuracy means a network represents the world as people do. A flexible mapping from model features to human data can make the wrong model look right, so I use model-recovery simulations to test whether a comparison recovers the model that generated the data. Our results argue for experiments that balance predictive accuracy against identifiability.
+  # The intro frames and hands off; it does not summarise the card 250px below it. The mechanism, the method
+  # and the number are stated once, better, in the paper card -- saying them here too put the same argument on
+  # one screen twice in the same order. The closing phrase deliberately echoes the paper title printed just
+  # beneath it. Do not reintroduce the bare noun "identifiability" here: its only definition on this site was
+  # the sentence that was cut, and the plain verb needs no setup.
+  intro: Neural networks can predict human visual judgments, such as which of three images is the odd one out. I ask when that accuracy means a network represents the world as people do. Our results argue for comparisons built to identify the right model, not only the best-fitting one.
   description: The paper, talks and projects of Itamar Avitan, on identifying the right model of human vision rather than the best-fitting one.
 - slug: teaching/
   nav: Teaching
@@ -74,7 +79,8 @@ nobreak:
 - odd-one-out
 - five-person
 - add-on
-- 1733-34
+- brain–computer
+- 1733–34
 
 # --- content (text verbatim from the fact-checked seed) ---
 name: Itamar Avitan
@@ -89,7 +95,7 @@ identity_line: I study how to tell which neural network models of human vision a
 # DRAFT, awaiting the owner's own words. Written on 2026-09-21 in answer to his ask for "a proper about me in
 # your voice" and a "Now / what I'm up to" block. Every clause below is drawn from facts already on this site
 # or given by him -- the lab, the advisor, the fields he came from, the question the work asks, the result the
-# paper found, the teaching, the two students, the EEG speller and the practicum product. Nothing about his
+# paper found, the teaching, the two students, the BCI4ALS build and the practicum product. Nothing about his
 # life outside that is invented, and nothing should be added here that he has not said. It replaces the old
 # three-paragraph "bio", whose second paragraph is kept verbatim as the Research page's intro above.
 #
@@ -111,7 +117,7 @@ identity_line: I study how to tell which neural network models of human vision a
 about:
 - I am a PhD candidate in the Brains and Machines Lab at Ben-Gurion University of the Negev, advised by Dr. Tal Golan, and I came to it from cognitive and brain sciences and from psychology — the degrees and the dates are in the CV.
 - The measure is the hard part. To say a network sees the way people do, you fit a mapping from its features to human judgments and check how well it predicts — and a mapping flexible enough to fit anything can make the wrong network look like the winner. In our simulations that comparison recovered the model that had generated the data less than 80% of the time.
-- 'I teach as well: courses on cognition and computation and on deep learning, an academic writing course from next year, and two undergraduate students whose research I mentor. I like building things with other people — an EEG speller that let a person with ALS answer yes or no, and a headphone add-on for the noises that set anxiety off. And I collect lines about the mind.'
+- 'I teach as well: courses on cognition and computation and on deep learning, an academic writing course from next year, and two undergraduate students whose research I mentor. I like building things with other people — an EEG brain–computer interface that let a person with ALS answer yes or no, and a headphone add-on for the noises that set anxiety off. And I collect lines about the mind.'
 # DRAFT, as above. Short enough to keep true: rewrite it whenever it stops being what you are doing.
 now_as_of: Sep 2026
 now:
@@ -141,9 +147,10 @@ elsewhere:
   url: research/
   text: the paper this all comes out of, the three talks that carried it, and the things I build with other people.
 # "the newest from 2026/27", not "and an academic writing course from 2026/27": the writing course is one of
-# the three, not a fourth beside them, and the first wording said there were four.
+# the four, not a fifth beside them, and the first wording said there was one more course than there is.
+# The count is a real count -- it has to match the rows on /teaching/, which in turn have to match the CV.
 - page: Teaching
-  label: Three courses, the newest from 2026/27
+  label: Four courses, the newest from 2026/27
   url: teaching/
   text: what each one covers, and the students I work with.
 - page: Commonplace
@@ -332,7 +339,7 @@ projects:
   url: https://github.com/Itamar-Avitan/earbetter-ebt-practicum
 - title: BCI4ALS
   period: 2022–2023
-  blurb: In a team of five, we built a brain–computer interface (BCI) that let a person with amyotrophic lateral sclerosis (ALS) answer yes/no questions through the P300 brain response measured with electroencephalography (EEG). The patient used it live.
+  blurb: In a team of five, we built a brain–computer interface (BCI) that let a person with amyotrophic lateral sclerosis (ALS) answer yes/no questions through the P300 brain response measured with electroencephalography (EEG). The person it was built for used it live.
 # Lines about the mind, collected. text, attribution and note are printed; year is the gutter label; status,
 # evidence and copyright are the provenance record and are not rendered. Always name a quotation's source.
 # House rule: keep a quotation from a work that is still in copyright to a single sentence. The Snape entry
@@ -392,7 +399,7 @@ quotes:
   copyright: public-domain
   note: Holmes says this immediately after learning the earth goes round the sun and replying, “Now that I do know it I shall do my best to forget it.”
 - text: “The proper study of mankind is man.”
-  attribution: Dr John Watson, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter I, “Mr. Sherlock Holmes” — quoting Alexander Pope, An Essay on Man, Epistle II (1733-34)
+  attribution: Dr. John Watson, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter I, “Mr. Sherlock Holmes” — quoting Alexander Pope, An Essay on Man, Epistle II (1733–34)
   year: '1887'
   status: verified
   evidence: >-
@@ -450,6 +457,13 @@ teaching:
     kind: Teaching assistant
     when: 2023/24, 2024/25 and 2025/26
     what: 'An introduction to treating a mind as something that computes: the questions cognitive science asks, and the models built to answer them.'
+  # Quote the year. `when` is lifted into the gutter and split on the en dash by the template, so a bare 2024
+  # is read by YAML as an integer and the build stops on it. This is the first row whose date is a bare year.
+  # It is placed here, not last, because the gutter dates are a time axis and 2024 precedes spring 2026.
+  - title: Computational Approaches to Neuroimaging
+    kind: Teaching assistant
+    when: '2024'
+    what: 'Turning brain images into numbers: the computational methods that take imaging data and make a measurement out of it.'
   - title: Deep Learning for Neuroscience and Cognition
     kind: Teaching assistant
     when: spring 2026
@@ -464,7 +478,9 @@ teaching:
   - title: Two undergraduate research students
     kind: Mentoring
     when: 2025–2026
-  - title: Algebra and calculus, Dean of Students Office
+  # The subjects are TEACH-TUTOR's, from the advisor-edited CV the register sources: the site printed a
+  # weaker list that dropped statistics and said "algebra" where the confirmed subject is linear algebra.
+  - title: Calculus, linear algebra and statistics, Dean of Students Office
     kind: Tutor
     when: 2021–2023
 
@@ -500,7 +516,7 @@ accessibility:
   limits:
   - This site has not been audited by anyone else, and it has not been tested with a screen reader, with voice control or with a magnifier. The checks above are automated ones and my own reading, and neither can tell you how a page actually sounds.
   - 'The CV is a PDF, and it is the weakest thing here: it is built so that its text comes out in order and every address in it is real text, but it is not a tagged PDF.'
-  - This is a personal site. One person writes it and keeps it working, in the time he has, so a fix may not be quick.
+  - This is a personal site. I write it and keep it working, in the time I have, so a fix may not be quick.
   report: 'If something here is hard to use, or does not work with whatever you use to read the web, please tell me — that is the fastest way for it to get fixed. My address is on every page of this site: at the top of the home page, and at the foot of the others. What helps most: which page you were on, what you were using, and what happened.'
 
 footer:

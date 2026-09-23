@@ -102,12 +102,15 @@
   {%- endfor -%}
 {%- endmacro -%}
 
-{#- The role line under a name: "PhD candidate · Brains and Machines Lab · Ben-Gurion University of the Negev". -#}
+{#- The role line under a name: "PhD candidate · Brains and Machines Lab · Ben-Gurion University of the Negev".
+    Through nb(), because the stylesheet no longer sets the item nowrap: a rigid 344px box scrolled the page
+    sideways as soon as the reader enlarged the text. "Ben-Gurion" is already in site.yaml's nobreak list, so
+    this protects the hyphen from setting as "Ben-/Gurion" while letting the phrase wrap where a space is. -#}
 {%- macro role_line() %}
 {% if site.get("role") %}
       <ul class="role" role="list">
   {% for item in site.role %}
-        <li>{% if item.get("url") %}<a href="{{ item.url }}">{{ item.label }}</a>{% else %}{{ item.label }}{% endif %}</li>
+        <li>{% if item.get("url") %}<a href="{{ item.url }}">{{ nb(item.label) }}</a>{% else %}{{ nb(item.label) }}{% endif %}</li>
   {% endfor %}
       </ul>
 {% endif %}

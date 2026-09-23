@@ -14,6 +14,12 @@ NAV_SLUGS = [page["slug"] for page in SITE["pages"] if page.get("nav")]   # the 
 NAV = [page["nav"] for page in SITE["pages"] if page.get("nav")]
 COLOPHON = [page["colophon"] for page in SITE["pages"] if page.get("colophon")]
 WIDTHS = [320, 400, 768, 1280]                                   # 320px is the narrowest viewport supported
+# The reader's own text size, as a root font size in px: 16 is the browser default, 32 is 200%. This axis is
+# here because it was missing -- the overflow test below only ever ran at the default size, and so it passed
+# on a site that ran 231px past a 320px viewport as soon as anyone enlarged the text. That is WCAG 1.4.4
+# (Resize Text) and 1.4.10 (Reflow), two of the criteria /accessibility/ claims. iOS and Android "Larger
+# Text" and Chrome's Medium/Large settings land inside this band: ordinary readers, not an edge case.
+TEXT_SIZES = [16, 20, 24, 28, 32]
 
 
 @pytest.fixture(scope="module")
@@ -39,9 +45,13 @@ def _page(browser, width, scheme="light", slug=""):
 
 @pytest.mark.parametrize("slug", SLUGS)
 @pytest.mark.parametrize("width", WIDTHS)
-def test_no_horizontal_overflow(browser, width, slug):
+@pytest.mark.parametrize("text", TEXT_SIZES)
+def test_no_horizontal_overflow(browser, width, text, slug):
     page, _, _ = _page(browser, width, slug=slug)
-    assert page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
+    page.evaluate(f"document.documentElement.style.fontSize = '{text}px'")
+    page.wait_for_timeout(50)
+    over = page.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth")
+    assert over <= 0, f"{slug or 'home'} at {width}px, {text}px text: {over}px past the viewport"
 
 
 @pytest.mark.parametrize("slug", SLUGS)
@@ -499,7 +509,8 @@ def test_the_statement_says_the_aim_the_checks_the_limits_and_how_to_report(brow
     text = page.inner_text("main")
     assert "WCAG 2.1 Level AA" in text
     assert "not a certificate" in text and "nobody but me has audited" in text
-    assert "One person writes it" in text                      # a personal site, maintained by one person
+    assert "I write it and keep it working" in text            # a personal site, maintained by one person,
+                                                               # said in the first person like the rest of the page
     assert "has not been tested with a screen reader" in text  # and what is therefore not claimed
     assert "at the top of the home page" in text                       # how to report, without printing an address
     # the statement itself carries no address; the colophon below it does, as it does on every page
