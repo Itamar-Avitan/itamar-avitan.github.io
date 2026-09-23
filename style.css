@@ -190,10 +190,12 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
   padding-block: 1rem var(--strip-pad);
   border-bottom: 1px solid var(--rule);
 }
-/* The row gap is wider than the tick is long. Below about 360px the five items no longer fit on one line, and
-   the tick under a link on the first line then hangs into the gap under it; 1.125rem of gap against 0.6875rem
-   of overhang keeps it clear of the line below, so it still reads as an underline and never lands on another
-   link. Above that width the strip is one line and the tick lies on the hairline, which is the point of it. */
+/* The row gap is wider than the tick is long. On a phone the five items do not fit beside the 44px theme
+   toggle -- measured 2026-09-23, they wrap at every width from 320px to 430px (they need about 355px, and the
+   nav gets 294px at 390) -- and the tick under a link on the first line then hangs into the gap under it;
+   1.125rem of gap against 0.6875rem of overhang keeps it clear of the line below, so it still reads as an
+   underline and never lands on another link. From 45rem up the strip is one line and the tick lies on the
+   hairline, which is the point of it. */
 .sitenav ul {
   display: flex;
   flex-wrap: wrap;
