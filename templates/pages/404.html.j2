@@ -1,0 +1,14 @@
+{#- The page GitHub Pages serves, with status 404, for any address that has nothing at it. It is served at
+    every depth, so build.py renders it with base "/" and every link and asset on it is root-absolute; a copy
+    opened straight off the disk is therefore unstyled, which is expected. Its words are the `not_found`
+    entry of site.yaml, and the CV sentence disappears with `show_cv`, like the strip's CV chip. -#}
+{% extends "base.html.j2" %}
+
+{% block main %}
+
+    <section id="not-found" aria-labelledby="not-found-h">
+      <h1 id="not-found-h" class="inset">{{ page.heading }}</h1>
+      <p class="page-intro inset">{{ page.intro }}{% for link in site.links if link.label == "CV" and site.show_cv and link.get("url") %} The CV is at <a href="{{ link.url|local(base) }}">{{ site.site_url }}{{ link.url }}</a>.{% endfor %}</p>
+    </section>
+
+{% endblock %}

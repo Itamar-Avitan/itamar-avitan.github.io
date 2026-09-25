@@ -519,6 +519,10 @@ main.opens-with-h1 { margin-top: 2.25rem; }
 
 /* one or two lines of framing under a page title, in the text column */
 .page-intro { margin: -0.25rem 0 1.5rem; color: var(--ink-2); }
+/* A page-intro that ends its page (the 404 page) must not push its margin out past main, or the margin rule
+   breaks for that height between main's foot and the colophon's first segment. Elsewhere it ends only its
+   own section, and the next section's larger top margin sets that gap, so nothing else moves. */
+.page-intro:last-child { margin-bottom: 0; }
 
 /* ---------- Now: what he is doing, under one date ----------
    Not events, so no dates of their own and no ticks of their own; the accent hairline before each line is the

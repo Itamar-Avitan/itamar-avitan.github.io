@@ -5,6 +5,12 @@
 site_url: https://itamar-avitan.github.io/
 alternate_name: Itamar Amram Avitan
 affiliation: Ben-Gurion University of the Negev
+# Structured data only (the JSON-LD graph in every page's head); nothing here prints on a page. `knows_about`
+# holds only terms a page of the site prints -- the field words of About (FACTS ID-FIELD), the research
+# intro's term, the identity line's nouns -- because structured data describes the visible page and must not
+# add to it (deep review 2026-09-25, MR-06 with EM-14's rule; tests/test_build.py checks each term is visible).
+affiliation_url: https://www.bgu.ac.il/
+knows_about: [NeuroAI, Computational cognitive neuroscience, Representational alignment, Human vision, Neural network models]
 show_cv: true
 # Hiding a card does not make it private: nothing unpublished may be stored in this repository at all, hidden
 # or not (README, public-only policy). This switch only decides whether a card marked `ongoing: true` is drawn
@@ -29,12 +35,24 @@ portrait: {webp: img/portrait-400.webp, jpg: img/portrait-800.jpg}
 #               A page needs one of `nav` and `colophon`, or nothing links to it; it may not have both, which
 #               would say the same address twice on every page. build.py checks all three of those.
 #   heading     the page's <h1>. The home page has none here: its <h1> is the name in the masthead.
+#   title       the page's <title> and og:title (optional). Without it: "<heading> — <name>", or the bare
+#               name on the home page. The home page sets one so that a search result says who he is, not
+#               only his name, which he shares with another Itamar Avitan (deep review 2026-09-25, MR-03).
 #   intro       one line of framing under the heading (optional).
-#   description the page's meta description; the home page falls back to identity_line.
+#   description the page's meta description (optional); without one, identity_line.
+#   og_image, og_image_alt
+#               the link-preview picture (1200 by 630, under img/) and its description, when the page has one
+#               of its own; every other page shares img/og.png, the name card. The two go together.
 # Every page listed here is written into sitemap.xml, strip or colophon alike.
 pages:
 - slug: ''
   nav: Home
+  # Every word of the title and the description is printed on the site already: the field words are in About
+  # (FACTS ID-FIELD), the status in the role line, the university in the affiliation. The name leads, exactly
+  # as the <h1> prints it (spec 4.5 is a name-form rule: never "Itamar Amram Avitan" here). The description
+  # ends on the identity line and follows it when that line changes (owner ruling 17, built by WP-S17).
+  title: Itamar Avitan · NeuroAI PhD candidate, Ben-Gurion University
+  description: NeuroAI PhD candidate at Ben-Gurion University. I study how to tell which neural network models of human vision are right, not just which ones predict best.
 - slug: research/
   nav: Research
   heading: Research
@@ -49,6 +67,12 @@ pages:
   # True of every item on the page: all three talk and poster titles are literally on representational
   # alignment, and the two projects are neurotechnology, not model identification (CS-08).
   description: Itamar Avitan’s paper, talks and posters on representational alignment between neural networks and human vision, and two neurotechnology team projects.
+  # This page's link-preview card is the paper's own (img/og-research.png, drawn by tools/make_og.py from the
+  # first research card: its badge, short title, authors and the figure the card shows), so a shared
+  # /research/ link previews the paper and not the name card (deep review 2026-09-25, DI-09). The alt text
+  # follows the image: it names what the picture shows, not what the name card shows.
+  og_image: img/og-research.png
+  og_image_alt: 'NeurIPS 2025 paper by Itamar Avitan and Tal Golan: When the Best-Fitting Model Isn’t the Right One.'
 - slug: teaching/
   nav: Teaching
   heading: Teaching
@@ -74,6 +98,13 @@ pages:
   # where the GOV.UK model statement puts it (deep review 2026-09-25, FL-09).
   intro: What this site aims at, how to tell me when it falls short, what was actually done about it, and what is not claimed.
   description: 'The accessibility statement for the personal site of Itamar Avitan: what it aims at, how to report a problem, and what was actually done and checked.'
+
+# The page for an address with nothing at it (GitHub Pages serves /404.html with status 404, at any depth).
+# NOT under `pages`: it belongs in neither the strip, the colophon nor the sitemap, and search engines are told
+# not to index it. build.py writes it with root-absolute links. The CV sentence is added by the template.
+not_found:
+  heading: Nothing here
+  intro: Nothing lives at this address. Everything on the site is in the strip above.
 
 # Proper nouns and terms of art that must never break across two lines, wherever they occur in the text.
 # A term here must actually occur in the content: a rule that matches nothing is dead configuration, and the
@@ -241,6 +272,10 @@ links:
   url: https://orcid.org/0009-0004-3662-7881
 - label: CV
   url: cv.pdf
+  # The chip's hidden label, after the visible "CV": a reader who cannot see the chip is told that it opens a
+  # PDF, and how long, before it opens (deep review 2026-09-25, PA-07). The page count is the cv repository's
+  # to change: tests/test_build.py reads it from cv.pdf with pdfinfo and fails until this line agrees.
+  format: PDF, 2 pages
 # News runs newest first. Two optional keys on an item turn one phrase of its sentence into a link:
 #   link   a phrase that occurs verbatim in `text`; its first occurrence becomes the link, the rest of the
 #          sentence stays plain. Choose the thing the reader can open -- the preprint, the code, the page.
@@ -328,6 +363,11 @@ research:
   - Itamar Avitan
   - Tal Golan
   me: Itamar Avitan
+  # For the ScholarlyArticle record in the research page's head only (FACTS PUB-CITATION and PUB-DOI); neither
+  # prints on the card. The DOI is the identifier Google Scholar and Semantic Scholar reconcile on, the
+  # academic CVs print it, and the BibTeX block below carries the same one (build.py refuses a disagreement).
+  published: {periodical: Advances in Neural Information Processing Systems, volume: '38', year: '2025'}
+  doi: 10.52202/085713-0404
   # Every clause is the arXiv 2510.23321 abstract (the W source of FACTS RES-DESC, RES-PLATEAU and PUB-NUM):
   # the method, named by the paper's own term "linear probing", and the number with its chance baseline, one
   # in twenty being the paper's 1/|M| with |M| = 20 models. The mechanism, the abstract's regression sentence,

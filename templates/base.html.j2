@@ -9,18 +9,46 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ page_title }}</title>
 <meta name="description" content="{{ page_description }}">
+{# The 404 page has no address of its own -- it is served at whatever address was not found -- so it carries
+   no canonical and no og:url, and asks not to be indexed instead. #}
+{% if page.get("noindex") %}
+<meta name="robots" content="noindex">
+{% else %}
 <link rel="canonical" href="{{ page_url }}">
+{% endif %}
 <meta property="og:title" content="{{ page_title }}">
 <meta property="og:description" content="{{ page_description }}">
+<meta property="og:site_name" content="{{ site.name }}">
+<meta property="og:locale" content="en_US">
+{# The home page is his profile (a person, named by his own first and last name); every other page is a page
+   of the site. #}
+{% if not page.slug %}
+<meta property="og:type" content="profile">
+<meta property="profile:first_name" content="{{ site.name.split()[0] }}">
+<meta property="profile:last_name" content="{{ site.name.split()[-1] }}">
+{% else %}
 <meta property="og:type" content="website">
+{% endif %}
+{% if not page.get("noindex") %}
 <meta property="og:url" content="{{ page_url }}">
-<meta property="og:image" content="{{ site.site_url }}img/og.png">
+{% endif %}
+{# The link-preview card: the name card (img/og.png: mark, name, role line, identity line) unless the page
+   sets `og_image`, as the research page does with the paper's own card. The alt text follows the image, so
+   it is the page's `og_image_alt` where there is one and the name card's description everywhere else. #}
+<meta property="og:image" content="{{ site.site_url }}{{ page.get("og_image", "img/og.png") }}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="{{ site.name }}. {{ site.identity_line }}">
+<meta property="og:image:alt" content="{{ page.get("og_image_alt", site.name ~ ". " ~ (site.role|map(attribute='label')|join(' · ') ~ ". " if site.get('role') else "") ~ site.identity_line) }}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="color-scheme" content="light dark">
-<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2042%2010'%3E%3Cstyle%3Ecircle%7Bfill:%2314212B%7Drect%7Bfill:%230B5F73%7D@media%20(prefers-color-scheme:dark)%7Bcircle%7Bfill:%23E4EBEF%7Drect%7Bfill:%236DB3C4%7D%7D%3C/style%3E%3Ccircle%20cx='5'%20cy='5'%20r='5'/%3E%3Ccircle%20cx='21'%20cy='5'%20r='5'/%3E%3Crect%20x='32'%20width='10'%20height='10'/%3E%3C/svg%3E">
+{# The mark as three files at the site root, written by tools/make_favicon.py from img/mark.svg: the PNG is
+   what a search engine takes (square, larger than 48px, a raster format, crawlable), the SVG is what a browser
+   that can use it takes (it keeps the dark-theme colours), and favicon.ico answers a client that asks for it
+   blindly. The home-screen tile sets the row on the paper colour. Relative paths, like every other asset, so
+   a page opened straight off the disk still finds them. #}
+<link rel="icon" href="{{ base }}favicon-96.png" sizes="96x96" type="image/png">
+<link rel="icon" href="{{ base }}favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="{{ base }}apple-touch-icon.png">
 <script>
 /* Theme toggle. Follows the system setting until the visitor chooses; the choice is remembered. */
 (function () {
@@ -71,7 +99,10 @@
    carries a 2px ink tick on that hairline -- the same tick that marks a section on the margin rule below, so
    moving between pages is the same gesture as moving between sections of one. aria-current says it again for
    a reader who cannot see the tick. The CV is the strip's one filled element, by the rule this site has kept
-   throughout: a filled box is the single primary action in its group. #}
+   throughout: a filled box is the single primary action in its group. Its visible label stays "CV"; a hidden
+   span adds the link's `format` from site.yaml ("PDF, 2 pages") to its accessible name, so a reader who
+   cannot see the chip is told what opens before it opens, and `type` says the same to the browser (deep
+   review 2026-09-25, PA-07). #}
     <div class="topstrip">
       <nav class="sitenav" aria-label="Pages">
         <ul role="list">
@@ -79,7 +110,7 @@
           <li><a href="{{ item.href }}"{% if item.current %} aria-current="page"{% endif %}>{{ item.label }}</a></li>
 {% endfor %}
 {% for link in site.links if link.label == "CV" and site.show_cv and link.get("url") %}
-          <li class="sitenav__cv"><a class="btn btn--primary" href="{{ link.url|local(base) }}">{{ link.label }}</a></li>
+          <li class="sitenav__cv"><a class="btn btn--primary" href="{{ link.url|local(base) }}" type="application/pdf">{{ link.label }}{% if link.get("format") %}<span class="vh"> ({{ link.format }})</span>{% endif %}</a></li>
 {% endfor %}
         </ul>
       </nav>

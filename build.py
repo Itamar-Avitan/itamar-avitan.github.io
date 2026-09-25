@@ -1,8 +1,11 @@
 """Build the static site: validate site.yaml, then render every page it lists.
 
-The site is four pages (home, research, teaching, commonplace). Each entry under `pages` in site.yaml names
-its own template in templates/pages/ and the folder it is written into, so adding a page is a site.yaml edit
-and one template -- never a change here. All text still lives in site.yaml; templates hold markup only.
+The site is five pages (home, research, teaching, commonplace, accessibility). Each entry under `pages` in
+site.yaml names its own template in templates/pages/ and the folder it is written into, so adding a page is
+a site.yaml edit and one template -- never a change here. All text still lives in site.yaml; templates hold
+markup only. One more file is written beside them: 404.html, from the `not_found` entry, which is not a page
+of the site (no link leads to it, it is not in the sitemap, and it asks not to be indexed) but the answer
+GitHub Pages serves for an address with nothing at it.
 """
 from __future__ import annotations
 
@@ -116,6 +119,11 @@ def validate(site: dict) -> list[str]:
         elif slug in seen:
             problems.append(f"quotation slug {slug!r} is used twice")
         seen.add(slug)
+    # A paper card's `doi` feeds the structured data; its BibTeX block prints the same identifier for a reader.
+    # Both come from one FACTS row (PUB-DOI), so they may not disagree.
+    for card in site.get("research") or []:
+        if card.get("doi") and card.get("cite") and card["doi"] not in card["cite"]:
+            problems.append(f"research card {card.get('title', '')[:40]!r}: doi {card['doi']!r} is not in its cite block")
     for page in site.get("pages") or []:
         if not template_path(page).exists():
             problems.append(f"page {page['slug']!r} has no template at {template_path(page).relative_to(ROOT)}")
@@ -160,7 +168,10 @@ def page_url(site: dict, page: dict) -> str:
 
 
 def page_title(site: dict, page: dict) -> str:
-    return f'{page["heading"]} — {site["name"]}' if page.get("heading") else site["name"]
+    """The <title> and og:title: the page's own `title` when it sets one, else "<heading> — <name>", else the
+    bare name. The home page sets one (see the note over `pages` in site.yaml): a search result that says only
+    "Itamar Avitan" cannot be told from his namesake's."""
+    return page.get("title") or (f'{page["heading"]} — {site["name"]}' if page.get("heading") else site["name"])
 
 
 def page_description(site: dict, page: dict) -> str:
@@ -172,14 +183,69 @@ def local(url: str, base: str) -> str:
     return url if ABSOLUTE.match(url or "") else base + url
 
 
-def person_jsonld(site: dict) -> str:
-    return json.dumps({
-        "@context": "https://schema.org", "@type": "Person",
+def _person(site: dict) -> dict:
+    """The one Person every page describes. The @id is what lets a crawler merge the copies on every page into
+    one entity, and tell that entity from the other Itamar Avitan. Everything past the name is optional: a key
+    missing from site.yaml leaves its field out, never a blank. `knows_about` holds only terms a page of the
+    site prints (tests/test_build.py checks that): structured data describes the visible page, it does not
+    add to it."""
+    role = site.get("role") or []
+    lab = next((r for r in role if r.get("url")), None)
+    university = {"@type": "CollegeOrUniversity", "name": site["affiliation"],
+                  **({"url": site["affiliation_url"]} if site.get("affiliation_url") else {})}
+    person = {
+        "@type": "Person", "@id": site["site_url"] + "#person",
         "name": site["name"], "alternateName": site["alternate_name"], "url": site["site_url"],
-        "description": site["identity_line"],
-        "affiliation": {"@type": "CollegeOrUniversity", "name": site["affiliation"]},
-        "sameAs": [l["url"] for l in site["links"] if l.get("url") and l["label"] not in ("Email", "CV")],
-    }, ensure_ascii=False, indent=2).replace("<", "\\u003c")
+        "image": site["site_url"] + site["portrait"]["jpg"],
+        "description": site["identity_line"], "affiliation": university, "alumniOf": university,
+        # a profile's canonical address carries no interface language
+        "sameAs": [l["url"].replace("&hl=en", "") for l in site["links"]
+                   if l.get("url") and l["label"] not in ("Email", "CV")],
+    }
+    if role:
+        person["jobTitle"] = role[0]["label"]
+    if lab:
+        person["memberOf"] = {"@type": "ResearchOrganization", "name": lab["label"], "url": lab["url"]}
+    if site.get("knows_about"):
+        person["knowsAbout"] = site["knows_about"]
+    return person
+
+
+def _article(site: dict, card: dict) -> dict:
+    """A ScholarlyArticle for a paper card that carries `published`: the record a scholarly crawler reconciles
+    on -- the DOI first (FACTS PUB-DOI, the identifier the CVs print), then the arXiv page -- with him as the
+    author the graph already knows by @id."""
+    by = {b["label"]: b["url"] for b in card.get("buttons") or []}
+    pub = card["published"]
+    article = {
+        "@type": "ScholarlyArticle", "name": card["title"], "headline": card["title"],
+        "author": [{"@id": site["site_url"] + "#person"} if a == card.get("me") else {"@type": "Person", "name": a}
+                   for a in card.get("authors") or []],
+        "datePublished": pub["year"],
+        "isPartOf": {"@type": "PublicationVolume", "volumeNumber": pub["volume"],
+                     "isPartOf": {"@type": "Periodical", "name": pub["periodical"]}},
+    }
+    if "Paper" in by:
+        article["url"] = by["Paper"]
+    same_as = ([f'https://doi.org/{card["doi"]}'] if card.get("doi") else []) + ([by["arXiv"]] if "arXiv" in by else [])
+    if same_as:
+        article["sameAs"] = same_as
+    return article
+
+
+def person_jsonld(site: dict, page: dict | None = None) -> str:
+    """The head's JSON-LD, one graph: the Person on every page; on the home page a ProfilePage whose main
+    entity he is, first; on the research page one ScholarlyArticle per shown paper card that carries
+    `published`. "<" is escaped so no content string can close the script element it is written into."""
+    page = page or site["pages"][0]
+    graph = [_person(site)]
+    if not page["slug"]:
+        graph.insert(0, {"@type": "ProfilePage", "@id": site["site_url"] + "#page", "url": site["site_url"],
+                         "mainEntity": {"@id": site["site_url"] + "#person"}})
+    if page["slug"] == "research/":
+        graph += [_article(site, card) for card in visible_research(site) if card.get("published")]
+    return json.dumps({"@context": "https://schema.org", "@graph": graph},
+                      ensure_ascii=False, indent=2).replace("<", "\\u003c")
 
 
 def environment() -> Environment:
@@ -201,10 +267,16 @@ def links_to(site: dict, page: dict, base: str, label_key: str) -> list[dict]:
             for p in site["pages"] if p.get(label_key)]
 
 
+def not_found_page(site: dict) -> dict:
+    """The 404 page: not a member of `pages`, so it is in no link list and not in the sitemap. `noindex` is
+    the switch render() and the base template read: root-absolute links, a robots line, no canonical."""
+    return {**site["not_found"], "slug": "404", "noindex": True}
+
+
 def render(site: dict, page: dict | None = None) -> str:
     """One page of the site. Without an argument: the home page, which is the first entry under `pages`."""
     page = page or site["pages"][0]
-    base = base_of(page)
+    base = "/" if page.get("noindex") else base_of(page)     # the 404 page is served at every depth
     shown, older = split_news(site["news"], site.get("news_visible", 5))
     nav = links_to(site, page, base, "nav")
     colophon_nav = links_to(site, page, base, "colophon")
@@ -213,7 +285,7 @@ def render(site: dict, page: dict | None = None) -> str:
         page_url=page_url(site, page), page_title=page_title(site, page),
         page_description=page_description(site, page),
         news_shown=shown, news_older=older,
-        research=visible_research(site), jsonld=person_jsonld(site))
+        research=visible_research(site), jsonld=person_jsonld(site, page))
 
 
 def main(argv: list[str]) -> int:
@@ -228,6 +300,9 @@ def main(argv: list[str]) -> int:
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(render(site, page), encoding="utf-8")
         written.append(str(out.relative_to(ROOT)))
+    if site.get("not_found"):
+        (ROOT / "404.html").write_text(render(site, not_found_page(site)), encoding="utf-8")
+        written.append("404.html")
     locs = "".join(f"  <url><loc>{page_url(site, p)}</loc></url>\n" for p in site["pages"])
     (ROOT / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'

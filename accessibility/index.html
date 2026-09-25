@@ -8,15 +8,19 @@
 <link rel="canonical" href="https://itamar-avitan.github.io/accessibility/">
 <meta property="og:title" content="Accessibility — Itamar Avitan">
 <meta property="og:description" content="The accessibility statement for the personal site of Itamar Avitan: what it aims at, how to report a problem, and what was actually done and checked.">
+<meta property="og:site_name" content="Itamar Avitan">
+<meta property="og:locale" content="en_US">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://itamar-avitan.github.io/accessibility/">
 <meta property="og:image" content="https://itamar-avitan.github.io/img/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Itamar Avitan. I study how to tell which neural network models of human vision are right, not just which ones predict best.">
+<meta property="og:image:alt" content="Itamar Avitan. PhD candidate · Brains and Machines Lab · Ben-Gurion University of the Negev, Israel. I study how to tell which neural network models of human vision are right, not just which ones predict best.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="color-scheme" content="light dark">
-<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2042%2010'%3E%3Cstyle%3Ecircle%7Bfill:%2314212B%7Drect%7Bfill:%230B5F73%7D@media%20(prefers-color-scheme:dark)%7Bcircle%7Bfill:%23E4EBEF%7Drect%7Bfill:%236DB3C4%7D%7D%3C/style%3E%3Ccircle%20cx='5'%20cy='5'%20r='5'/%3E%3Ccircle%20cx='21'%20cy='5'%20r='5'/%3E%3Crect%20x='32'%20width='10'%20height='10'/%3E%3C/svg%3E">
+<link rel="icon" href="../favicon-96.png" sizes="96x96" type="image/png">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
 <script>
 /* Theme toggle. Follows the system setting until the visitor chooses; the choice is remembered. */
 (function () {
@@ -59,22 +63,47 @@
 <link rel="stylesheet" href="../style.css">
 <script type="application/ld+json">{
   "@context": "https://schema.org",
-  "@type": "Person",
-  "name": "Itamar Avitan",
-  "alternateName": "Itamar Amram Avitan",
-  "url": "https://itamar-avitan.github.io/",
-  "description": "I study how to tell which neural network models of human vision are right, not just which ones predict best.",
-  "affiliation": {
-    "@type": "CollegeOrUniversity",
-    "name": "Ben-Gurion University of the Negev"
-  },
-  "sameAs": [
-    "https://scholar.google.com/citations?user=3fynQuAAAAAJ&hl=en",
-    "https://github.com/Itamar-Avitan",
-    "https://www.linkedin.com/in/itamar-avitan/",
-    "https://bsky.app/profile/avitanit.bsky.social",
-    "https://x.com/avitanit",
-    "https://orcid.org/0009-0004-3662-7881"
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://itamar-avitan.github.io/#person",
+      "name": "Itamar Avitan",
+      "alternateName": "Itamar Amram Avitan",
+      "url": "https://itamar-avitan.github.io/",
+      "image": "https://itamar-avitan.github.io/img/portrait-800.jpg",
+      "description": "I study how to tell which neural network models of human vision are right, not just which ones predict best.",
+      "affiliation": {
+        "@type": "CollegeOrUniversity",
+        "name": "Ben-Gurion University of the Negev",
+        "url": "https://www.bgu.ac.il/"
+      },
+      "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": "Ben-Gurion University of the Negev",
+        "url": "https://www.bgu.ac.il/"
+      },
+      "sameAs": [
+        "https://scholar.google.com/citations?user=3fynQuAAAAAJ",
+        "https://github.com/Itamar-Avitan",
+        "https://www.linkedin.com/in/itamar-avitan/",
+        "https://bsky.app/profile/avitanit.bsky.social",
+        "https://x.com/avitanit",
+        "https://orcid.org/0009-0004-3662-7881"
+      ],
+      "jobTitle": "PhD candidate",
+      "memberOf": {
+        "@type": "ResearchOrganization",
+        "name": "Brains and Machines Lab",
+        "url": "https://brainsandmachines.org"
+      },
+      "knowsAbout": [
+        "NeuroAI",
+        "Computational cognitive neuroscience",
+        "Representational alignment",
+        "Human vision",
+        "Neural network models"
+      ]
+    }
   ]
 }</script>
 </head>
@@ -89,7 +118,7 @@
           <li><a href="../research/">Research</a></li>
           <li><a href="../teaching/">Teaching</a></li>
           <li><a href="../commonplace/">Commonplace</a></li>
-          <li class="sitenav__cv"><a class="btn btn--primary" href="../cv.pdf">CV</a></li>
+          <li class="sitenav__cv"><a class="btn btn--primary" href="../cv.pdf" type="application/pdf">CV<span class="vh"> (PDF, 2 pages)</span></a></li>
         </ul>
       </nav>
       <button id="theme-toggle" class="toggle" type="button" hidden>

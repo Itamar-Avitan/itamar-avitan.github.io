@@ -1,6 +1,8 @@
+import http.server
 import re
 import subprocess
 import sys
+import threading
 from pathlib import Path
 
 import pytest
@@ -13,6 +15,9 @@ SLUGS = [page["slug"] for page in SITE["pages"]]                 # every page bu
 NAV_SLUGS = [page["slug"] for page in SITE["pages"] if page.get("nav")]   # the four the strip carries
 NAV = [page["nav"] for page in SITE["pages"] if page.get("nav")]
 COLOPHON = [page["colophon"] for page in SITE["pages"] if page.get("colophon")]
+# The CV chip's accessible name: the visible "CV" and then, hidden, what opens -- "CV (PDF, 2 pages)".
+CV_LINK = next(l for l in SITE["links"] if l["label"] == "CV")
+CV_NAME = f'{CV_LINK["label"]} ({CV_LINK["format"]})'
 WIDTHS = [320, 400, 768, 1280]                                   # 320px is the narrowest viewport supported
 # The reader's own text size, as a root font size in px: 16 is the browser default, 32 is 200%. This axis is
 # here because it was missing -- the overflow test below only ever ran at the default size, and so it passed
@@ -110,7 +115,8 @@ def test_the_navigation_reaches_every_page_without_javascript(browser, slug):
     page = ctx.new_page()
     page.goto((ROOT / slug / "index.html").as_uri())
     assert page.locator(".sitenav a").count() == len(NAV) + 1           # the four pages and the CV
-    assert [t.strip() for t in page.locator(".sitenav a").all_inner_texts()] == NAV + ["CV"]
+    # innerText puts a line break before the chip's hidden span, so the names are compared whitespace-normalised
+    assert [" ".join(t.split()) for t in page.locator(".sitenav a").all_inner_texts()] == NAV + [CV_NAME]
     current = page.locator('.sitenav a[aria-current="page"]')
     assert current.count() == 1
     assert current.inner_text().strip() == next(p["nav"] for p in SITE["pages"] if p["slug"] == slug)
@@ -122,6 +128,72 @@ def test_the_navigation_reaches_every_page_without_javascript(browser, slug):
         page.goto((ROOT / other / "index.html").as_uri())
         assert page.locator('.sitenav a[aria-current="page"]').inner_text().strip() == NAV[index]
         page.goto((ROOT / slug / "index.html").as_uri())
+    ctx.close()
+
+
+class _LikeGitHubPages(http.server.SimpleHTTPRequestHandler):
+    """Serves the built site the way the host does: an address with nothing at it gets 404.html, status 404."""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=str(ROOT), **kwargs)
+
+    def log_message(self, *args):
+        pass
+
+    def send_error(self, code, message=None, explain=None):
+        page = ROOT / "404.html"
+        if code != 404 or not page.exists():
+            return super().send_error(code, message, explain)
+        body = page.read_bytes()
+        self.send_response(404)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+
+@pytest.fixture(scope="module")
+def served():
+    """The built site on a local port, for the one page that cannot be opened off the disk (its links are
+    root-absolute, because it is served at every depth)."""
+    server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), _LikeGitHubPages)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    yield f"http://127.0.0.1:{server.server_address[1]}"
+    server.shutdown()
+
+
+@pytest.mark.parametrize("width, scheme", [(320, "light"), (390, "dark"), (1280, "light")])
+def test_a_wrong_address_gets_the_sites_own_404_page(browser, served, width, scheme):
+    """GitHub Pages answers a missing address with /404.html and status 404, at any depth, and used to answer
+    with its own page: 980px wide, no viewport, no way back (deep review 2026-09-25, PA-02, MR-08). The
+    site's own page is served here the way the host serves it and asked for two folders deep: the status
+    stays 404, the stylesheet and the fonts arrive, nothing overflows at 100% or 200% text, and every link on
+    it leads back to the root."""
+    ctx = browser.new_context(viewport={"width": width, "height": 900}, color_scheme=scheme)
+    page = ctx.new_page()
+    requests, failed = [], []
+    page.on("request", lambda r: requests.append(r.url))
+    page.on("requestfailed", lambda r: failed.append(r.url))
+    response = page.goto(f"{served}/nonexistent/deeper/")
+    page.wait_for_timeout(300)
+    assert response.status == 404
+    assert failed == [] and all(u.startswith(served + "/") for u in requests), requests
+    assert page.inner_text("h1").strip() == SITE["not_found"]["heading"]
+    assert SITE["not_found"]["intro"] in page.inner_text("main")
+    loaded = page.evaluate("[...document.fonts].filter(f => f.status === 'loaded').map(f => f.family.replace(/\"/g, ''))")
+    assert "Fira Sans" in loaded and "Fira Mono" in loaded, loaded
+    assert "Fira Sans" in page.evaluate("getComputedStyle(document.querySelector('h1')).fontFamily")
+    for text in (16, 32):
+        page.evaluate(f"document.documentElement.style.fontSize = '{text}px'")
+        page.wait_for_timeout(50)
+        over = page.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth")
+        assert over <= 0, f"404 page at {width}px, {text}px text: {over}px past the viewport"
+    hrefs = page.evaluate("[...document.querySelectorAll('.sitenav a')].map(a => a.getAttribute('href'))")
+    assert hrefs == ["/"] + [f"/{s}" for s in NAV_SLUGS[1:]] + ["/cv.pdf"]
+    assert page.locator('.sitenav a[aria-current="page"]').count() == 0     # it is nowhere in the site
+    assert page.get_attribute("#not-found a", "href") == "/cv.pdf"
+    assert page.request.get(f"{served}/cv.pdf").status == 200               # and the CV is really there
+    assert page.request.get(f"{served}/research/").status == 200
+    assert page.request.get(f"{served}/favicon.ico").status == 200
     ctx.close()
 
 
@@ -202,7 +274,7 @@ def test_every_navigation_link_is_at_least_a_24px_target(browser, width, slug):
     row: 24 by 24 CSS px, at every width, the CV chip included."""
     page, _, _ = _page(browser, width, slug=slug)
     links = page.evaluate(HIT_TEST_JS, ".sitenav a")
-    assert [l["label"] for l in links] == NAV + ["CV"]
+    assert [l["label"] for l in links] == NAV + [CV_NAME]
     assert [l for l in links if l["height"] < 24 or not l["covered"]] == []
 
 

@@ -5,7 +5,6 @@ import shutil
 import subprocess
 from html import unescape
 from pathlib import Path
-from urllib.parse import unquote
 
 import pytest
 from PIL import Image
@@ -104,23 +103,72 @@ def test_ongoing_research_is_hidden_unless_flag_set():
     assert "FIXTURE ONGOING" in [r["title"] for r in build.visible_research(site)]
 
 
-def test_person_jsonld_is_valid_and_names_match():
-    data = json.loads(build.person_jsonld(SITE))
-    assert data["@type"] == "Person" and data["name"] == "Itamar Avitan"
-    assert data["alternateName"] == "Itamar Amram Avitan" and data["url"] == SITE["site_url"]
-    assert all(u.startswith("https://") for u in data["sameAs"]) and "email" not in data
-    assert len(data["sameAs"]) == 6 and "cv.pdf" not in data["sameAs"]
+def _graph(slug: str, site: dict | None = None) -> dict:
+    """The JSON-LD graph of a page, by node type."""
+    site = site or SITE
+    return {n["@type"]: n for n in json.loads(build.person_jsonld(site, page(slug, site)))["@graph"]}
+
+
+def test_person_jsonld_is_one_entity_on_every_page_with_his_profile_and_his_paper():
+    """One graph, one Person with one @id on every page, so a crawler merges the copies into one entity and
+    tells it from his namesake's (deep review 2026-09-25, MR-06). The home page says it is his profile page,
+    the research page files the paper under him by the DOI the CVs print (FACTS PUB-DOI) and the arXiv id,
+    and no other page claims a paper. Every field is generated from site.yaml, never pasted."""
+    for slug in SLUGS:
+        data = _graph(slug)["Person"]
+        assert data["@id"] == SITE["site_url"] + "#person", slug           # one entity, every page
+        assert data["name"] == "Itamar Avitan"
+        assert data["alternateName"] == "Itamar Amram Avitan" and data["url"] == SITE["site_url"]
+        assert data["description"] == SITE["identity_line"]
+        assert data["image"] == SITE["site_url"] + SITE["portrait"]["jpg"]
+        assert all(u.startswith("https://") for u in data["sameAs"]) and "email" not in data
+        assert len(data["sameAs"]) == 6 and "cv.pdf" not in data["sameAs"]
+        assert not any("hl=" in u for u in data["sameAs"])                # a profile's address, no interface language
+        assert data["jobTitle"] == "PhD candidate" and "NeuroAI" in data["knowsAbout"]
+        assert data["affiliation"] == data["alumniOf"] == {
+            "@type": "CollegeOrUniversity", "name": SITE["affiliation"], "url": SITE["affiliation_url"]}
+        assert data["memberOf"] == {"@type": "ResearchOrganization", "name": "Brains and Machines Lab",
+                                    "url": "https://brainsandmachines.org"}
     assert "same_as" not in SITE
+    home = json.loads(build.person_jsonld(SITE, page("")))["@graph"]
+    assert [n["@type"] for n in home] == ["ProfilePage", "Person"]
+    assert home[0]["mainEntity"] == {"@id": SITE["site_url"] + "#person"} and home[0]["url"] == SITE["site_url"]
+    art = _graph("research/")["ScholarlyArticle"]
+    assert art["name"] == art["headline"] == SITE["research"][0]["title"]
+    assert art["author"] == [{"@id": SITE["site_url"] + "#person"}, {"@type": "Person", "name": "Tal Golan"}]
+    assert art["sameAs"] == ["https://doi.org/10.52202/085713-0404", "https://arxiv.org/abs/2510.23321"]
+    assert art["url"].startswith("https://proceedings.neurips.cc/")
+    assert art["datePublished"] == "2025" and art["isPartOf"]["volumeNumber"] == "38"
+    assert art["isPartOf"]["isPartOf"] == {"@type": "Periodical", "name": "Advances in Neural Information Processing Systems"}
+    for slug in SLUGS:
+        assert ("ScholarlyArticle" in _graph(slug)) == (slug == "research/"), slug
+    not_found = json.loads(build.person_jsonld(SITE, build.not_found_page(SITE)))["@graph"]
+    assert [n["@type"] for n in not_found] == ["Person"]                   # the 404 page is nobody's profile
+
+
+def test_structured_data_names_only_what_a_page_prints():
+    """`knowsAbout` earns no rich result; what it may do is describe the visible page, so every term in it has
+    to be printed somewhere on the site (deep review 2026-09-25, EM-14's rule narrowing MR-06). And the DOI the
+    graph cites is the one the BibTeX block prints: both come from FACTS PUB-DOI, and the build refuses a
+    disagreement."""
+    body = " ".join(_visible_text(h.partition("<body")[2]) for h in every_page().values()).lower()
+    for term in SITE["knows_about"]:
+        assert term.lower() in body, term
+    card = SITE["research"][0]
+    assert card["doi"] in card["cite"] and "https://doi.org/" + card["doi"] in html_of("research/")
+    bad = copy.deepcopy(SITE)
+    bad["research"][0]["doi"] = "10.0000/not-the-one-in-the-cite-block"
+    assert [p for p in build.validate(bad) if "doi" in p], build.validate(bad)
 
 
 def test_jsonld_cannot_break_out_of_its_script_element():
     site = copy.deepcopy(SITE)
     site["identity_line"] = 'x</script><script>alert(1)</script>'
-    assert json.loads(build.person_jsonld(site))["description"] == site["identity_line"]
+    assert _graph("", site)["Person"]["description"] == site["identity_line"]
     html = build.render(site)
     assert "</script><script>" not in html and "alert(1)</script>" not in html
     block = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.S).group(1)
-    assert json.loads(block)["description"] == site["identity_line"]
+    assert {n["@type"]: n for n in json.loads(block)["@graph"]}["Person"]["description"] == site["identity_line"]
 
 
 def test_render_escapes_html_and_hides_cv_when_flag_off():
@@ -147,12 +195,46 @@ def test_main_builds_every_page_and_the_two_robot_files(tmp_path, monkeypatch):
     shutil.copy(build.ROOT / "site.yaml", tmp_path / "site.yaml")
     monkeypatch.setattr(build, "ROOT", tmp_path)
     assert build.main([]) == 0
-    assert "<title>Itamar Avitan</title>" in (tmp_path / "index.html").read_text(encoding="utf-8")
+    assert f"<title>{build.page_title(SITE, page(''))}</title>" in (tmp_path / "index.html").read_text(encoding="utf-8")
     for slug in SLUGS:
         assert (tmp_path / slug / "index.html").exists(), slug
     sitemap = (tmp_path / "sitemap.xml").read_text(encoding="utf-8")
     assert [m for m in re.findall(r"<loc>([^<]+)</loc>", sitemap)] == [SITE["site_url"] + s for s in SLUGS]
     assert "Allow: /" in (tmp_path / "robots.txt").read_text(encoding="utf-8")
+
+
+def test_the_404_page_is_built_beside_the_site_and_not_as_part_of_it(tmp_path, monkeypatch):
+    """GitHub Pages serves /404.html, with status 404, for any address that has nothing at it, at any depth.
+    So the page is written with root-absolute links, asks not to be indexed, has no canonical and no og:url
+    (it has no address of its own), is in no link list and not in the sitemap, and says where everything
+    else is (deep review 2026-09-25, MR-08 and PA-02)."""
+    # the sentence is the last thing in main, and its margin must not fall out of main: the margin rule is
+    # drawn to main's foot, and would otherwise break for that height above the colophon (measured, MR-08)
+    assert ".page-intro:last-child { margin-bottom: 0; }" in _css()
+    shutil.copytree(build.ROOT / "templates", tmp_path / "templates")
+    shutil.copy(build.ROOT / "site.yaml", tmp_path / "site.yaml")
+    monkeypatch.setattr(build, "ROOT", tmp_path)
+    assert build.main([]) == 0
+    html = (tmp_path / "404.html").read_text(encoding="utf-8")
+    assert '<meta name="robots" content="noindex">' in html
+    assert 'rel="canonical"' not in html and 'property="og:url"' not in html
+    for target in re.findall(r'\s(?:href|src|srcset)="([^"]+)"', html):
+        assert target.startswith(("/", "http", "data:", "#")), target
+    assert "404" not in (tmp_path / "sitemap.xml").read_text(encoding="utf-8")
+    assert build.validate(SITE) == []
+    text = _visible_text(html.partition("<body")[2])
+    assert SITE["not_found"]["heading"] in text and SITE["not_found"]["intro"] in text
+    assert html.count("<h1") == 1 and 'class="opens-with-h1"' in html
+    assert f'The CV is at <a href="/cv.pdf">{SITE["site_url"]}cv.pdf</a>.' in html
+    strip = html.partition('<nav class="sitenav"')[2].partition("</nav>")[0]
+    assert re.findall(r'href="([^"]*)"', strip) == ["/"] + [f"/{s}" for s in NAV_SLUGS[1:]] + ["/cv.pdf"]
+    assert 'aria-current="page"' not in html                                  # it is nowhere in the site
+    assert '<span id="email">' in html and 'href="/style.css"' in html
+    without = copy.deepcopy(SITE)
+    without.pop("not_found")
+    monkeypatch.setattr(build, "load_site", lambda _p: without)
+    (tmp_path / "404.html").unlink()
+    assert build.main([]) == 0 and not (tmp_path / "404.html").exists()      # the entry is optional
 
 
 # --- the four pages ---------------------------------------------------------------------------------------
@@ -187,9 +269,25 @@ def test_each_page_has_its_own_address_title_and_canonical():
         assert f'<link rel="canonical" href="{url}">' in html, slug
         assert f'property="og:url" content="{url}"' in html, slug
         heading = page(slug).get("heading")
-        title = f"{heading} — Itamar Avitan" if heading else "Itamar Avitan"
+        title = page(slug).get("title") or (f"{heading} — Itamar Avitan" if heading else "Itamar Avitan")
+        assert "Itamar Avitan" in title and "Amram" not in title, slug     # spec 4.5: the name exactly as printed
         assert f"<title>{title}</title>" in html and f'property="og:title" content="{title}"' in html, slug
         assert f'name="description" content="{build.page_description(SITE, page(slug))}"' in html, slug
+
+
+def test_the_home_title_and_description_say_who_he_is():
+    """A search result that says only "Itamar Avitan" cannot be told from his namesake's, which outranks this
+    site for the bare name (deep review 2026-09-25, MR-03). The home title leads with the name exactly as the
+    <h1> prints it and then says the field, the status and the university; the description says the same and
+    ends on the identity line, which it follows when that line changes (owner ruling 17)."""
+    home = page("")
+    assert home["title"].startswith(SITE["name"] + " ") and "Amram" not in home["title"]
+    assert home["description"].endswith(SITE["identity_line"])
+    for words in ("NeuroAI", "PhD candidate", "Ben-Gurion University"):
+        assert words in home["title"] and words in home["description"], words
+    assert build.page_title(SITE, home) == home["title"]
+    assert build.page_title(SITE, {"slug": "x/", "heading": "X"}) == "X — Itamar Avitan"
+    assert build.page_title(SITE, {"slug": "x/"}) == "Itamar Avitan"
 
 
 def test_every_page_has_exactly_one_h1_and_it_names_the_page():
@@ -204,7 +302,7 @@ def test_the_navigation_is_ordinary_links_that_mark_the_page_you_are_on():
     one carrying aria-current so a reader who cannot see the tick is told the same thing."""
     for slug, html in every_page().items():
         strip = html.partition('<nav class="sitenav"')[2].partition("</nav>")[0]
-        labels = re.findall(r'<a [^>]*href="([^"]*)"([^>]*)>([^<]+)</a>', strip)
+        labels = re.findall(r'<a [^>]*href="([^"]*)"([^>]*)>([^<]+)(?:<span class="vh">[^<]*</span>)?</a>', strip)
         assert [label for _, _, label in labels] == ["Home", "Research", "Teaching", "Commonplace", "CV"], slug
         current = [label for _, attrs, label in labels if 'aria-current="page"' in attrs]
         # a page the strip does not carry marks nothing in it: the colophon row below marks itself instead
@@ -226,10 +324,22 @@ def test_every_link_between_pages_climbs_back_to_the_root_first():
             assert f'"{base}{asset}"' in html, (slug, asset)
 
 
+def _cv_pages() -> int:
+    out = subprocess.run(["pdfinfo", str(build.ROOT / "cv.pdf")], capture_output=True, text=True)
+    assert out.returncode == 0, "pdfinfo is needed to check the CV chip's label; install poppler"
+    return int(re.search(r"^Pages:\s+(\d+)", out.stdout, re.M).group(1))
+
+
 def test_the_cv_is_one_click_from_every_page():
+    """The chip reads "CV" and its accessible name goes on "(PDF, 2 pages)": what opens, and how long it is,
+    before it opens (deep review 2026-09-25, PA-07). The count is read off the published file, so a CV that
+    grows to three pages fails here until site.yaml says so."""
+    pages = _cv_pages()
     for slug, html in every_page().items():
         base = "../" if slug else ""
-        assert html.count(f'<a class="btn btn--primary" href="{base}cv.pdf">CV</a>') == 1, slug
+        chip = (f'<a class="btn btn--primary" href="{base}cv.pdf" type="application/pdf">CV'
+                f'<span class="vh"> (PDF, {pages} pages)</span></a>')
+        assert html.count(chip) == 1, slug
 
 
 def test_every_page_says_whose_site_it_is_without_repeating_the_bio():
@@ -377,12 +487,29 @@ def test_removed_items_stay_removed():
 
 
 def test_open_graph_points_at_the_site_and_its_card():
+    """The home page is his profile (og:type profile, his first and last name); every other page is a page of
+    the site. The card's alt text says what the card shows: the name, the role line, the identity line -- and
+    on the research page, the paper (deep review 2026-09-25, MR-09, PA-08, DI-09)."""
     html = html_of("")
-    for needle in ('property="og:title" content="Itamar Avitan"', 'property="og:type" content="website"',
+    role = " · ".join(r["label"] for r in SITE["role"])
+    for needle in (f'property="og:title" content="{page("")["title"]}"', 'property="og:type" content="profile"',
+                   'property="profile:first_name" content="Itamar"', 'property="profile:last_name" content="Avitan"',
+                   'property="og:site_name" content="Itamar Avitan"', 'property="og:locale" content="en_US"',
                    'property="og:url" content="https://itamar-avitan.github.io/"',
                    'property="og:image" content="https://itamar-avitan.github.io/img/og.png"',
-                   f'property="og:description" content="{SITE["identity_line"]}"'):
+                   f'property="og:image:alt" content="Itamar Avitan. {role}. {SITE["identity_line"]}"',
+                   f'property="og:description" content="{page("")["description"]}"'):
         assert needle in html, needle
+    research = html_of("research/")
+    assert 'property="og:type" content="website"' in research and "profile:" not in research
+    assert f'property="og:image:alt" content="{page("research/")["og_image_alt"]}"' in research
+    for slug, html in every_page().items():
+        picture = page(slug).get("og_image", "img/og.png")
+        assert picture == ("img/og-research.png" if slug == "research/" else "img/og.png"), slug
+        assert f'property="og:image" content="{SITE["site_url"]}{picture}"' in html, slug
+        assert html.count('property="og:image"') == 1 and html.count('property="og:image:alt"') == 1, slug
+        assert 'property="og:site_name" content="Itamar Avitan"' in html, slug
+        assert bool(page(slug).get("og_image")) == bool(page(slug).get("og_image_alt")), slug   # the two go together
 
 
 def test_section_ids_and_script_hooks():
@@ -713,14 +840,22 @@ def test_optional_keys_may_be_absent():
                 continue                                # a news item's sentence is required; its link is not
             entry.pop(key, None)
     for entry in site["research"]:
-        for key in ("venue", "how", "found", "open", "cite"):    # the card's citation line and depth blocks are
-            entry.pop(key, None)                                # optional; a talk's venue is not
+        for key in ("venue", "how", "found", "open", "cite", "published", "doi"):    # the card's citation line,
+            entry.pop(key, None)                                # depth blocks and record are optional; a talk's venue is not
+    for entry in site["links"]:
+        entry.pop("format", None)
     for entry in site["pages"]:
-        entry.pop("intro", None)
-        entry.pop("description", None)
-    for key in ("role", "nobreak", "news_visible", "show_ongoing", "quotes_intro"):
+        for key in ("intro", "description", "title", "og_image", "og_image_alt"):
+            entry.pop(key, None)
+    for key in ("role", "nobreak", "news_visible", "show_ongoing", "quotes_intro", "knows_about",
+                "affiliation_url", "not_found"):
         site.pop(key, None)
     pages = every_page(site)
+    person = _graph("research/", site)["Person"]
+    assert not {"jobTitle", "memberOf", "knowsAbout"} & set(person) and "url" not in person["affiliation"]
+    assert "ScholarlyArticle" not in _graph("research/", site)
+    for html in pages.values():
+        assert 'class="vh"' not in html.partition('<nav class="sitenav"')[2].partition("</nav>")[0]
     for slug, html in pages.items():
         for gone in ('<p class="venue"><a', 'class="venue paper__venue"', 'class="note"', "<figure",
                      'class="authors"', 'class="role"', 'class="nb"', 'rel="me"', 'id="email"',
@@ -1234,20 +1369,38 @@ def test_favicon_is_the_mark():
     assert 'viewBox="0 0 42 10"' in mark and mark.count("<circle") == 2 and mark.count("<rect") == 1
     for shape in ('<circle cx="5" cy="5" r="5"/>', '<circle cx="21" cy="5" r="5"/>', '<rect x="32" width="10" height="10"/>'):
         assert shape in mark
+    # The icon files at the root, written by tools/make_favicon.py from that mark (deep review 2026-09-25,
+    # MR-07): the row, centred on a square, in an SVG that keeps the theme style, a 96px PNG (Google takes only
+    # a square raster it can crawl, larger than 48px), an ICO for clients that ask for one blindly, and a
+    # home-screen tile. The arrangement of the mark is the owner's (Q-L A) and does not change here.
+    square = (build.ROOT / "favicon.svg").read_text(encoding="utf-8").strip()
+    assert square == mark.replace('viewBox="0 0 42 10"', 'viewBox="0 -16 42 42"')
+    with Image.open(build.ROOT / "favicon-96.png") as im:
+        assert im.size == (96, 96) and im.mode == "RGBA"
+        assert im.getpixel((11, 48))[:3] == (0x14, 0x21, 0x2B) and im.getpixel((84, 48))[:3] == (0x0B, 0x5F, 0x73)
+        assert im.getpixel((1, 1))[3] == 0 and im.getpixel((30, 48))[3] == 0     # transparent ground, a row
+    with Image.open(build.ROOT / "favicon.ico") as im:
+        assert im.format == "ICO" and im.info["sizes"] == {(16, 16), (32, 32), (48, 48)}
+    with Image.open(build.ROOT / "apple-touch-icon.png") as im:
+        assert im.size == (180, 180) and im.getpixel((2, 2)) == (0xF4, 0xF7, 0xF8)
     for slug, html in every_page().items():
-        href = re.search(r'<link rel="icon" href="data:image/svg\+xml,([^"]+)">', html).group(1)
-        assert unquote(href).replace("'", '"') == mark, slug
+        base = build.base_of(page(slug))
+        assert f'<link rel="icon" href="{base}favicon-96.png" sizes="96x96" type="image/png">' in html, slug
+        assert f'<link rel="icon" href="{base}favicon.svg" type="image/svg+xml">' in html, slug
+        assert f'<link rel="apple-touch-icon" href="{base}apple-touch-icon.png">' in html, slug
+        assert "data:image/svg+xml" not in html, slug                      # the inline icon, which no crawler took
 
 
-def test_images_carry_no_metadata_and_the_social_card_is_1200x630():
-    for name in ("portrait-400.webp", "portrait-800.jpg", "og.png", "paper-lab.webp", "paper-lab.jpg"):
+def test_images_carry_no_metadata_and_the_social_cards_are_1200x630():
+    for name in ("portrait-400.webp", "portrait-800.jpg", "og.png", "og-research.png", "paper-lab.webp", "paper-lab.jpg"):
         with Image.open(build.ROOT / "img" / name) as im:
             assert len(im.getexif()) == 0 and not getattr(im, "text", None), name
     for name in ("paper-lab.webp", "paper-lab.jpg"):                 # square, and twice the 272px it is laid out at
         with Image.open(build.ROOT / "img" / name) as im:
             assert im.size == (544, 544), name
-    with Image.open(build.ROOT / "img" / "og.png") as im:
-        assert im.size == (1200, 630)
+    for name in ("og.png", "og-research.png"):
+        with Image.open(build.ROOT / "img" / name) as im:
+            assert im.size == (1200, 630), name
 
 
 # --- The accessibility statement: every line of it is a claim about this site ------------------------------
