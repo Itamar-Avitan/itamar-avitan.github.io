@@ -270,9 +270,12 @@ news:
 # explanatory diagram of the recovery test (`how`, below). The running-robots illustration stays here as an
 # option and is not drawn anywhere by default; its one possible home is the link-preview card, and only if he
 # asks for it there.
-#   caption   a gutter label under the plate, in the gutter's own 12px mono. It carries the meaning of the
-#             matrix; the labels inside the SVG only name the axes, because a picture inside <img> cannot use
-#             the page's webfont and must stay small.
+#   caption   a gutter label under the plate, in the gutter's own 12px mono, at most four lines at 1280 (the
+#             aside is 192px there, so the label is two short sentences: where the picture comes from and
+#             what a dark cell off the diagonal means). Which axis is which is said by the labels inside the
+#             SVG and by the alt text; a picture inside <img> cannot use the page's webfont, so those labels
+#             only name the axes and stay small. "Fig. 1D" is tied with a no-break space so the number never
+#             opens a line.
 figure_options:
   lab_illustration: &lab_illustration
     webp: img/paper-lab.webp
@@ -284,7 +287,7 @@ figure_options:
     alt: 'Figure 1D of the paper, adapted, with both axes labelled: a 20-by-20 matrix of data-generating model
       (rows) against recovered model (columns) at 1.6 million training triplets. Most rows fall on the diagonal,
       but seven are mostly or entirely attributed to one model in the last column.'
-    caption: 'Adapted from Fig. 1D of the paper: each row is the model that generated the judgments, each column the model the comparison picked. A dark cell off the diagonal is a wrong winner.'
+    caption: 'Adapted from Fig. 1D of the paper. A dark cell off the diagonal is a wrong winner.'
     plot: true
 research:
 - title: 'Model–Behavior Alignment under Flexible Evaluation: When the Best-Fitting Model Isn’t the Right One'
@@ -313,7 +316,7 @@ research:
   #   cite   the BibTeX entry, behind a "Cite (BibTeX)" expander. Every field is FACTS PUB-CITATION plus the
   #          DOI of PUB-DOI; no `pages`, because the two published paginations disagree.
   how:
-  - Each of the 20 networks, already fitted to the human judgments, takes a turn as the generator.
+  - Each of the 20 networks, already fitted to the human judgments, takes a turn as the generator.
   - It answers millions of odd-one-out questions as if it were a participant.
   - All 20 networks are fitted to those simulated answers, the way they would be fitted to people’s.
   - The comparison ranks them. One that can be trusted puts the generator on top.

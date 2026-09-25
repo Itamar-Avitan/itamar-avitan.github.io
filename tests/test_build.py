@@ -437,7 +437,7 @@ def test_the_card_figure_is_swapped_by_one_line_and_only_a_plot_is_marked_as_one
     assert SITE["research"][0]["figure"] is plot                             # the labelled matrix is live
     assert f'<img src="../{plot["src"]}" alt="{plot["alt"]}" width="272" height="272">' in html
     assert '<figure class="paper__fig paper__fig--plot">' in html            # a plot, whose colour is data
-    assert "<figcaption>Adapted from Fig. 1D" in html
+    assert "<figcaption>Adapted from Fig.\u00a01D" in html                # a no-break space ties the number
     assert "paper__fig--art" not in html and lab["webp"] not in html and lab["src"] not in html
     site = copy.deepcopy(SITE)
     site["research"][0]["figure"] = site["figure_options"]["lab_illustration"]
