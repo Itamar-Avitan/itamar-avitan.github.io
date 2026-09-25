@@ -70,8 +70,10 @@ cannot be told from the other Itamar Avitan's.
 on the home page is the hand-off: one row per other page, each carrying a real line from it. Its gutter
 holds the page's name as a tag rather than a date, because these rows are addresses and not points in time —
 the margin rule stays a time axis, and a tag takes no tick. A tag in a log's gutter (a page name here, a role
-or a talk's kind elsewhere) is a small uppercase mono label; the outlined box is the paper card's venue badge
-alone.
+or a talk's kind elsewhere) is a small uppercase mono label; the outlined box is a venue badge: the paper
+card's, and the paper's first badge again under the Research row of `elsewhere`, which also carries the
+card's Paper and Code addresses under its line, so the work is one click from the front door. Both are drawn
+from the first research card and are written nowhere else.
 
 The list under `pages` in `site.yaml` **is** the site. Each entry's `slug` is three things at once: the
 address under `site_url`, the folder the file is written into, and the name of its template in
@@ -113,6 +115,15 @@ and a `.jpg` fallback, square and stripped of metadata, and prints their sizes.
 misread is as wrong as a plot misread. What settles a pale print into the dark page is the mount — the light
 card behind it, `--mat` in `style.css`. A figure whose colour is the data still carries `plot: true`, because
 the distinction is real and the `--plot-filter` hook is what a future change has to go through in the open.
+The portrait is the one image that is not a figure, and the one the dark theme dims: `--portrait-filter`
+in `style.css` takes it down a shade there (its white wall was the brightest thing on the dark first
+screen), and leaves it alone in the light theme and in print.
+
+**Four faces, all self-hosted** under `fonts/` (Fira Sans 400, 600 and 400 italic; Fira Mono 400 and 500),
+so no page asks another host for anything. The italic is used for the titles of works alone: the `works`
+list in `site.yaml` names them, and the templates set each in `<i class="work">` wherever the text names it,
+the way a book or a long poem is set in prose. A title listed there must occur in the content; a test fails
+on one that does not, as it does for a `nobreak` term.
 
 ## The link marks: three, and only three
 

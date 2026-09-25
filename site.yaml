@@ -133,6 +133,19 @@ nobreak:
 # "Negev, Israel" (the role line) is NOT here: the label ties it with a no-break space instead, because WebKit lets
 # a nowrap span that holds a space run past the column by up to a space width (see the note over `role`).
 
+# Titles of works that are set in italic wherever they occur in the text, the way a book-length work or a long
+# poem is set in running prose (Chicago 8.171, MLA, APA), while a chapter title keeps its quotation marks. The
+# template wraps each in <i class="work"> after the no-break wrapping (macros.html.j2, nb()); the italic face is
+# fonts/fira-sans-latin-400-italic.woff2, self-hosted like the other three, so the page still asks no other host
+# for anything (deep review 2026-09-25, DS-07). Not <cite>: the attributions are paragraphs that open with a
+# speaker, and a test forbids <cite> on that page. A title here must occur in the content exactly as written,
+# spaces included -- "An Essay on Man" is tied with no-break spaces in the Pope attribution, so it is tied here
+# too -- and tests/test_build.py fails on an entry that matches nothing, as it does for `nobreak`.
+works:
+- Harry Potter and the Order of the Phoenix
+- A Study in Scarlet
+- An Essay on Man
+
 # --- content (text verbatim from the fact-checked seed) ---
 name: Itamar Avitan
 # The line under the name; an entry with a url becomes a link.
@@ -223,6 +236,14 @@ now:
 # The commonplace row deliberately does not quote the Snape passage again: the novel is in copyright, the
 # house rule keeps such an extract to the page that argued for it, and the full passage is printed there at
 # the owner's ruling. Naming the speaker and the subject gets a reader there without a second reproduction.
+# The Research row is the one row that says more than its label and its line (deep review 2026-09-25, DS-09
+# and AS-02). Under its gutter label it carries the paper's first venue badge -- "NeurIPS 2025", the one
+# outlined box outside the paper card, drawn from `research[0].badges` -- and under its line a small mono row
+# with the paper's first button (Paper) and its Code link, drawn from `research[0].buttons`. Nothing is
+# written here for it: the badge and the addresses are the card's own, so they cannot drift from it. That
+# gives the row three ways out (the page, the paper, the code) where the other two keep one; the work is what
+# a visitor came to the front door for, and until this it was two clicks away. tests/test_build.py pins the
+# count and the two addresses.
 elsewhere:
 - page: Research
   label: When the Best-Fitting Model Isn’t the Right One
@@ -786,3 +807,9 @@ accessibility:
 
 footer:
   updated: September 2026
+  # The caption beside the colophon's mark, which had stood on every page unexplained: two of a kind and the
+  # odd one out is the task of the paper (deep review 2026-09-25, DI-01). "our", as every line on the site
+  # that names the paper says it; every word is already on the site (the research intro's "odd one out", the
+  # news items' "our NeurIPS 2025 paper"). The mark itself is drawn in templates/base.html.j2; the favicon and
+  # the arrangement of the three shapes are the owner's (Q-L) and this line does not touch them.
+  mark_note: 'Two alike and one odd one out: the task behind our NeurIPS 2025 paper.'

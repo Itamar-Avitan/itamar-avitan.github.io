@@ -2,11 +2,17 @@
     Optional keys (url, note, text, link, links, venue on the paper card, ongoing, authors, figure, me, role,
     nobreak) are tested before use, because the build renders with StrictUndefined. -#}
 
-{#- Wrap the no-break terms listed in site.yaml; the text is escaped first, so content can never inject markup. -#}
+{#- Wrap the no-break terms listed in site.yaml; the text is escaped first, so content can never inject markup.
+    Then the titles of works (`works` in site.yaml) go in <i class="work">, so a book or a long poem is set in
+    italic wherever the text names one (deep review 2026-09-25, DS-07); the italic face is self-hosted with the
+    others. After the no-break loop on purpose: a title may hold a tied term, and a term is never a title. -#}
 {%- macro nb(text) -%}
   {%- set ns = namespace(out=text) -%}
   {%- for term in site.get("nobreak") or [] -%}
     {%- set ns.out = ns.out|replace(term, ('<span class="nb">'|safe) ~ term ~ ('</span>'|safe)) -%}
+  {%- endfor -%}
+  {%- for work in site.get("works") or [] -%}
+    {%- set ns.out = ns.out|replace(work, ('<i class="work">'|safe) ~ work ~ ('</i>'|safe)) -%}
   {%- endfor -%}
   {{- ns.out -}}
 {%- endmacro -%}
@@ -215,12 +221,29 @@
     link is a real thing on the page it leads to -- a paper's title, a course, a speaker -- and the clause
     after the em dash says what else is there. The dash is tied to the label's last word by a no-break
     space, so it never opens a line: with the Teaching label at the course's full name it stood at the
-    start of a line on 390-400px phones, and the Research row's did at 430 (deep review 2026-09-25). -#}
+    start of a line on 390-400px phones, and the Research row's did at 430 (deep review 2026-09-25).
+    The Research row carries two things more, both drawn from the first paper card (`research[0]`) so
+    that nothing is written twice: the paper's first venue badge under the gutter label -- the one
+    outlined box outside the card, set in the gutter exactly as the card sets its badges -- and, under
+    the line, a small mono row with the card's first button (Paper) and its Code link (deep review
+    2026-09-25, DS-09 and AS-02). The links row stands outside .what on purpose: inside it, the title
+    rule (.log--go .what a) would set them as two more bold ink titles. Every key is tested before use;
+    a card without badges or buttons draws neither. -#}
 {%- macro elsewhere_rows(items) %}
 {% for item in items %}
         <li class="row">
           <p class="kind"><span class="tag">{{ item.page }}</span></p>
+  {% if item.url == "research/" and research and research[0].get("badges") %}
+          <p class="go-venue"><span class="tag tag--venue">{{ research[0].badges[0] }}</span></p>
+  {% endif %}
           <p class="what"><a href="{{ item.url|local(base) }}">{{ nb(item.label) }}</a>&nbsp;— {{ nb(item.text) }}</p>
+  {% if item.url == "research/" and research and research[0].get("badges") %}
+    {% set buttons = research[0].get("buttons") or [] %}
+    {% set code = buttons|selectattr("label", "equalto", "Code")|list %}
+    {% if buttons %}
+          <p class="go-links"><a href="{{ buttons[0].url }}">{{ buttons[0].label }}</a>{% if code %} · <a href="{{ code[0].url }}">Code</a>{% endif %}</p>
+    {% endif %}
+  {% endif %}
         </li>
 {% endfor %}
 {% endmacro -%}

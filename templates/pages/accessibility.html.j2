@@ -11,8 +11,21 @@
     id="email" (it is the hook that script uses), and site.yaml refuses a plain address anywhere in the file.
 
     The prose lists use the same `prose` measure as the About block, so the text column is the one the rest of
-    the site sets, and the bullets hang in it rather than in the gutter, which belongs to the time axis. -#}
+    the site sets, and the bullets hang in it rather than in the gutter, which belongs to the time axis.
+
+    Each item of the two lists opens with a bold lead -- its claim -- and the evidence follows in the
+    secondary grey, so a page a reader scans for one of twelve things can be scanned (deep review
+    2026-09-25, DS-14). The lead is cut by the template, not written: up to and including the first ". " or
+    ": ", whichever comes first, and where an item has neither (two of them are one sentence), at its first
+    ", ". Not one word of the statement changes, so its editing rule -- every line is a claim, and a claim is
+    checked -- is untouched; the two halves go through nb() one each, so the no-break terms are kept. -#}
 {% extends "base.html.j2" %}
+
+{%- macro lead(item) -%}
+  {%- set cuts = [item.find(". "), item.find(": ")]|select(">", 0)|list -%}
+  {%- if not cuts -%}{%- set cuts = [item.find(", ")]|select(">", 0)|list -%}{%- endif -%}
+  {%- if cuts -%}{%- set i = cuts|min -%}<strong class="lead">{{ m.nb(item[:i + 1]) }}</strong>{{ m.nb(item[i + 1:]) }}{%- else -%}{{ m.nb(item) }}{%- endif -%}
+{%- endmacro -%}
 
 {% block main %}
 
@@ -43,7 +56,7 @@
         <p>{{ m.nb(site.accessibility.done_intro) }}</p>
         <ul class="statement" role="list">
 {% for item in site.accessibility.done %}
-          <li>{{ m.nb(item) }}</li>
+          <li>{{ lead(item) }}</li>
 {% endfor %}
         </ul>
       </div>
@@ -55,7 +68,7 @@
         <p>{{ m.nb(site.accessibility.limits_intro) }}</p>
         <ul class="statement" role="list">
 {% for item in site.accessibility.limits %}
-          <li>{{ m.nb(item) }}</li>
+          <li>{{ lead(item) }}</li>
 {% endfor %}
         </ul>
       </div>

@@ -395,7 +395,23 @@ def test_home_hands_the_visitor_on_to_every_other_page():
         assert row["label"] in _visible_text(section) and row["text"] in _visible_text(section)
         assert "read more" not in row["label"].lower() and row["label"] != row["page"]
     assert '<p class="when">' not in section          # the gutter carries an address here, so it takes no tick
-    assert section.count("<a ") == 3                  # one way out of each row, and no second link to dilute it
+    # one way out of each row, plus the paper and its code under the Research row (2026-09: the two objects a
+    # visitor came for). The extras are the first paper card's own: its first venue badge in the gutter under
+    # the label -- the one outlined box outside the card -- and its Paper and Code addresses, so nothing here
+    # can drift from the card (deep review 2026-09-25, DS-09 and AS-02).
+    assert section.count("<a ") == 5
+    card = SITE["research"][0]
+    research_row = section.partition('<span class="tag">Research</span>')[2].partition("</li>")[0]
+    assert f'<p class="go-venue"><span class="tag tag--venue">{card["badges"][0]}</span></p>' in research_row
+    assert section.count('class="tag tag--venue"') == 1
+    paper = card["buttons"][0]
+    code = next(b for b in card["buttons"] if b["label"] == "Code")
+    assert paper["label"] == "Paper"
+    assert (f'<p class="go-links"><a href="{paper["url"]}">Paper</a> · <a href="{code["url"]}">Code</a></p>'
+            in unescape(research_row))
+    assert re.findall(r'<a href="([^"]+)">', unescape(research_row))[1:] == [paper["url"], code["url"]]
+    assert research_row.index('class="go-venue"') < research_row.index('class="what"') < research_row.index('class="go-links"')
+    assert "go-links" not in research_row.partition('class="what"')[2].partition("</p>")[0]   # outside .what: not a title
     for slug in SLUGS[1:]:                            # and only the home page hands off; no page does it twice
         assert 'id="elsewhere"' not in html_of(slug), slug
 
@@ -864,7 +880,7 @@ def test_optional_keys_may_be_absent():
     for entry in site["pages"]:
         for key in ("intro", "description", "title", "og_image", "og_image_alt"):
             entry.pop(key, None)
-    for key in ("role", "nobreak", "news_visible", "show_ongoing", "quotes_intro", "knows_about",
+    for key in ("role", "nobreak", "works", "news_visible", "show_ongoing", "quotes_intro", "knows_about",
                 "affiliation_url", "not_found"):
         site.pop(key, None)
     pages = every_page(site)
@@ -877,7 +893,7 @@ def test_optional_keys_may_be_absent():
         for gone in ('<p class="venue"><a', 'class="venue paper__venue"', 'class="note"', "<figure",
                      'class="authors"', 'class="role"', 'class="nb"', 'rel="me"', 'id="email"',
                      'class="tag tag--venue"', 'class="btn', 'class="page-intro', 'class="recovery-diagram"',
-                     'class="open"', 'class="cite"'):
+                     'class="open"', 'class="cite"', 'class="work"', 'class="go-venue"', 'class="go-links"'):
             assert gone not in html, (slug, gone)
     assert "<h3>Embodied Brain Technology Practicum</h3>" in pages["research/"]
     assert "Cognitive Computational Neuroscience (CCN) 2025" in pages["research/"]
@@ -1012,8 +1028,9 @@ def test_quotes_print_the_line_its_attribution_and_its_context_and_nothing_else(
     assert '<time class="when" datetime="2003">2003</time>' in section
     # the borrowed line keeps its own date in the attribution, where it cannot break at the hyphen -- after the
     # poem's title, as the novel's year follows the novel's (AK-16); the permalink follows inside the same <p>.
-    # The title, its span and the epistle's numeral are tied with U+00A0 (see the numeral test below).
-    assert 'An\u00a0Essay\u00a0on\u00a0Man\u00a0(<span class="nb">1733–34</span>), Epistle\u00a0II' in section
+    # The title, its span and the epistle's numeral are tied with U+00A0 (see the numeral test below); the
+    # title is set in italic (`works`, DS-07), so the tie inside it is inside the <i> and the one after it is not.
+    assert '<i class="work">An\u00a0Essay\u00a0on\u00a0Man</i>\u00a0(<span class="nb">1733–34</span>), Epistle\u00a0II' in section
     assert 'Epistle\u00a0II (<span class="nb">1733–34</span>)' not in section
 
 
@@ -1288,6 +1305,45 @@ def test_terms_of_art_do_not_break_and_stay_escaped():
     assert '<p><span class="nb">Ben-Gurion</span> &lt;b&gt;&amp; co&lt;/b&gt;</p>' in html_of("", site)
     del site["nobreak"]
     assert "<p>Ben-Gurion &lt;b&gt;&amp; co&lt;/b&gt;</p>" in html_of("", site)
+
+
+def test_every_work_title_is_set_in_italic_and_matches_the_content():
+    """The titles of works (`works` in site.yaml) are set in <i class="work"> wherever the text names one, in
+    a self-hosted italic face (deep review 2026-09-25, DS-07): a book or a long poem is italic in prose, and
+    the chapter titles beside them keep their quotation marks. Like a `nobreak` term, a title that matches
+    nothing is dead configuration. <i>, not <cite>: the attributions open with a speaker, and the test above
+    forbids <cite> on that page. The face is a local file, declared once, so the "nothing loads from anyone
+    else" bullet of the accessibility statement stays true."""
+    pages = every_page()
+    assert SITE["works"] and len(set(SITE["works"])) == len(SITE["works"])
+    for work in SITE["works"]:
+        assert any(f'<i class="work">{work}</i>' in h for h in pages.values()), work
+        assert not any(work in re.sub(r'<i class="work">.*?</i>', "", h) for h in pages.values()), work   # none left roman
+    assert "<cite" not in pages["commonplace/"]
+    css = _css()
+    face = re.search(r'@font-face \{ font-family: "Fira Sans"; font-style: italic; font-weight: 400;[^}]*\}', css)
+    assert face and 'src: url("fonts/fira-sans-latin-400-italic.woff2") format("woff2")' in face.group(0)
+    assert (build.ROOT / "fonts" / "fira-sans-latin-400-italic.woff2").read_bytes()[:4] == b"wOF2"
+    assert "font-synthesis: none" in css                       # so a face that fails to load falls back to roman, not faux italic
+    site = copy.deepcopy(SITE)
+    del site["works"]
+    assert 'class="work"' not in html_of("commonplace/", site)
+
+
+def test_the_colophon_mark_carries_its_caption_on_every_page():
+    """The mark had stood at the foot of every page unexplained (deep review 2026-09-25, DI-01); the caption
+    beside it is one line from site.yaml, and the mark keeps the owner's row of three shapes at one and a
+    half times its old size (DS-10) -- the same drawing the favicon is made from."""
+    note = SITE["footer"]["mark_note"]
+    assert "our NeurIPS 2025 paper" in note and "odd one out" in note      # every word is already on the site
+    for slug, html in every_page().items():
+        foot = html.partition('<footer class="colophon">')[2]
+        assert foot.count('<p class="mark-row inset">') == 1, slug
+        assert f'<span class="mark-note">{note}</span></p>' in foot, slug
+        mark = foot.partition('<svg class="mark"')[2].partition("</svg>")[0]
+        assert 'viewBox="0 0 42 10" width="63" height="15"' in mark and 'aria-hidden="true"' in mark, slug
+        assert mark.count("<circle") == 2 and mark.count("<rect") == 1, slug
+    assert (build.ROOT / "404.html").read_text(encoding="utf-8").count(f'<span class="mark-note">{note}</span>') == 1
 
 
 def test_role_line_keeps_the_lab_link_on_every_page():
