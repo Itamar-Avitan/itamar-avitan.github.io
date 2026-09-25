@@ -91,7 +91,11 @@ def test_structure_and_alt_text(browser, slug):
     page, _, _ = _page(browser, 1280, slug=slug)
     heading = next(p.get("heading") for p in SITE["pages"] if p["slug"] == slug) or SITE["name"]
     assert page.locator("h1").count() == 1 and page.inner_text("h1").strip() == heading
-    assert page.evaluate("[...document.images].every(i => i.alt && i.complete && i.naturalWidth > 0)")
+    # every image loads and has an alt attribute; only the portrait's is empty -- it stands beside the name,
+    # and a description would make a screen reader say the name twice (deep review 2026-09-25, PA-05)
+    assert page.evaluate("[...document.images].every(i => i.hasAttribute('alt') && i.complete && i.naturalWidth > 0)")
+    assert page.evaluate("[...document.images].filter(i => !i.alt).every(i => i.matches('.byline__who img, .masthead img'))")
+    assert page.evaluate("[...document.images].filter(i => i.matches('.byline__who img, .masthead img')).map(i => i.alt)") == [""]
     assert page.evaluate("[...document.querySelectorAll('svg.ico')].every(s => s.getAttribute('aria-hidden') === 'true')")
     # Email, GitHub, Bluesky, and nothing else -- GitHub twice at home, beside the address and in the colophon
     assert page.locator("svg.ico").count() == (4 if slug == "" else 3)
@@ -534,7 +538,37 @@ def test_the_statement_says_the_aim_the_checks_the_limits_and_how_to_report(brow
     assert "@" not in text and "mailto:" not in main_html
     assert page.locator("main #email").count() == 0 and page.locator("footer a#email").count() == 1
     assert [h.strip() for h in page.locator("main h2").all_inner_texts()] == [
-        "The aim", "What was done", "What is not claimed", "Reporting a problem"]
+        "The aim", "Reporting a problem", "What was done", "What is not claimed"]
     # no legal claim of any kind: this page states no obligation and cites no law
     for word in ("law", "legal", "legally", "required by", "Section 508", "directive", "compliance"):
         assert word.lower() not in text.lower(), word
+
+
+def test_the_way_to_report_a_problem_is_on_the_first_screen(browser):
+    """The GOV.UK model's order puts feedback and contact directly after the opening statement of how
+    accessible the site is; here that brings "Reporting a problem" from 2.8 screens down to the first one
+    (deep review 2026-09-25, FL-09: heading bottom 2270 -> 668 at 1280x800)."""
+    ctx = browser.new_context(viewport={"width": 1280, "height": 800})
+    page = ctx.new_page()
+    page.goto((ROOT / "accessibility" / "index.html").as_uri())
+    bottom = page.evaluate("document.querySelector('#report-h').getBoundingClientRect().bottom")
+    assert bottom <= 700, bottom
+    ctx.close()
+
+
+@pytest.mark.parametrize("width", WIDTHS)
+def test_every_quotation_permalink_is_a_24px_target_and_marks_its_entry(browser, width):
+    """The "§" at the end of each attribution is not a link inside a sentence, so the 24px rule applies to it
+    (WCAG 2.2 SC 2.5.8); and following one lands on the entry it names, which wears the 2px accent ring."""
+    page, _, _ = _page(browser, width, slug="commonplace/")
+    links = page.evaluate(HIT_TEST_JS, ".quote__link")
+    assert [l["label"] for l in links] == ["§"] * len(SITE["quotes"])
+    assert [l for l in links if l["height"] < 24 or l["width"] < 24 or not l["covered"]] == []
+    slug = SITE["quotes"][1]["slug"]
+    page.goto((ROOT / "commonplace" / "index.html").as_uri() + "#" + slug)
+    page.wait_for_timeout(100)
+    ring = page.evaluate(f"""() => {{
+      const s = getComputedStyle(document.querySelector('#{slug} > .what'));
+      return [s.outlineStyle, s.outlineWidth, document.querySelectorAll('.row:target').length];
+    }}""")
+    assert ring == ["solid", "2px", 1], ring

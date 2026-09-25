@@ -21,6 +21,9 @@ PHONE = re.compile(r"(?:\+?972|\b0)[\s\-.]?5\d(?:[\s\-.]?\d){7}\b")
 EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
 UNPUBLISHED = re.compile(r"\b(in[\s-]prep(?:aration)?|under[\s-]review|submitted to)\b", re.I)
 ABSOLUTE = re.compile(r"^(?:[a-z][a-z0-9+.-]*:|//|#)")
+# A quotation's permalink slug: lower-case ASCII words joined by single hyphens. It becomes an id and an
+# address, and it is never changed once published (see the note over `quotes` in site.yaml).
+SLUG = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 
 
 def load_site(path: Path) -> dict:
@@ -80,6 +83,17 @@ def validate(site: dict) -> list[str]:
             # span and without anything to say so.
             for term in _terms_cut_by(item["text"], item["link"], site.get("nobreak") or []):
                 problems.append(f"news item {item.get('date')!r}: link {item['link']!r} cuts through the nobreak term {term!r}")
+    # Every quotation carries a slug, well formed and its own: the slug is the row's id and the address its
+    # "§" permalink points at, so a missing one leaves an entry that cannot be shared and a repeated one
+    # sends two links to the same place.
+    seen = set()
+    for quote in site.get("quotes") or []:
+        slug = quote.get("slug")
+        if not isinstance(slug, str) or not SLUG.fullmatch(slug):
+            problems.append(f"quotation {quote.get('text', '')[:40]!r} has no well-formed slug (got {slug!r})")
+        elif slug in seen:
+            problems.append(f"quotation slug {slug!r} is used twice")
+        seen.add(slug)
     for page in site.get("pages") or []:
         if not template_path(page).exists():
             problems.append(f"page {page['slug']!r} has no template at {template_path(page).relative_to(ROOT)}")

@@ -93,10 +93,12 @@
 {# Every page but the home page says whose site it is in two lines: the same portrait, small, the name, and
    the role line under it. The bio itself is said once, on the home page, and the address once in the
    colophon below. The name is not a link -- "Home" is the first item of the strip directly above it, and a
-   second way home, in accent, would only make the identity read as a control. #}
+   second way home, in accent, would only make the identity read as a control. The portrait's alt is empty
+   on purpose: the name is the next word, and a screen reader would otherwise say it twice (deep review
+   2026-09-25, PA-05); the accessibility statement says so, so the two change together. #}
     <div class="byline inset">
       <p class="byline__who">
-        <picture><source srcset="{{ site.portrait.webp|local(base) }}" type="image/webp"><img src="{{ site.portrait.jpg|local(base) }}" width="36" height="36" alt="{{ site.portrait.alt }}"></picture>
+        <picture><source srcset="{{ site.portrait.webp|local(base) }}" type="image/webp"><img src="{{ site.portrait.jpg|local(base) }}" width="36" height="36" alt=""></picture>
         <span>{{ site.name }}</span>
       </p>
       {{ m.role_line()|trim }}

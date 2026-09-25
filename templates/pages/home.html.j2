@@ -3,7 +3,9 @@
 
 {% block identity %}
     <div class="masthead">
-      <picture><source srcset="{{ site.portrait.webp|local(base) }}" type="image/webp"><img src="{{ site.portrait.jpg|local(base) }}" width="120" height="120" alt="{{ site.portrait.alt }}"></picture>
+{# alt="" on purpose: the portrait stands beside the name, and a description would make a screen reader say
+   "Itamar Avitan" twice (deep review 2026-09-25, PA-05). The accessibility statement says so; change both. #}
+      <picture><source srcset="{{ site.portrait.webp|local(base) }}" type="image/webp"><img src="{{ site.portrait.jpg|local(base) }}" width="120" height="120" alt=""></picture>
       <h1>{{ site.name }}</h1>
       {{ m.role_line()|trim }}
       <p class="lede">{{ site.identity_line }}</p>

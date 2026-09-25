@@ -737,6 +737,23 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   color: var(--muted);
   text-wrap: pretty;
 }
+/* The permalink: a small "§" at the end of the attribution, in the mono of the gutter labels and their muted
+   colour, lifting to the link colour when pointed at or focused. Always painted -- a keyboard or a finger
+   cannot hover. The padding is what makes a one-glyph link a 24px target (WCAG 2.2 SC 2.5.8): the box is
+   padded all round rather than widened by the overlay the profile row uses, because here nothing stands to
+   its right to keep a rhythm with. Measured: the "§" is 7.8px wide at 13px, so 0.5rem a side left a 23.8px
+   box; 0.5625rem a side makes it 25.8. Inline padding, so the attribution's line height does not grow. */
+.quote__link {
+  margin-left: 0.5rem;
+  padding: 0.5rem 0.5625rem;
+  font: 500 0.8125rem/1 var(--mono);
+  color: var(--muted);
+  text-decoration: none;
+}
+.quote__link:hover, .quote__link:focus-visible { color: var(--accent); text-decoration: underline; }
+/* the entry a permalink lands on wears the same 2px accent ring a focused control does, so it is visibly the
+   one meant; the offset keeps the ring off the quotation's hanging mark and inside the row's own air */
+.row:target > .what { outline: 2px solid var(--accent); outline-offset: 0.5rem; }
 /* and the step between two quotations is larger again than any step inside one */
 .log--quotes > .row + .row { margin-top: 1.75rem; }
 

@@ -8,7 +8,10 @@ affiliation: Ben-Gurion University of the Negev
 show_cv: true
 show_ongoing: false
 news_visible: 5
-portrait: {webp: img/portrait-400.webp, jpg: img/portrait-800.jpg, alt: Itamar Avitan}
+# The portrait has no alt text on purpose (deep review 2026-09-25, PA-05): it stands beside the name on every
+# page, so a description would only make a screen reader say "Itamar Avitan" twice. The templates write
+# alt="" and the accessibility statement says so; there is no `alt` key here to fall out of step with them.
+portrait: {webp: img/portrait-400.webp, jpg: img/portrait-800.jpg}
 
 # The site is four pages, not one long scroll. The owner asked for that on 2026-09-21: "the phone one column
 # is not fun", "might want to go more tabs", "not make it an online cv but more hey this is me website and
@@ -49,7 +52,7 @@ pages:
 - slug: commonplace/
   nav: Commonplace
   heading: Commonplace
-  description: 'A commonplace book: lines about memory and mind that Itamar Avitan keeps coming back to.'
+  description: 'A commonplace book: lines about minds, and about how to study one, that Itamar Avitan keeps coming back to.'
 # The accessibility statement, added 2026-09-21 at the owner's request.
 # A PAGE OF ITS OWN, NOT A SECTION, and NOT IN THE NAVIGATION STRIP. Three decisions, each with its reason:
 #   * its own page, because it is about the site rather than about him. Folded into Home it would sit under
@@ -62,7 +65,9 @@ pages:
 - slug: accessibility/
   colophon: Accessibility
   heading: Accessibility
-  intro: What this site aims at, what was actually done about it, what is not claimed, and how to tell me when it falls short.
+  # The four things in the order the page says them: reporting comes second, directly after the aim, which is
+  # where the GOV.UK model statement puts it (deep review 2026-09-25, FL-09).
+  intro: What this site aims at, how to tell me when it falls short, what was actually done about it, and what is not claimed.
   description: 'The accessibility statement for the personal site of Itamar Avitan: what it aims at, what was actually done and checked, and how to report a problem.'
 
 # Proper nouns and terms of art that must never break across two lines, wherever they occur in the text.
@@ -238,8 +243,12 @@ news:
 # full) and kept, because it already obeyed it: the programme leads the sentence, EarBetter is named in a
 # clause, and nothing here says who did what. One word of repetition went -- the line named Brown University
 # twice in twenty words, once in the programme's name and once as the place -- and nothing else changed.
+# US spelling, here and everywhere the site speaks in its own words ("program", "behavior", "color"): the
+# paper's title is US and cannot change, so US is the one consistent choice (deep review 2026-09-25, RN-04).
+# Quoted text keeps its own spelling -- "skilful" in the commonplace evidence -- and comments and test names
+# that say "programme-first" keep the ruling's name.
 - date: Aug 2026
-  text: Completed the Embodied Brain Technology Practicum, a joint Brown University–Ben-Gurion University programme held at Brown, where our team of five designed, built and pitched EarBetter, a headphone add-on that filters the sounds that set a person’s anxiety off.
+  text: Completed the Embodied Brain Technology Practicum, a joint Brown University–Ben-Gurion University program held at Brown, where our team of five designed, built and pitched EarBetter, a headphone add-on that filters the sounds that set a person’s anxiety off.
 # The full paper title is not repeated here: it is printed on the card and in the Elsewhere label, and a
 # third copy on the home page said the same thing three times in two screens. The phrase links to the card.
 - date: Dec 2025
@@ -287,7 +296,7 @@ figure_options:
       handing a baton marked 011 to the next, under brain-shaped clouds filled with charts and network graphs.'
   recovery_matrix: &recovery_matrix
     src: img/model-recovery.svg
-    alt: 'Figure 1D of the paper, adapted, with both axes labelled: a 20-by-20 matrix of data-generating model
+    alt: 'Figure 1D of the paper, adapted, with both axes labeled: a 20-by-20 matrix of data-generating model
       (rows) against recovered model (columns) at 1.6 million training triplets. Most rows fall on the diagonal,
       but seven are mostly or entirely attributed to one model in the last column.'
     caption: 'Adapted from Fig. 1D of the paper. A dark cell off the diagonal is a wrong winner.'
@@ -462,7 +471,7 @@ projects:
   period: 24 Jul–6 Aug 2026
   # 63 words against the 64 of the wording it replaces, so the reframe costs the Research page nothing: this
   # row still sits below the peer-reviewed paper's own summary and still weighs less than it, which is right.
-  blurb: 'Two weeks at Brown University in Providence, on a programme run jointly with Ben-Gurion University: graduate students from the two universities, admitted by competitive selection, work in small teams, each building a piece of neurotechnology and pitching it. Our five-person team built and pitched EarBetter, an add-on that works with any headphones, reads biosignals and filters out the sounds that set a person’s anxiety off.'
+  blurb: 'Two weeks at Brown University in Providence, on a program run jointly with Ben-Gurion University: graduate students from the two universities, admitted by competitive selection, work in small teams, each building a piece of neurotechnology and pitching it. Our five-person team built and pitched EarBetter, an add-on that works with any headphones, reads biosignals and filters out the sounds that set a person’s anxiety off.'
   url: https://sites.google.com/brown.edu/ebt/2026-practicum
   links:
   - label: Code
@@ -470,8 +479,15 @@ projects:
 - title: BCI4ALS
   period: 2022–2023
   blurb: In a team of five, we built a brain–computer interface (BCI) that let a person with amyotrophic lateral sclerosis (ALS) answer yes/no questions through the P300 brain response measured with electroencephalography (EEG). The person it was built for used it live.
-# Lines about the mind, collected. text, attribution and note are printed; year is the gutter label; status,
-# evidence and copyright are the provenance record and are not rendered. Always name a quotation's source.
+# Lines about the mind, collected. text, attribution and note are printed; year is the gutter label; slug is
+# the entry's own address on the page (see PERMALINKS below); status, evidence and copyright are the
+# provenance record and are not rendered. Always name a quotation's source.
+# PERMALINKS (deep review 2026-09-25, AS-52): every quotation carries a `slug` -- lower-case ASCII words
+# joined by hyphens -- which becomes the id of its row and the address of the small "§" link at the end of
+# its attribution, so that one line can be shared (commonplace/#holmes-brain-attic lands on that entry, with
+# the page's accent ring around it). A slug is NEVER CHANGED once published: a link someone kept would stop
+# landing. build.py refuses a quotation without one, a malformed one, and two the same. The link is always
+# painted, never only on hover: a keyboard or a finger cannot hover.
 # House rule: keep a quotation from a work that is still in copyright to a single sentence. The Snape entry
 # below is a deliberate exception, ruled by the owner and recorded there; every future in-copyright entry
 # still starts from the single sentence.
@@ -482,7 +498,12 @@ projects:
 # oldest first, so that the years in the gutter only went forward; that rule is dropped, because he cares
 # which line a reader meets first and the gutter can carry 2003 above 1887. A commonplace book is a person's
 # own order, not a chronology. Keep his order when you add to it: say where a new line goes, do not sort.
-quotes_intro: Lines about memory and mind I keep coming back to.
+# The intro says what a commonplace book is, for the reader who has not met the word, and what these four
+# have in common -- "about minds, and about how to study one" covers Pope's line and the thousand-and-first
+# misdeed as well as the two the old intro fit (deep review 2026-09-25, CS-18 and DI-05). "how to study one"
+# is the agent's phrase for what the lines share, not his: Q-N item 18 asks whether he wants his own sentence
+# here instead. The space before the em dash is a no-break space (U+00A0), so the dash never opens a line.
+quotes_intro: A commonplace book is a notebook of lines worth keeping. These are mine — lines about minds, and about how to study one, that I keep coming back to.
 quotes:
 # The owner was shown that this novel is in copyright and that the single sentence “The mind is not a book…”
 # was the safer extract, and chose the full four-sentence passage anyway on 2026-09-21. It is printed here at
@@ -492,6 +513,7 @@ quotes:
 - text: “Only Muggles talk of ‘mind reading.’ The mind is not a book, to be opened at will and examined at leisure. Thoughts are not etched on the inside of skulls, to be perused by any invader. The mind is a complex and many-layered thing, Potter—or at least, most minds are.”
   attribution: Severus Snape, in J.K. Rowling, Harry Potter and the Order of the Phoenix (2003), Chapter 24, “Occlumency”
   year: '2003'
+  slug: snape-mind-not-a-book
   status: corrected
   evidence: >-
     The novel is in copyright and no full text is reachable, so wording was triangulated across scanned books
@@ -516,6 +538,7 @@ quotes:
 - text: “I consider that a man’s brain originally is like a little empty attic, and you have to stock it with such furniture as you choose.”
   attribution: Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter II, “The Science of Deduction”
   year: '1887'
+  slug: holmes-brain-attic
   status: verified
   evidence: >-
     Project Gutenberg ebook #244 (https://www.gutenberg.org/cache/epub/244/pg244.txt), downloaded in full and
@@ -529,8 +552,11 @@ quotes:
   copyright: public-domain
   note: Holmes says this immediately after learning the earth goes round the sun and replying, “Now that I do know it I shall do my best to forget it.”
 - text: “The proper study of mankind is man.”
-  attribution: Dr. John Watson, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter I, “Mr. Sherlock Holmes” — quoting Alexander Pope, An Essay on Man, Epistle II (1733–34)
+  # The poem's span sits after the poem's title, as the novel's year sits after the novel's: Epistle II alone
+  # is 1733, and "(1733–34)" is the whole Essay's (deep review 2026-09-25, AK-16).
+  attribution: Dr. John Watson, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter I, “Mr. Sherlock Holmes” — quoting Alexander Pope, An Essay on Man (1733–34), Epistle II
   year: '1887'
+  slug: watson-proper-study
   status: verified
   evidence: >-
     Project Gutenberg ebook #244, lines 393-395. Exact source text: ‘“Oh! a mystery is it?” I cried, rubbing my
@@ -541,12 +567,19 @@ quotes:
     Essay on Man; Moral Essays and Satires), Epistle II lines 1-2 — “Know, then, thyself, presume not God to
     scan; / The proper study of mankind is man.” — and the Wikisource transcription of the 1751 edition
     (en.wikisource.org/wiki/An_Essay_on_Man/Chapter_4), which reads identically apart from period spelling
-    (“Plac’d on this isthmus”).
+    (“Plac’d on this isthmus”). Context of the note: Gutenberg #244 lines 261-265 (the introduction and
+    'You have been in Afghanistan, I perceive.'), 384-399 (the walk, Watson's question to Stamford, the line
+    and Stamford's reply, whose sentence runs on to 'a knotty problem, though.').
   copyright: public-domain
-  note: Doyle prints it in single quotation marks because Watson is himself quoting Pope; Stamford’s reply is “You must study him, then… You’ll find him a knotty problem.”
+  # The note places the line in the scene rather than explaining Doyle's single quotation marks, which the
+  # page does not show (deep review 2026-09-25, CS-19). The "…" in Stamford's reply marks a cut speech tag
+  # (", Stamford said, as he bade me good-bye."); ", though" is Doyle's. Quoted, because the colon before the
+  # reply would otherwise end the YAML scalar.
+  note: 'Watson says it walking away from his first meeting with Holmes, still wondering how Holmes knew, unasked, that he had come from Afghanistan. Stamford, who introduced them, replies: “You must study him, then… You’ll find him a knotty problem, though.”'
 - text: “There is a strong family resemblance about misdeeds, and if you have all the details of a thousand at your finger ends, it is odd if you can’t unravel the thousand and first.”
   attribution: Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter II, “The Science of Deduction”
   year: '1887'
+  slug: holmes-thousand-and-first
   status: verified
   evidence: >-
     Project Gutenberg ebook #244 (https://www.gutenberg.org/cache/epub/244/pg244.txt), downloaded in full
@@ -569,50 +602,69 @@ quotes:
 # Teaching, in two sections since 2026-09-21. It was one undifferentiated list of four sentences: no headings,
 # no ticks of its own, the only page on the site with no internal structure -- and it ranked "mentoring two
 # undergraduate research students" level with a three-year teaching assistantship. Worse, this page is meant
-# to be the authority on his teaching and it did not carry the academic writing course that "about" and "now"
-# above both announce for 2026/27. The institution is not repeated on every row any more: the page's own intro
-# says it once, and the one row that belongs to another unit names it (Dean of Students Office).
-#   title  the course, or the students.
+# to be the authority on his teaching and it did not carry the academic writing course that "now" above
+# announces for 2026/27. The institution is not repeated on every row any more: the page's own intro says it
+# once, and the one row that belongs to another unit names it (Dean of Students Office).
+# ORDER: newest first, like every list on the site (deep review 2026-09-25, FL-08). Courses was the one list
+# on the site that ran the other way, so the gutter changed direction between it and Students; it now reads
+# one direction down the whole page, and the CV prints the courses in the same order.
+#   title  the course, or the students -- or, for the one course whose registrar title is not printed yet, a
+#          description of it (see the note over that row).
 #   kind   what he is in it: an outlined tag in the gutter, under the dates -- the same label a talk carries.
+#          A role noun in every row (Teaching assistant, Teaching team, Mentor, Tutor): a gerund there read as
+#          an activity, and "Joining" read as attending (deep review 2026-09-25, CS-17).
 #   when   the years. Lifted into the gutter and ticked on the margin rule like every other date on the site.
-#   what   DRAFT. One sentence on what the course is about, written from the course's own name and from what
-#          this site already says; the rows carry no claim about his duties beyond the role in "kind", because
-#          nothing here records them. What he actually does inside each course is his to say -- when he says
-#          it, replace these sentences with his words rather than adding to them.
-# The academic writing course's own title is not recorded anywhere yet; "Academic writing" stands in for it,
-# and it is the one entry on this page whose name still has to be confirmed.
+#   what   Under Courses: DRAFT. One sentence on what the course is about, written from the course's own name
+#          and from what this site already says; the rows carry no claim about his duties beyond the role in
+#          "kind", because nothing here records them. What he actually does inside each course is his to say
+#          (Q-G) -- when he says it, replace these sentences with his words rather than adding to them.
+#          Under Students: not a draft. The two sentences are the register's own words (FACTS TEACH-MENT-DESC
+#          and TEACH-TUTOR), which cv.pdf already prints; this page was the one place that said less.
 teaching:
   courses:
+  # DESCRIBED, NOT TITLED, until the title is printed. The course's own title is recorded nowhere on the site
+  # or in the register (FACTS TEACH-WRITING, "title unconfirmed"), so the row says what the course is rather
+  # than setting a stand-in in the title slot beside three real titles, and it carries no sentence: a line
+  # about the content of a course nobody has named would be the one claim on the site with no source (deep
+  # review 2026-09-25, AK-03 and CS-17). Owner ruling 13 of 2026-09-25 has since given the title ("Academic
+  # Writing") and the role (teaching assistant, from 2026/27); printing them is WP-S12, with the CV line in
+  # WP-C13, and this row waits for that package rather than pre-empting it.
+  # Teaching team: the course is under his teaching appointment (spec §8, source E), which is all that is
+  # recorded here, and the tag claims no more than the Now line's "helping teach"; the exact role is his to
+  # give, and the ruling above gives it -- WP-S12 prints it.
+  - title: An academic writing course
+    kind: Teaching team
+    when: from 2026/27
   - title: Introduction to Cognition and Computation
     kind: Teaching assistant
     when: 2023/24, 2024/25 and 2025/26
     what: 'An introduction to treating a mind as something that computes: the questions cognitive science asks, and the models built to answer them.'
+  - title: Deep Learning for Neuroscience and Cognition
+    kind: Teaching assistant
+    when: spring 2026
+    what: 'Deep networks as models of brains and behavior: how one is built and trained, and what it takes to read it as a claim about a mind.'
   # Quote the year. `when` is lifted into the gutter and split on the en dash by the template, so a bare 2024
-  # is read by YAML as an integer and the build stops on it. This is the first row whose date is a bare year.
-  # It is placed here, not last, because the gutter dates are a time axis and 2024 precedes spring 2026.
+  # is read by YAML as an integer and the build stops on it. This is the one row whose date is a bare year;
+  # which semester of 2024 it was is his to say (Q-G).
   - title: Computational Approaches to Neuroimaging
     kind: Teaching assistant
     when: '2024'
     what: 'Turning brain images into numbers: the computational methods that take imaging data and make a measurement out of it.'
-  - title: Deep Learning for Neuroscience and Cognition
-    kind: Teaching assistant
-    when: spring 2026
-    what: 'Deep networks as models of brains and behaviour: how one is built and trained, and what it takes to read it as a claim about a mind.'
-  # "Joining", not "Teaching assistant": what "now" and "about" record is that he joins this course in
-  # 2026/27, not in what capacity. The tag says exactly that and no more until he says the rest.
-  - title: Academic writing
-    kind: Joining
-    when: from 2026/27
-    what: 'Writing up a result: what a paper has to say, and how to say it so that a reader can check it.'
   students:
+  # One topic per student, in the register's words (TEACH-MENT-DESC; the students are not named, MENT-NAMES),
+  # spelled "modeling" because the site spells US (RN-04).
   - title: Two undergraduate research students
-    kind: Mentoring
+    kind: Mentor
     when: 2025–2026
-  # The subjects are TEACH-TUTOR's, from the advisor-edited CV the register sources: the site printed a
-  # weaker list that dropped statistics and said "algebra" where the confirmed subject is linear algebra.
-  - title: Calculus, linear algebra and statistics, Dean of Students Office
+    what: 'In the lab: one on model–brain alignment, one on statistical modeling of neural spiking data.'
+  # The post is the title and the subjects are the sentence, so the row reads as a post and not as a course
+  # with an odd name. The subjects are TEACH-TUTOR's, from the advisor-edited CV the register sources: the
+  # site once printed a weaker list that dropped statistics and said "algebra" where the confirmed subject is
+  # linear algebra.
+  - title: Academic tutoring, Dean of Students Office
     kind: Tutor
     when: 2021–2023
+    what: Calculus, linear algebra and statistics.
 
 # The accessibility statement. Every line below is a claim about this site, so the rule for editing it is
 # stricter than for anything else in this file: it may only say what is true and what is checked.
@@ -630,24 +682,33 @@ teaching:
 #     build refuses a plain address anywhere in this file, and exactly one element per page may carry
 #     id="email" -- that is the hook the script in base.html.j2 uses.
 accessibility:
-  aim: 'This site aims at WCAG 2.1 Level AA — the Web Content Accessibility Guidelines, level AA. That is the standard I hold it to. It is not a certificate: nobody but me has audited this site, and the list below is what was actually done, not a claim that the whole of AA has been met.'
-  done_intro: 'What that has meant in practice. Each of these is checked automatically before the site is built, so it stays true:'
+  # Reworded in the deep review of 2026-09-25 (CS-10, CS-11, MR-12, PA-05) so that every sentence is true as
+  # written: the host sees every visit (so "tells nobody else" became "no one but the host, GitHub Pages");
+  # the tests are run by hand before a change is published, not "automatically before the site is built"
+  # (README: build, then pytest, no CI); the portrait carries alt="" on purpose, so the picture bullet names
+  # only what a test asserts -- the figure's description and the three hidden link marks (test_browser.py,
+  # test_structure_and_alt_text); and the email sentence no longer gives "harder to harvest" as its reason,
+  # because cv.pdf, linked from every page, prints both addresses as plain links.
+  aim: 'This site aims at WCAG 2.1 Level AA — the middle of the three levels of the Web Content Accessibility Guidelines — and that is the standard I hold it to. It is not a certificate: nobody but me has audited this site, and the list below is what was actually done, not a claim that the whole of AA has been met.'
+  done_intro: 'What that has meant in practice. Each of these is checked by an automated test that I run before I publish a change, so the list stays true:'
   done:
-  - 'Nothing loads from anyone else. The fonts are served from this site, and no page asks any other host for anything — no analytics, no trackers, no embedded players, no hosted fonts — so the pages work on a slow or filtered connection, and reading them tells nobody else that you were here.'
-  - 'Contrast is measured, not judged by eye. Every piece of text painted on every page is sampled in a real browser and checked against the WCAG contrast formula — 4.5 to 1 for ordinary text, 3 to 1 for large text — in the light theme and in the dark one, and in each of them reached both from your system setting and from the theme button.'
+  - 'Nothing loads from anyone else. The fonts are served from this site, and no page asks any other host for anything — no analytics, no trackers, no embedded players, no hosted fonts — so the pages work on a slow or filtered connection, and reading them tells no one but the host, GitHub Pages, that you were here.'
+  - 'Contrast is measured, not judged by eye. Every piece of text painted on every page is sampled in a real browser and checked against the WCAG contrast formula — 4.5 to 1 for ordinary text, 3 to 1 for large text — in both themes, whether the theme comes from your system setting or from the theme button.'
   - 'Everything you can use, you can reach from a keyboard, and you can see where you are: every link and the theme button draws the same two-pixel ring when it takes focus.'
-  - 'The controls are big enough to hit: every link in the navigation strip, in the row of profiles and in the footer is at least 24 by 24 pixels to point at, at every width down to a 320-pixel screen. A link set inside a sentence is left at the size of the words around it.'
-  - 'Nothing moves on its own. The only motion is a short colour fade and smooth scrolling, and both are switched off for a visitor whose system asks for reduced motion.'
+  - 'The controls are big enough to hit: every link in the navigation strip, in the row of profiles and in the footer is a target at least 24 by 24 pixels, on every screen down to 320 pixels wide. A link set inside a sentence is left at the size of the words around it.'
+  - 'Nothing moves on its own. The only motion is a short color fade and smooth scrolling, and both are switched off for a visitor whose system asks for reduced motion.'
   - 'The markup says what things are: one first-level heading per page, headings that never skip a level, lists marked up as lists, the navigation in a named landmark with the current page marked, and a language set on the document.'
-  - 'Every image carries a description of what it shows, written for a reader who cannot see it.'
-  - 'The site works with JavaScript switched off: the pages are ordinary links. Two things need it, and both fail quietly — the theme button, which stays hidden until the script has run rather than sitting there doing nothing, and my e-mail address, which is written as text and made into a link in your browser so that it is harder to harvest.'
+  - 'Every picture that carries information has a text alternative: the paper’s figure is described in full for a reader who cannot see it. The portrait beside my name, and the small marks beside Email, GitHub and Bluesky, are hidden from screen readers, because the words beside them already say it.'
+  - 'The site works with JavaScript switched off: the pages are plain HTML joined by ordinary links. Two things need it, and both fail quietly — the theme button, which stays hidden until the script has run rather than sitting there doing nothing, and my email address, which is written as text and made into a link in your browser.'
   - 'Body text is set at 16 pixels or larger, the layout reflows into one column on a phone, and no page scrolls sideways at any width down to 320 pixels.'
   limits_intro: 'The gaps I know about, so that the list above is not read for more than it says:'
   limits:
   - This site has not been audited by anyone else, and it has not been tested with a screen reader, with voice control or with a magnifier. The checks above are automated ones and my own reading, and neither can tell you how a page actually sounds.
   - 'The CV is a PDF, and it is the weakest thing here: it is built so that its text comes out in order and every address in it is real text, but it is not a tagged PDF.'
   - This is a personal site. I write it and keep it working, in the time I have, so a fix may not be quick.
-  report: 'If something here is hard to use, or does not work with whatever you use to read the web, please tell me — that is the fastest way for it to get fixed. My address is on every page of this site: at the top of the home page, and at the foot of the others. What helps most: which page you were on, what you were using, and what happened.'
+  # "at the foot of this page" first: this section now stands second on the page, under the aim, so the
+  # colophon that carries the address is no longer in view when the sentence is read (FL-09, CS-11).
+  report: 'If something here is hard to use, or does not work with whatever you use to read the web, please tell me — that is the fastest way for it to get fixed. My address is at the foot of this page, and at the top of the home page. What helps most: which page you were on, what you were using, and what happened.'
 
 footer:
   updated: September 2026

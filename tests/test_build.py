@@ -240,7 +240,8 @@ def test_every_page_says_whose_site_it_is_without_repeating_the_bio():
         assert html.count('class="role"') == 1, slug
         assert html.count('id="email"') == 1, slug
         assert html.count(SITE["links"][0]["text"]) == 1, slug
-        assert '<img src="' in html and SITE["portrait"]["alt"] in html, slug
+        # the portrait is there, and it is decorative: the name is the next word (deep review, PA-05)
+        assert re.search(r'<img src="(?:\.\./)?img/portrait-800\.jpg" width="\d+" height="\d+" alt="">', html), slug
         if slug:
             assert '<div class="byline inset">' in html and "masthead" not in html, slug
             assert '<footer class="colophon">' in html and "links-nav" in html.partition("<footer")[2], slug
@@ -453,7 +454,7 @@ def test_the_matrix_is_labelled_and_is_the_figure_its_description_says():
     text inside the SVG, small, and the caption carries the meaning. The alt text describes the drawing --
     twenty rows, most on the diagonal, seven attributed to the last column -- so the drawing is held to it."""
     svg = (build.ROOT / SITE["figure_options"]["recovery_matrix"]["src"]).read_text(encoding="utf-8")
-    assert svg.count("<text") >= 4 and "adapted, axes labelled" in svg
+    assert svg.count("<text") >= 4 and "adapted, axes labeled" in svg
     assert "recovered model" in svg and "generating model" in svg           # the axes, named
     assert re.search(r'font-size="\d+">1</text>', svg) and re.search(r'font-size="\d+">20</text>', svg)
     cells = [(int(x), int(y)) for x, y in re.findall(r'<rect x="(\d+)" y="(\d+)" width="10" height="10"', svg)]
@@ -793,21 +794,43 @@ def test_teaching_is_two_sections_and_every_row_is_dated_and_titled():
 
 
 def test_the_teaching_page_carries_the_course_home_announces():
-    """This page is the authority on his teaching, and it did not list the academic writing course that both
-    "about" and "now" on the home page announce for 2026/27."""
+    """This page is the authority on his teaching, and it did not list the academic writing course that "now"
+    on the home page announces for 2026/27. The course is described, not titled, until he gives its title
+    (deep review 2026-09-25, AK-03 and CS-17), and the list runs newest first like every list on the site
+    (FL-08): it was the one list that ran the other way, so the gutter changed direction between Courses and
+    Students. The order is the CV's."""
     courses = SITE["teaching"]["courses"]
     writing = next(c for c in courses if "writing" in c["title"].lower())
     assert writing["when"] == "from 2026/27" and "2026/27" in SITE["now"][1]
     assert "academic writing course" in SITE["now"][-1]
     assert writing["title"] in _visible_text(html_of("teaching/"))
-    assert [c["title"] for c in courses][0] == "Introduction to Cognition and Computation"
+    assert "what" not in writing and writing["kind"] == "Teaching team"      # a description, and no invented sentence
+    assert [c["title"] for c in courses] == ["An academic writing course", "Introduction to Cognition and Computation",
+                                             "Deep Learning for Neuroscience and Cognition",
+                                             "Computational Approaches to Neuroimaging"]
+    # the gutter reads one direction down the whole page: the years of the six rows, in page order
+    html = html_of("teaching/")
+    whens = re.findall(r'<p class="when">(.*?)</p>', html)
+    assert [_visible_text(w) for w in whens] == ["from 2026/27", "2023/24, 2024/25 and 2025/26", "spring 2026", "2024",
+                                                 "2025–2026", "2021–2023"]
 
 
 def test_a_teaching_row_without_a_sentence_still_renders():
-    """The two rows under "Students" are people, not a syllabus: they carry a title and nothing under it."""
+    """The rows under "Students" carry the register's own sentence under the title (the mentoring topics and
+    the tutoring subjects, which cv.pdf already prints); the one row with nothing under its title is now the
+    writing course under "Courses", so the no-sentence path is still exercised by a real row (deep review
+    2026-09-25, AC-12 and CS-17). The synthetic site below proves it on its own as well."""
     html = html_of("teaching/")
     students = html.partition('<section id="students"')[2].partition("</section>")[0]
-    assert students.count("<h3>") == 2 and "<p>" not in students
+    assert students.count("<h3>") == 2 and students.count("<p>") == 2
+    assert [k["kind"] for k in SITE["teaching"]["students"]] == ["Mentor", "Tutor"]     # role nouns, not gerunds
+    assert "<h3>Academic tutoring, Dean of Students Office</h3>" in students            # a post, not a course
+    assert "<p>Calculus, linear algebra and statistics.</p>" in students
+    assert "statistical modeling of neural spiking data" in students                   # US spelling, FACTS TEACH-MENT-DESC
+    courses = html.partition('<section id="courses"')[2].partition("</section>")[0]
+    writing = re.search(r'<li class="row">(?:(?!</li>).)*An academic writing course(?:(?!</li>).)*</li>', courses, re.S).group(0)
+    assert "<h3>An academic writing course</h3>" in writing and "<p>" not in writing
+    assert 'log--tight' not in html                          # both lists take the ordinary step: every row may carry a sentence
     site = copy.deepcopy(SITE)
     site["teaching"] = {"courses": [{"title": "A course", "kind": "Teaching assistant", "when": "2026"}]}
     only = html_of("teaching/", site)
@@ -827,8 +850,10 @@ def test_quotes_print_the_line_its_attribution_and_its_context_and_nothing_else(
             assert quote[private] not in shown
     assert section.count('<time class="when" datetime="1887">1887</time>') == 3      # the year takes its tick
     assert '<time class="when" datetime="2003">2003</time>' in section
-    # the borrowed line keeps its own date in the attribution, where it cannot break at the hyphen
-    assert 'Epistle II (<span class="nb">1733–34</span>)</p>' in section
+    # the borrowed line keeps its own date in the attribution, where it cannot break at the hyphen -- after the
+    # poem's title, as the novel's year follows the novel's (AK-16); the permalink follows inside the same <p>
+    assert 'An Essay on Man (<span class="nb">1733–34</span>), Epistle II' in section
+    assert 'Epistle II (<span class="nb">1733–34</span>)' not in section
 
 
 def test_a_quotation_carries_its_own_quotation_marks():
@@ -913,6 +938,64 @@ def test_the_attribution_is_a_paragraph_not_a_cite():
     html = html_of("commonplace/")
     assert "<cite" not in html
     assert html.count('<p class="quote__by">') == len(SITE["quotes"])
+
+
+def test_every_quotation_has_a_permalink_of_its_own():
+    """One line can be shared (deep review 2026-09-25, AS-52): each quotation's slug is the id of its row and
+    the address of the small "§" at the end of its attribution. The slug is ASCII, unique, and never changed
+    once published; the link is always painted, since a keyboard or a finger cannot hover; and the entry a
+    link lands on wears the same 2px accent ring a focused control does."""
+    slugs = [q["slug"] for q in SITE["quotes"]]
+    assert slugs == ["snape-mind-not-a-book", "holmes-brain-attic", "watson-proper-study", "holmes-thousand-and-first"]
+    assert len(set(slugs)) == len(slugs) and all(build.SLUG.fullmatch(s) for s in slugs)
+    html = html_of("commonplace/")
+    section = html.partition('<section id="quotes"')[2].partition("</section>")[0]
+    rows = re.findall(r'<li class="row" id="([^"]+)">', section)
+    assert rows == slugs
+    for slug in slugs:
+        assert section.count(f'id="{slug}"') == 1
+        assert f'<a class="quote__link" href="#{slug}" aria-label="Link to this quotation">§</a></p>' in section
+    assert section.count('class="quote__link"') == len(slugs)
+    # inside the attribution's own paragraph, at its end, after the source
+    for q in SITE["quotes"]:
+        by = re.search(r'<p class="quote__by">(.*?)</p>', section[section.index(f'id="{q["slug"]}"'):], re.S).group(1)
+        assert by.endswith("§</a>") and _visible_text(by).startswith(q["attribution"][:20])
+    css = _css()
+    link = re.search(r"\.quote__link \{[^}]*\}", css).group(0)
+    assert "padding: 0.5rem 0.5625rem" in link and "var(--mono)" in link and "text-decoration: none" in link
+    for hidden in ("display: none", "opacity: 0", "visibility: hidden"):
+        assert hidden not in link                                              # never hover-only
+    assert ".quote__link:hover, .quote__link:focus-visible {" in css
+    assert ".row:target > .what { outline: 2px solid var(--accent); outline-offset: 0.5rem; }" in css
+
+
+def test_the_build_refuses_a_quotation_without_a_good_slug():
+    """A missing slug is an entry that cannot be shared; a repeated one sends two links to one place; a slug
+    with a space or a capital is not an address anyone can type."""
+    site = copy.deepcopy(SITE)
+    del site["quotes"][1]["slug"]
+    assert any("has no well-formed slug" in p and "I consider that a man" in p for p in build.validate(site))
+    site = copy.deepcopy(SITE)
+    site["quotes"][2]["slug"] = site["quotes"][1]["slug"]
+    assert any("used twice" in p and "holmes-brain-attic" in p for p in build.validate(site))
+    for bad in ("Holmes Brain Attic", "holmes_brain", "-leading", "trailing-", "double--hyphen", "ünïcode", 7):
+        site = copy.deepcopy(SITE)
+        site["quotes"][0]["slug"] = bad
+        assert any("has no well-formed slug" in p for p in build.validate(site)), bad
+    assert build.validate(SITE) == []
+
+
+def test_the_statement_reports_before_it_lists():
+    """Intro, aim, report, done, limits: the GOV.UK model's order (deep review 2026-09-25, FL-09), so the way
+    to report a problem is on the first screen and not 2.8 screens down. The intro names the four in the same
+    order, and the report sentence points at the address at the foot of this page first, because the colophon
+    is no longer in view when it is read."""
+    html = html_of("accessibility/")
+    assert (html.index('<section id="aim"') < html.index('<section id="report"')
+            < html.index('<section id="done"') < html.index('<section id="limits"'))
+    intro = page("accessibility/")["intro"]
+    assert intro.index("aims at") < intro.index("tell me") < intro.index("actually done") < intro.index("not claimed")
+    assert "My address is at the foot of this page, and at the top of the home page." in SITE["accessibility"]["report"]
 
 
 def test_every_gutter_label_in_the_quotes_section_is_a_plain_date():
@@ -1032,7 +1115,7 @@ def test_role_line_keeps_the_lab_link_on_every_page():
 def test_portrait_and_calm_rows_of_links():
     html = html_of("")
     assert ('<picture><source srcset="img/portrait-400.webp" type="image/webp">'
-            '<img src="img/portrait-800.jpg" width="120" height="120" alt="Itamar Avitan"></picture>') in html
+            '<img src="img/portrait-800.jpg" width="120" height="120" alt=""></picture>') in html
     # the address, then the profiles this page may mark, then the profiles it may not
     assert html.count('<ul class="links ') == 3 and "monogram" not in html
     email_row = html.partition('<li class="links__email">')[2].partition("</li>")[0]
@@ -1140,7 +1223,18 @@ def test_images_carry_no_metadata_and_the_social_card_is_1200x630():
 def test_the_statement_claims_only_what_something_actually_checks():
     """The page says the site aims at WCAG 2.1 AA and lists what was done. Each bullet has to be backed by a
     check that runs, or it is marketing. This test pins the three that had no guard of their own: reduced
-    motion, the document language, and the fact that nothing on any page loads from a third party."""
+    motion, the document language, and the fact that nothing on any page loads from a third party -- and the
+    three sentences the deep review of 2026-09-25 found saying more than was true (CS-10, MR-12, PA-05)."""
+    done = SITE["accessibility"]["done"]
+    assert "tells no one but the host, GitHub Pages, that you were here" in done[0]     # the host sees every visit
+    assert "tells nobody else" not in done[0]
+    assert "checked by an automated test that I run before I publish a change" in SITE["accessibility"]["done_intro"]
+    assert "automatically before the site is built" not in SITE["accessibility"]["done_intro"]   # by hand, after the build
+    assert done[6].startswith("Every picture that carries information has a text alternative")
+    assert "The portrait beside my name, and the small marks beside Email, GitHub and Bluesky, are hidden from screen readers" in done[6]
+    assert "Every image carries a description" not in " ".join(done)                   # false once the portrait is decorative
+    assert done[7].endswith("made into a link in your browser.") and "harvest" not in done[7]   # cv.pdf prints both addresses
+    assert "the middle of the three levels" in SITE["accessibility"]["aim"]
     css = _css()
     motion = re.search(r"@media \(prefers-reduced-motion: reduce\) \{[^@]*\}\s*\}", css)
     assert motion and "transition: none !important" in motion.group(0)
@@ -1216,8 +1310,7 @@ def test_the_accessibility_page_tells_the_truth_about_where_the_address_is():
         slug = page["slug"].strip("/") or "home"
         placement[slug] = "header" if 'id="email"' in head else ("footer" if 'id="email"' in html else "absent")
         if slug == "accessibility":
-            claim = ("My address is on every page of this site: at the top of the home page, "
-                     "and at the foot of the others.")
+            claim = "My address is at the foot of this page, and at the top of the home page."
             assert claim in _visible_text(html), "the statement no longer matches the markup"
     assert "absent" not in placement.values(), placement          # reachable from every page
     assert placement["home"] == "header", placement               # the home page puts it under the name

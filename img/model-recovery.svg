@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 232 232" role="img">
-<title>Figure 1D, Avitan and Golan (NeurIPS 2025): model-recovery confusion matrix at 1.6M training triplets — adapted, axes labelled</title>
+<title>Figure 1D, Avitan and Golan (NeurIPS 2025): model-recovery confusion matrix at 1.6M training triplets — adapted, axes labeled</title>
 <rect width="232" height="232" fill="#FFFFFF"/>
 <g font-family="ui-monospace, Menlo, Consolas, monospace" fill="#5B6B75">
 <text x="132" y="13" text-anchor="middle" font-size="14">recovered model →</text>
