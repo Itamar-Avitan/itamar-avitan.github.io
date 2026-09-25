@@ -4,8 +4,10 @@
                        shares it unless it sets `og_image`.
   img/og-research.png  the paper card, for /research/: the mark, the first badge of the first research card,
                        the paper's short title (the part after the colon), the authors, and the figure the
-                       card shows -- Figure 1D drawn from its own SVG, or the illustration's JPEG, whichever
-                       `research[0].figure` points at -- so the preview always matches the page it opens.
+                       card shows -- Figure 1D drawn from its own SVG (the matrix's cells and its grid, not
+                       its axis labels), or the illustration's JPEG, whichever `research[0].figure` points
+                       at -- so the preview always matches the page it opens. The first clause of the
+                       figure's caption stands under it, split in two balanced lines when it needs two.
 
 Run once after the name, the role line, the identity line, or the paper card's title, badge, authors or
 figure change:  python3 tools/make_og.py
@@ -55,18 +57,21 @@ def load_font(style: str, size: int, family: str = "Sans") -> ImageFont.FreeType
 
 
 def wrap_in_two(text: str, font, draw: ImageDraw.ImageDraw) -> tuple[list[str], float]:
-    """The two-line split with the shortest longer line, and that line's width."""
-    words = text.split()
+    """The two-line split with the shortest longer line, and that line's width; of two equally wide splits,
+    the one with the fuller first line, so the short line is the last. Only a plain space is a place to
+    break: a no-break space keeps its two words together, as it does on the page, and Pillow draws it as a
+    space in both Fira faces."""
+    words = text.split(" ")
     splits = [[" ".join(words[:i]), " ".join(words[i:])] for i in range(1, len(words))] or [[text]]
     widest = lambda lines: max(draw.textlength(line, font=font) for line in lines)
-    best = min(splits, key=widest)
+    best = min(splits, key=lambda lines: (widest(lines), -draw.textlength(lines[0], font=font)))
     return best, widest(best)
 
 
 def wrap(text: str, font, draw: ImageDraw.ImageDraw, room: float) -> list[str]:
-    """Greedy word wrap into lines no wider than `room`."""
+    """Greedy word wrap into lines no wider than `room`; a no-break space ties, as in wrap_in_two."""
     lines, line = [], ""
-    for word in text.split():
+    for word in text.split(" "):
         trial = f"{line} {word}".strip()
         if line and draw.textlength(trial, font=font) > room:
             lines.append(line)
@@ -132,13 +137,17 @@ def draw_card(name: str, line: str, role: str = "") -> Image.Image:
     return img.resize((W, H), Image.LANCZOS)
 
 
-def svg_rects(path: Path) -> list[tuple[float, float, float, float, str]]:
-    """The rectangles of the figure's SVG that sit inside a translated group -- for img/model-recovery.svg the
-    matrix: its ground and every cell -- as (x, y, width, height, fill) in the SVG's own units. The text
-    labels and the root-level ground are left out: a card cannot set the page's webfont, and the sheet the
-    figure is drawn on here stands in for that ground."""
+def svg_figure(path: Path) -> tuple[list[tuple[float, float, float, float, str]],
+                                    list[tuple[float, float, float, float, str]]]:
+    """What the card redraws of the figure's SVG, in the SVG's own units: the rectangles inside a translated
+    group -- for img/model-recovery.svg the matrix's ground and every cell -- as (x, y, width, height,
+    fill), and the straight strokes of a <path> in the same group -- the matrix's grid -- as (x1, y1, x2,
+    y2, stroke). A path is read as absolute M, H and V commands, which is all the grid uses; any other
+    command is refused rather than drawn wrong. The text labels and the root-level ground are left out: a
+    card cannot set the page's webfont, and the sheet the figure is drawn on here stands in for that
+    ground."""
     ns = "{http://www.w3.org/2000/svg}"
-    rects = []
+    rects, lines = [], []
     for group in ET.parse(path).getroot().iter(f"{ns}g"):
         move = re.fullmatch(r"translate\(\s*([-\d.]+)[\s,]+([-\d.]+)\s*\)", group.get("transform", ""))
         if not move:
@@ -147,25 +156,53 @@ def svg_rects(path: Path) -> list[tuple[float, float, float, float, str]]:
         for rect in group.iter(f"{ns}rect"):
             rects.append((tx + float(rect.get("x", 0)), ty + float(rect.get("y", 0)),
                           float(rect.get("width")), float(rect.get("height")), rect.get("fill", INK)))
-    return rects
+        for shape in group.iter(f"{ns}path"):
+            d, stroke = shape.get("d", ""), shape.get("stroke", "none")
+            if stroke == "none":
+                continue
+            if re.sub(r"[MHV\d\s.,-]", "", d):
+                raise ValueError(f"{path.name}: a path with commands other than M, H and V cannot be redrawn")
+            cx = cy = 0.0
+            for command, a, b in re.findall(r"([MHV])\s*([-\d.]+)(?:[\s,]+([-\d.]+))?", d):
+                if command == "M":
+                    cx, cy = float(a), float(b)
+                elif command == "H":
+                    lines.append((tx + cx, ty + cy, tx + float(a), ty + cy, stroke))
+                    cx = float(a)
+                else:
+                    lines.append((tx + cx, ty + cy, tx + cx, ty + float(a), stroke))
+                    cy = float(a)
+    return rects, lines
 
 
 def figure_image(fig: dict, s: int) -> Image.Image:
     """The card's picture of `research[0].figure`, FIG px square on a sheet with FIG_PAD around it: a plot is
-    redrawn from its SVG's rectangles, an illustration is its JPEG resized."""
+    redrawn from its SVG's rectangles and then its grid, one final pixel wide in the path's own stroke
+    colour (the SVG's hairline would vanish at this size, and without the grid the matrix read as dots on a
+    pale square rather than the 20 by 20 grid the page shows); an illustration is its JPEG resized."""
     side = (FIG + 2 * FIG_PAD) * s
     sheet = Image.new("RGB", (side, side), SHEET)
     draw = ImageDraw.Draw(sheet)
     draw.rectangle([0, 0, side - 1, side - 1], outline=RULE, width=s)
     src = ROOT / fig["src"]
     if src.suffix == ".svg":
-        rects = svg_rects(src)
+        rects, lines = svg_figure(src)
         x0, y0 = min(r[0] for r in rects), min(r[1] for r in rects)
         x1, y1 = max(r[0] + r[2] for r in rects), max(r[1] + r[3] for r in rects)
         k = FIG * s / max(x1 - x0, y1 - y0)
+        at = lambda x, y: (FIG_PAD * s + (x - x0) * k, FIG_PAD * s + (y - y0) * k)     # SVG units to sheet px
         for x, y, w, h, fill in rects:
-            left, top = FIG_PAD * s + (x - x0) * k, FIG_PAD * s + (y - y0) * k
+            left, top = at(x, y)
             draw.rectangle([round(left), round(top), round(left + w * k) - 1, round(top + h * k) - 1], fill=fill)
+        last = FIG_PAD * s + FIG * s - 1                    # the figure's last pixel: the outermost lines stay inside it
+        for xa, ya, xb, yb, stroke in lines:
+            (left, top), (right, bottom) = at(min(xa, xb), min(ya, yb)), at(max(xa, xb), max(ya, yb))
+            if xa == xb:                                    # a vertical line, s px wide (one final pixel)
+                px = min(round(left), last - s + 1)
+                draw.rectangle([px, round(top), px + s - 1, min(round(bottom), last)], fill=stroke)
+            else:
+                py = min(round(top), last - s + 1)
+                draw.rectangle([round(left), py, min(round(right), last), py + s - 1], fill=stroke)
     else:
         with Image.open(src) as im:
             sheet.paste(im.convert("RGB").resize((FIG * s, FIG * s), Image.LANCZOS), (FIG_PAD * s, FIG_PAD * s))
@@ -190,11 +227,13 @@ def draw_research_card(site: dict) -> Image.Image:
     leading = round(tsize * 1.15)
     authors = " and ".join(card.get("authors") or [])
     authors_font = load_font("Regular", 30 * s)
-    # the caption's first clause ("Adapted from Fig. 1D of the paper"): split before the no-break space that
-    # ties "Fig." to its number is turned into a plain one, or the split would land on it
-    caption = (card["figure"].get("caption") or "").split(". ")[0].replace(" ", " ")
+    # the caption's first clause ("Adapted from Fig. 1D of the paper"); the no-break space that ties "Fig."
+    # to its number stays, so neither wrap can part them
+    caption = (card["figure"].get("caption") or "").split(". ")[0]
     caption_font = load_font("Regular", 22 * s, "Mono")
     caption_lines = wrap(caption, caption_font, draw, sheet_w * s) if caption else []
+    if len(caption_lines) == 2:             # two lines: the balanced split, not the greedy one that leaves a runt
+        caption_lines, _ = wrap_in_two(caption, caption_font, draw)     # its longer line is never wider than greedy's
 
     u = MARK_UNIT
     badge_h = 24 + 16 if badge else 0

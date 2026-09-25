@@ -161,6 +161,25 @@ def served():
     server.shutdown()
 
 
+# The lines an element's text is set in, read off the client rects of each character.
+_LINES_OF = """
+(el) => {
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const lines = []; let node, prevTop = null, line = '';
+  while ((node = walker.nextNode())) {
+    for (let i = 0; i < node.length; i++) {
+      const r = document.createRange(); r.setStart(node, i); r.setEnd(node, i + 1);
+      const rects = r.getClientRects(); if (!rects.length) continue;
+      const top = Math.round(rects[0].top);
+      if (prevTop !== null && Math.abs(top - prevTop) > 2) { lines.push(line); line = ''; }
+      line += node.data[i]; prevTop = top;
+    }
+  }
+  return line ? [...lines, line] : lines;
+}
+"""
+
+
 @pytest.mark.parametrize("width, scheme", [(320, "light"), (390, "dark"), (1280, "light")])
 def test_a_wrong_address_gets_the_sites_own_404_page(browser, served, width, scheme):
     """GitHub Pages answers a missing address with /404.html and status 404, at any depth, and used to answer
@@ -187,6 +206,11 @@ def test_a_wrong_address_gets_the_sites_own_404_page(browser, served, width, sch
         page.wait_for_timeout(50)
         over = page.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth")
         assert over <= 0, f"404 page at {width}px, {text}px text: {over}px past the viewport"
+        # the printed CV address breaks only where the template lets it: after "//", before a dot of the
+        # host or after its slash -- never at "itamar-", which read as a hyphenation, and never mid-word
+        lines = page.evaluate(_LINES_OF, page.query_selector("#not-found a"))
+        for end, start in zip(lines, lines[1:]):
+            assert end.endswith("/") or start.startswith("."), (width, text, lines)
     hrefs = page.evaluate("[...document.querySelectorAll('.sitenav a')].map(a => a.getAttribute('href'))")
     assert hrefs == ["/"] + [f"/{s}" for s in NAV_SLUGS[1:]] + ["/cv.pdf"]
     assert page.locator('.sitenav a[aria-current="page"]').count() == 0     # it is nowhere in the site

@@ -225,7 +225,9 @@ def test_the_404_page_is_built_beside_the_site_and_not_as_part_of_it(tmp_path, m
     text = _visible_text(html.partition("<body")[2])
     assert SITE["not_found"]["heading"] in text and SITE["not_found"]["intro"] in text
     assert html.count("<h1") == 1 and 'class="opens-with-h1"' in html
-    assert f'The CV is at <a href="/cv.pdf">{SITE["site_url"]}cv.pdf</a>.' in html
+    # the address may break after "//", before a dot of the host and after its slash, never at its hyphen
+    assert ('The CV is at <a href="/cv.pdf">https://<wbr><span class="nb">itamar-avitan</span><wbr>.github<wbr>.io/'
+            '<wbr>cv.pdf</a>.') in html
     strip = html.partition('<nav class="sitenav"')[2].partition("</nav>")[0]
     assert re.findall(r'href="([^"]*)"', strip) == ["/"] + [f"/{s}" for s in NAV_SLUGS[1:]] + ["/cv.pdf"]
     assert 'aria-current="page"' not in html                                  # it is nowhere in the site
@@ -235,6 +237,21 @@ def test_the_404_page_is_built_beside_the_site_and_not_as_part_of_it(tmp_path, m
     monkeypatch.setattr(build, "load_site", lambda _p: without)
     (tmp_path / "404.html").unlink()
     assert build.main([]) == 0 and not (tmp_path / "404.html").exists()      # the entry is optional
+
+
+def test_a_printed_address_breaks_only_where_a_reader_can_follow():
+    """An address printed as text (the 404 page's CV sentence) may break after the scheme, before a dot of
+    the host and after the slash that ends it, and never at a hyphen inside a host label: every engine
+    broke "https://itamar-avitan.github.io/cv.pdf" after "itamar-" on a 320px screen, which reads as a
+    hyphenation (deep review 2026-09-25, WP-S6 review). The visible text is the address, unchanged."""
+    printed = build.printable_url("https://itamar-avitan.github.io/cv.pdf")
+    assert printed == 'https://<wbr><span class="nb">itamar-avitan</span><wbr>.github<wbr>.io/<wbr>cv.pdf'
+    assert build.printable_url("https://example.org/") == "https://<wbr>example<wbr>.org/"     # nothing after the slash
+    assert build.printable_url("https://a-b.c-d.org/x") == ('https://<wbr><span class="nb">a-b</span>'
+                                                            '<wbr>.<span class="nb">c-d</span><wbr>.org/<wbr>x')
+    for url in ("https://itamar-avitan.github.io/cv.pdf", "https://example.org/", "https://a-b.c-d.org/x"):
+        assert unescape(re.sub(r"<[^>]+>", "", build.printable_url(url))) == url
+    assert "&lt;x&gt;" in build.printable_url("https://a-b.org/<x>") and "<x>" not in build.printable_url("https://a-b.org/<x>")
 
 
 # --- the four pages ---------------------------------------------------------------------------------------

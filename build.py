@@ -16,6 +16,7 @@ from pathlib import Path
 
 import yaml
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoescape
+from markupsafe import Markup, escape
 
 ROOT = Path(__file__).resolve().parent
 REQUIRED = ["site_url", "name", "alternate_name", "identity_line", "pages", "about", "now", "links", "news",
@@ -183,6 +184,23 @@ def local(url: str, base: str) -> str:
     return url if ABSOLUTE.match(url or "") else base + url
 
 
+def printable_url(url: str) -> Markup:
+    """An address printed as text, with its line breaks chosen rather than left to the browser: after the
+    scheme's "//", before each dot of the host, and after the slash that ends the host -- never at a hyphen
+    inside a host label, which is wrapped in the no-break span. Left alone, all three engines break
+    "https://itamar-avitan.github.io/cv.pdf" after "itamar-" on a 320px screen (and mid-word at 200% text),
+    and a hyphen at a line end reads as a hyphenation, so a reader retyping the address drops it. The labels
+    are kept separate rather than the whole host tied, so at 200% text on a 320px screen, where the host is
+    wider than the measure, the address still has a place of its own to break before overflow-wrap breaks
+    it anywhere (deep review 2026-09-25, WP-S6 review). The text is escaped here; the result is Markup."""
+    scheme, sep, rest = url.partition("://")
+    host, slash, path = rest.partition("/")
+    labels = [Markup('<span class="nb">{}</span>').format(label) if "-" in label else escape(label)
+              for label in host.split(".")]
+    return Markup("").join([escape(scheme + sep), Markup("<wbr>"), Markup("<wbr>.").join(labels),
+                            escape(slash), Markup("<wbr>") if path else Markup(""), escape(path)])
+
+
 def _person(site: dict) -> dict:
     """The one Person every page describes. The @id is what lets a crawler merge the copies on every page into
     one entity, and tell that entity from the other Itamar Avitan. Everything past the name is optional: a key
@@ -253,6 +271,7 @@ def environment() -> Environment:
                       autoescape=select_autoescape(["html", "j2"]), trim_blocks=True, lstrip_blocks=True)
     env.filters["local"] = local
     env.filters["opening"] = opening
+    env.filters["printable_url"] = printable_url
     return env
 
 

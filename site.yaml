@@ -102,9 +102,11 @@ pages:
 # The page for an address with nothing at it (GitHub Pages serves /404.html with status 404, at any depth).
 # NOT under `pages`: it belongs in neither the strip, the colophon nor the sitemap, and search engines are told
 # not to index it. build.py writes it with root-absolute links. The CV sentence is added by the template.
+# The intro's second sentence is a claim about the site, and it is true by construction: build.py refuses a
+# page that is in neither the strip nor the colophon (see the note over `pages`).
 not_found:
   heading: Nothing here
-  intro: Nothing lives at this address. Everything on the site is in the strip above.
+  intro: There is no page at this address. Every page of the site is linked from the strip above or the foot of this one.
 
 # Proper nouns and terms of art that must never break across two lines, wherever they occur in the text.
 # A term here must actually occur in the content: a rule that matches nothing is dead configuration, and the
