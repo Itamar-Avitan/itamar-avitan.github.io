@@ -518,46 +518,37 @@ talks:
   links:
   - label: Recording (starts at 11:55)
     url: https://www.youtube.com/watch?v=vT-3kV89Rhk&t=715s
-# THE PRACTICUM ENTRY. The owner ruled on this twice on 2026-09-21, and the SECOND ruling is the one in force.
+# THE PRACTICUM ENTRY. The owner ruled on this twice on 2026-09-21 (the second ruling, programme-first, is the
+# one the entry is built on) and once more on 2026-09-25 (one clause on his own part, see RULINGS below).
 #
-# RULING IN FORCE (source O, 2026-09-21), his words verbatim: "i think its need to be more of a description of
+# PROGRAMME-FIRST (source O, 2026-09-21), his words verbatim: "i think its need to be more of a description of
 # an neurotechnology internship practicum for grad students collaborate with brown university at providence
 # blah blah, like more about the environment less on what i did, if they want to know they can ask. (also on
 # the website btw i think)". Shown the options, he chose "Joint BGU-Brown neurotech practicum for grad
 # students" and "One entry, programme-first": keep the entry where it is, on the site and on the CVs, but let
-# the PROGRAMME lead, name EarBetter in a clause, and say nothing about who did what.
-# So the entry is titled by the programme and the blurb describes it; EarBetter is the second sentence. The
-# same reframe is in the CV repository, shared/projects.tex, with the same ruling recorded beside it.
+# the PROGRAMME lead, name EarBetter in a clause, and -- until rulings 4 and 7 below -- say nothing about who
+# did what.
+# So the entry is titled by the programme and the blurb describes it; EarBetter is the second sentence and
+# his one clause closes it. The same shape is in the CV repository, shared/projects.tex, with the same rulings
+# recorded beside it.
 #
-# THREE THINGS WERE DELETED AT HIS REQUEST AND MUST NOT COME BACK, here or in the news entry or in About:
-#   * the personal-contribution clause -- "I wrote the control software and put the system together";
-#   * the sensor inventory -- Muse headband, heart-rate variability, skin conductance (it was never on the
-#     site, but it was on the CVs, and it must not migrate here);
-#   * the go-to-market and business-plan detail -- "did the go-to-market work, wrote a business plan" -- of
-#     which the single word "pitched" is all that survives.
-# Do not replace them with different personal-contribution wording: he asked for less about what he did, not
-# for it said another way. "if they want to know they can ask" is the whole point of the entry's brevity.
-#
-# SUPERSEDED, kept as evidence of what was printed and why. Until this ruling the entry was titled "EarBetter"
-# and read: "Our five-person team's product from the Embodied Brain Technology Practicum at Brown University:
-# an add-on that works with any headphones, reads your biosignals, processes on your phone, and filters out
-# the sounds that set a person's anxiety off. We built a working version, did the go-to-market work, wrote a
-# business plan and pitched it. I wrote the control software and put the system together." That itself
-# replaced an earlier paper-language framing ("It explores whether physiological signals can drive selective
-# audio attenuation ... has not been clinically evaluated"), on his account of 2026-09-21: "the idea of the
-# course is internship and we didn't explore, we came out with an idea of having a product that works with
-# any headphones that record biosignals and selectively reduce certain noises ... then we implemented a
-# version of it and we also did the all go-to-market stuff and built a business plan and pitched it", and
-# "it's an add-on that will process through your phone and get biosignals and stuff" -- so the team did not
-# build headphones, and the add-on wording below is still his. Neither superseded form is to be restored.
+# RULINGS (source O; FACTS PROJ-EBT-DESC has the quotations). 2026-09-21, programme-first: the programme
+# leads, EarBetter is a clause; the sensor inventory (Muse headband, heart-rate variability, skin conductance)
+# and the go-to-market / business-plan detail were deleted at his request and stay deleted -- 'pitched' is all
+# that survives of the pitch. 2026-09-25, rulings 4 and 7: one short clause on his own part is allowed again,
+# in his words -- 'I led the system integration' (his account of 21 Sep: 'I kind of led the integration'). Do
+# not grow it into a list of what he did; do not restore the sensors or the business plan; do not put it in
+# News or About. (The wordings retired by these rulings are not kept here: a sentence retired from the page
+# but kept verbatim in a public repository is not off the site. The history lives in FACTS PROJ-EBT-DESC and
+# the private ledgers; deep review 2026-09-25, external review 2 §16.)
 #
 # FACTS THE ENTRY MAY STATE, all established: the practicum is the Embodied Brain Technology Practicum, run
 # jointly by Ben-Gurion University and Brown University; it ran at Brown, in Providence, USA, from 24 July to
-# 6 August 2026; entry was competitive; his team of five designed, built and pitched EarBetter. "Two weeks" is
-# derived from the dates in `period`, not asserted. NOT stated, because no source gives them: a course code,
-# the size of the Brown cohort, and any award. The number of BGU participants he was one of is NOT printed
-# either -- it is on his own list of private numbers (the CV register records that ruling), and the entry says
-# the entry was competitive and stops.
+# 6 August 2026; entry was competitive; his team of five designed, built and pitched EarBetter; he led the
+# system integration (ruling 7). "Two weeks" is derived from the dates in `period`, not asserted. NOT stated,
+# because no source gives them: a course code, the size of the Brown cohort, and any award. The number of BGU
+# participants he was one of is NOT printed either -- it is on his own list of private numbers (the CV
+# register records that ruling), and the entry says the entry was competitive and stops.
 projects:
 # Titled by the programme, not by the product: under a heading a reader's eye reaches first, "EarBetter" would
 # have led and the practicum would have been the clause, which is the ruling upside down. The title links the
@@ -569,16 +560,31 @@ projects:
 # unlinked (ruling): its README prints teammates' personal email addresses.
 - title: Embodied Brain Technology Practicum
   period: 24 Jul–6 Aug 2026
-  # 63 words against the 64 of the wording it replaces, so the reframe costs the Research page nothing: this
-  # row still sits below the peer-reviewed paper's own summary and still weighs less than it, which is right.
-  blurb: 'Two weeks at Brown University in Providence, on a program run jointly with Ben-Gurion University: graduate students from the two universities, admitted by competitive selection, work in small teams, each building a piece of neurotechnology and pitching it. Our five-person team built and pitched EarBetter, an add-on that works with any headphones, reads biosignals and filters out the sounds that set a person’s anxiety off.'
+  # 63 words against the 64 of the wording it replaced, so the reframe cost the Research page nothing; the
+  # ruled clause of 2026-09-25 adds five (68). This row still sits below the peer-reviewed paper's own
+  # summary and still weighs less than it, which is right. The order is programme -> team -> product -> his
+  # clause, and the clause stays last and stays one sentence. Line ends measured (2026-09-26, WP-S10; Chromium
+  # and WebKit, every 10px from 320 to 1280): at 16px text neither this row nor BCI4ALS ever leaves one word
+  # alone on its last line, so neither clause carries a U+00A0 tie -- the wording is exact, as the plan gives
+  # it. At 200% text "integration." (31 widths in Chromium, 13 in WebKit) and "system." (15 in both) do stand
+  # alone, as "off." and "live." did before the clauses; a tie was measured and not taken: it clears the
+  # BCI4ALS row and halves this row's widths, but 320-400 and 720-750 remain, where "system integration." at
+  # 32px (294px) is wider than the column (211-291px).
+  blurb: 'Two weeks at Brown University in Providence, on a program run jointly with Ben-Gurion University: graduate students from the two universities, admitted by competitive selection, work in small teams, each building a piece of neurotechnology and pitching it. Our five-person team built and pitched EarBetter, an add-on that works with any headphones, reads biosignals and filters out the sounds that set a person’s anxiety off. I led the system integration.'
   url: https://sites.google.com/brown.edu/ebt/2026-practicum
   links:
   - label: Code
     url: https://github.com/Itamar-Avitan/earbetter-ebt-practicum
+# BCI4ALS. RULING (source O, 2026-09-25, rulings 4 and 8; FACTS PROJ-BCI-TECH has the tick list). The team
+# sentence stands as it was -- the team is the subject of "built" -- and one clause on his own part follows
+# it, naming the three areas he ticked: data collection, signal processing, the real-time system. He did NOT
+# tick team lead / coordination: never "led" or "coordinated" here. This supersedes his 2026-09-21 answer
+# "Leave it as team credit" (B4). The CVs print the same three areas with the tools named; the site keeps its
+# plainer register. The order is team -> person -> his clause. The person it was built for stays unnamed and
+# the row stays unlinked (the note over `projects` says why).
 - title: BCI4ALS
   period: 2022–2023
-  blurb: In a team of five, we built a brain–computer interface (BCI) that let a person with amyotrophic lateral sclerosis (ALS) answer yes/no questions through the P300 brain response measured with electroencephalography (EEG). The person it was built for used it live.
+  blurb: In a team of five, we built a brain–computer interface (BCI) that let a person with amyotrophic lateral sclerosis (ALS) answer yes/no questions through the P300 brain response measured with electroencephalography (EEG). The person it was built for used it live. I worked on the data collection, the signal processing and the real-time system.
 # Lines about the mind, collected. text, attribution and note are printed; year is the gutter label; slug is
 # the entry's own address on the page (see PERMALINKS below); status, evidence and copyright are the
 # provenance record and are not rendered. Always name a quotation's source.

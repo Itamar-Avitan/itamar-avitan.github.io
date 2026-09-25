@@ -819,15 +819,20 @@ def test_project_titles_link_only_when_a_url_is_given():
     assert '<li><a class="btn" href="https://github.com/Itamar-Avitan/earbetter-ebt-practicum">Code</a></li>' in projects
 
 
-def test_the_practicum_leads_with_the_programme_and_says_nothing_about_who_did_what():
+def test_the_practicum_leads_with_the_programme_and_ends_on_his_one_clause():
     """The owner's ruling of 2026-09-21, which supersedes every earlier framing of this entry -- his own
     product-story correction of the same day included. His words: "i think its need to be more of a
     description of an neurotechnology internship practicum for grad students collaborate with brown
     university at providence blah blah, like more about the environment less on what i did, if they want to
     know they can ask. (also on the website btw i think)". He chose "One entry, programme-first": the
-    PROGRAMME leads, EarBetter is named in a clause, and nothing says who did what. See the long note over
-    `projects` in site.yaml, and shared/projects.tex in the CV repository, which carries the same reframe."""
+    PROGRAMME leads and EarBetter is named in a clause. On 2026-09-25 (rulings 4 and 7, OWNER-RULINGS) he
+    allowed one clause on his own part back, in his words -- "I led the system integration" -- and ruling 8
+    gave BCI4ALS its clause (the three areas he ticked, not leadership); this test used to be named
+    "...says_nothing_about_who_did_what" and forbade the first person in the blurb, which those rulings
+    supersede. The sensor inventory and the business-plan detail stay deleted. See the note over `projects`
+    in site.yaml, and shared/projects.tex in the CV repository, which carries the same shape."""
     entry = next(p for p in SITE["projects"] if "Practicum" in p["title"])
+    bci = next(p for p in SITE["projects"] if p["title"] == "BCI4ALS")
     news = next(n for n in SITE["news"] if "Practicum" in n["text"])
     html = html_of("research/")
 
@@ -842,16 +847,18 @@ def test_the_practicum_leads_with_the_programme_and_says_nothing_about_who_did_w
         assert phrase in entry["blurb"], phrase
     assert "headphone add-on" in news["text"] and "designed, built and pitched" in news["text"]
 
-    # DELETED AT HIS REQUEST, from the whole site: his own part, the sensors, the business-plan detail
+    # DELETED AT HIS REQUEST, from the whole site: the retired clause's wording, the sensors, the business-plan detail
     everywhere = " ".join(_visible_text(h) for h in every_page().values())
-    for gone in ("control software", "put the system together", "system integration",
+    for gone in ("control software", "put the system together",
                  "Muse", "heart-rate variability", "skin conductance",
                  "go-to-market", "business plan"):
         assert gone not in everywhere, gone
-    # and no personal-contribution wording put back in its place: nothing in the entry is in the first person
-    for first_person in ("I ", "I'", "my ", "myself"):
-        assert first_person not in entry["blurb"], first_person
+    # one clause on his own part, his words, at the end (rulings 4 and 7): not a list of what he did
+    assert entry["blurb"].endswith(" I led the system integration.") and entry["blurb"].count("I ") == 1
     assert "pitched" in entry["blurb"]              # the single word that survives of the pitch and the plan
+    # BCI4ALS: the three areas he ticked (ruling 8), after the team sentence, and no leadership claimed
+    assert bci["blurb"].endswith("the real-time system.") and "led" not in bci["blurb"]
+    assert bci["blurb"].index("team of five") < bci["blurb"].index("I worked on")
 
     # the older paper-language framing stays gone too
     for phrase in ("explores whether", "physiological signals", "selective audio attenuation",
@@ -864,12 +871,11 @@ def test_the_practicum_leads_with_the_programme_and_says_nothing_about_who_did_w
     assert "12" not in _visible_text(html)          # "1 of 12" is on his list of private numbers
     assert "award" not in everywhere.lower()
 
-    # the ruling is recorded where the next editor will see it, with the superseded wording kept as evidence
+    # the rulings are recorded where the next editor will see them, and the retired wording is not kept in
+    # this public file (external review 2 §16: the history lives in FACTS PROJ-EBT-DESC and the private ledgers)
     yaml_text = (build.ROOT / "site.yaml").read_text(encoding="utf-8")
     assert "more about the environment less on what i did" in yaml_text
-    assert "One entry, programme-first" in yaml_text
-    assert "MUST NOT COME BACK" in yaml_text and "SUPERSEDED, kept as evidence" in yaml_text
-    assert "I wrote the control software and put the system together." in yaml_text   # only as the old text
+    assert "programme-first" in yaml_text and "I led the system integration" in yaml_text and "control software" not in yaml_text
 
 
 
@@ -1661,9 +1667,13 @@ def test_the_statement_neither_claims_conformance_nor_cites_a_law():
 
 def test_the_published_cv_is_the_public_build_and_obeys_the_programme_ruling():
     """cv.pdf is linked from the strip of every page, so it is part of what this site says. The owner's
-    programme-first ruling deleted his personal contribution, the sensor inventory and the business-plan
+    programme-first ruling deleted the retired role clause, the sensor inventory and the business-plan
     detail from the CVs; if the published PDF still held them, the site would contradict its own project
     entry from its own navigation bar. It is the public build (no phone number) of the cv repository.
+    Since 2026-09-25 (rulings 4, 7 and 8) one role clause per project is printed again -- "Led system
+    integration." and "Worked on data collection ..." -- so "system integration" left the list below; the
+    assertion that the PDF carries those clauses is added by the commit that republishes it (WP-C8's
+    publish), because until then the served file is the older build.
 
     This checks what the file says, not how fresh it is: a cv.pdf ten commits stale would pass every line
     below, because none of these phrases would have moved. Freshness is guarded where the drift is caused
@@ -1675,7 +1685,7 @@ def test_the_published_cv_is_the_public_build_and_obeys_the_programme_ruling():
     out = subprocess.run(["pdftotext", str(pdf), "-"], capture_output=True, text=True)
     assert out.returncode == 0, "pdftotext is needed to check the published CV; install poppler"
     text = " ".join(out.stdout.split())
-    for gone in ("control software", "system integration", "Muse headband", "heart-rate variability",
+    for gone in ("control software", "Muse headband", "heart-rate variability",
                  "skin conductance", "go-to-market", "business plan", "selective audio attenuation"):
         assert gone not in text, gone
     assert "Embodied Brain Technology Practicum" in text and "EarBetter" in text
