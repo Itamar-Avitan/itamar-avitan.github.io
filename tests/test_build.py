@@ -1258,7 +1258,12 @@ def test_the_theme_toggle_is_not_painted_when_the_script_has_not_run():
     phone = rest.partition("Desktop: the gutter")[0]
     assert ".colophon-nav__theme { display: none; }" in base
     assert ".topstrip > .toggle { display: none; }" in phone and ".colophon-nav__theme { display: list-item; }" in phone
-    assert ".sitenav ul { justify-content: space-between; column-gap: 0.5rem; }" in phone   # the five items spread across the line
+    # the five items spread across the line only where it is tight (a phone, below 30rem); from 480px the
+    # laptop's 18px gap fits on one line, and a split-screen laptop window keeps the strip's own rhythm
+    spread = ".sitenav ul { justify-content: space-between; column-gap: 0.5rem; }"
+    assert spread in phone.partition("@media (max-width: 29.99rem) {")[2].partition("\n}")[0]
+    assert spread not in phone.partition("@media (max-width: 29.99rem) {")[0]
+    assert css.count("justify-content: space-between") == 1
 
 
 def test_a_link_says_where_it_leads_to_a_reader_who_cannot_see_the_card():

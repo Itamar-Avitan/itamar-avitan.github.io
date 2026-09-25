@@ -444,6 +444,21 @@ def test_the_strip_is_one_line_on_a_phone(browser, width, slug):
     assert page.evaluate("document.querySelector('.topstrip .toggle').checkVisibility()") is False
 
 
+@pytest.mark.parametrize("width", [480, 600, 719])
+def test_the_strip_keeps_the_laptops_gap_between_a_phone_and_a_laptop(browser, width):
+    """The spread that fits the five items on a phone's line was first applied up to 720px, so from 480 to
+    719px the items were strewn across the whole line with gaps of 39 to 99px and snapped back to 18px at
+    720 -- a stretched tab bar the site uses nowhere else, seen in a split-screen laptop window (WP-S9
+    review). The spread stops at 30rem now: from 480px the strip is one line at the laptop's 1.125rem gap,
+    still without the theme button, which returns at 720."""
+    page, _, _ = _page(browser, width)
+    boxes = page.evaluate("[...document.querySelectorAll('.sitenav li')].map(l => l.getBoundingClientRect().toJSON())")
+    assert max(b["top"] for b in boxes) - min(b["top"] for b in boxes) <= 2, (width, boxes)
+    gaps = [boxes[i + 1]["left"] - boxes[i]["right"] for i in range(len(boxes) - 1)]
+    assert all(abs(gap - 18) <= 1 for gap in gaps), (width, gaps)
+    assert page.evaluate("document.querySelector('.topstrip .toggle').checkVisibility()") is False
+
+
 @pytest.mark.parametrize("width", [768, 1280])
 def test_the_portrait_fills_the_gutter_it_sits_in(browser, width):
     """It was 120px right-aligned inside a 136px gutter, so its left edge stood 16px inside the page's own

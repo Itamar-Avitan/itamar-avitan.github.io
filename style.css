@@ -942,14 +942,14 @@ main.opens-with-h1 { margin-top: 2.25rem; }
      two lines from 320 to 430px, five lines at 200% text, where the strip was 70% of the screen (deep
      review 2026-09-25, PA-04). On a phone it stands in the colophon instead, labelled in full, beside the
      link about the site (the rules further down), and the navigation has the line to itself: one line and
-     60px tall from 356px up, the items spread across it; two lines only at 320-352px, the CV chip alone on
-     the second. The system setting is followed until a visitor chooses, so the one control a phone visitor
-     rarely needs is no longer the first thing on the page. "Home" stays in the strip on a phone: dropping
-     it, with the name above each page as the way home, is the owner's question (Q-L). A basis of 0 on the
-     nav lets it take the whole line and wrap inside itself, which is where any wrapping belongs. */
+     60px tall from 356px up (spread across it on a phone; the block after this one), two lines only at
+     320-352px, the CV chip alone on the second. The system setting is followed until a visitor chooses, so
+     the one control a phone visitor rarely needs is no longer the first thing on the page. "Home" stays in
+     the strip on a phone: dropping it, with the name above each page as the way home, is the owner's
+     question (Q-L). A basis of 0 on the nav lets it take the whole line and wrap inside itself, which is
+     where any wrapping belongs. */
   .topstrip > .toggle { display: none; }
   .sitenav { flex: 1 1 0; min-width: 0; }
-  .sitenav ul { justify-content: space-between; column-gap: 0.5rem; }
   /* The colophon's button: the row's own mono register at the row's own size, a button's box (28.8px tall,
      above the 24px a target needs) on the row's text line, and its label painted -- it is the one place
      the label is read by eye. The [hidden] rule keeps the no-JavaScript case: the button is written hidden
@@ -1032,6 +1032,13 @@ main.opens-with-h1 { margin-top: 2.25rem; }
      found -> the open questions; the citation closes the card */
   .paper .recovery-diagram, .paper .open { order: 6; }
   .paper .cite { order: 7; }
+}
+
+/* The five items spread across the line only where the line is tight -- a phone. From 30rem (480px) the
+   laptop's 18px gap fits on one line, and a split-screen laptop window (640px is half of 1280) keeps the
+   strip's own rhythm rather than a stretched tab bar the site uses nowhere else (WP-S9 review). */
+@media (max-width: 29.99rem) {
+  .sitenav ul { justify-content: space-between; column-gap: 0.5rem; }
 }
 
 /* ==========================================================================
@@ -1332,20 +1339,28 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   html { font-size: 87.5%; }
   body { background: #fff; }
   /* Screen furniture: the skip link, the strip, the colophon's row about the site with the phone's theme
-     button, the mark and its caption. The margin rule and its ticks are backgrounds, which the print dialog
-     drops by default; left in, they printed as white notches in the card's border and the strip's hairline. */
-  .skip, .topstrip, .colophon-nav, .mark, .mark-row,
+     button, the mark and its caption, and the marks that lead nowhere on paper -- a quotation's "§"
+     permalink and the closed "Cite (BibTeX)" expander. The margin rule and its ticks are backgrounds, which
+     the print dialog drops by default; left in, they printed as white notches in the card's border and the
+     strip's hairline. */
+  .skip, .topstrip, .colophon-nav, .mark, .mark-row, .quote__link, details.cite,
   main::before, .colophon .links-nav::before, .colophon .row::before,
   h1.inset::before, h2.inset::before, .row > .when::after { display: none !important; }
   /* The filled button prints as a plain link: its white-on-fill text is what the dialog greys out. */
   .btn--primary { color: var(--accent); background: none; border: 0; padding-inline: 0; text-decoration: underline; }
   /* On paper a link is only as good as its address: the card's and the rows' buttons, a venue, a title that
      is a link, and the home page's Paper and Code under the Research row. Not the links inside sentences --
-     an address in the middle of a line of prose is noise, and the ones that matter are also on the card. */
+     an address in the middle of a line of prose is noise, and the ones that matter are also on the card. An
+     address breaks only when it must (overflow-wrap, not word-break: break-all, which split short ones
+     after "ht" or mid-word); the short ones then sit whole on a line of their own. */
   .buttons a[href^="http"]::after, .venue a[href^="http"]::after, h3 a[href^="http"]::after,
   .go-links a[href^="http"]::after {
-    content: " <" attr(href) ">"; font: 400 0.6875rem/1.4 var(--mono); color: #444; word-break: break-all;
+    content: " <" attr(href) ">"; font: 400 0.6875rem/1.4 var(--mono); color: #444;
+    word-break: normal; overflow-wrap: anywhere;
   }
+  /* The card's title is the Paper link (WP-S2), and the Paper button ten lines under it printed the same
+     address again; once is enough, after the button. The rows' titles (the practicum) keep theirs. */
+  .paper h3 a[href^="http"]::after { content: none; }
   main, section + section { margin-top: 2.25rem; }
   .colophon { padding-block: 2.25rem 0; }
   .colophon .links-nav { margin-bottom: 1rem; }

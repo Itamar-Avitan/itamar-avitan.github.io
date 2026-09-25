@@ -88,7 +88,8 @@ the one set in ink rather than accent; it carries `aria-current="page"` and a 2p
 hairline — the same tick the margin rule uses to mark a section, one floor up. On a phone the strip carries
 only the five items: the theme button stands in the colophon there, labelled, beside the accessibility link
 (both buttons are in the markup, written hidden; the script unhides them and the stylesheet shows one at a
-time), so the strip is one line from 356px up. Below that the CV chip alone drops to a second line and the
+time), so the strip is one line from 356px up — the five items spread across it below 480px, and set at the
+laptop's 18px gap from there. Below 356px the CV chip alone drops to a second line and the
 tick becomes a plain underline under its own link; the row gap is wider than the tick is long, so it never
 lands on the line below. The CV is the strip's one filled element, by the rule the site has kept throughout:
 a filled box is the single primary action in its group. Before the strip, the first Tab stop on every page
@@ -99,7 +100,8 @@ toggle or by the system, used to print its name and lede in a 2.91:1 grey), one 
 strip, the colophon row and the mark left off the paper and the address printed after every link on the
 card, in the rows and under a title, so a link on paper still leads somewhere. The older news prints open:
 the script opens the expander on `beforeprint` and closes it again after. Measured with Chrome's default
-margins: home and `/research/` take two A4 sheets, `/teaching/` one, `/commonplace/` two.
+margins: home takes two A4 sheets, `/research/` three (its card is taller than a sheet, so the card's parts
+keep whole rather than the card), `/teaching/` one, `/commonplace/` two and `/accessibility/` three.
 
 **The `about` and `now` blocks are drafts** written on 2026-09-21 and marked as such in `site.yaml`. They
 stand in for the owner's own words until he replaces them. Every clause in them comes from a fact already on
