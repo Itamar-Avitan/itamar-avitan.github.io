@@ -266,14 +266,16 @@
     Each row carries its slug as its id, and the attribution ends on a small "§" that links to it, so one
     line can be shared (deep review 2026-09-25, AS-52). The link is inside the attribution's own paragraph,
     at its end, and it is always painted: a keyboard or a finger cannot hover. build.validate() refuses a
-    quotation without a slug, so the key is read directly. -#}
+    quotation without a slug, so the key is read directly. The link's accessible name carries the speaker
+    (the attribution up to ", in") and the line's first clause (build.opening), so a screen reader's list of
+    links tells the four apart; two of the lines are Holmes's, so the speaker alone would not. -#}
 {%- macro quote_rows(items) %}
 {% for quote in items %}
         <li class="row" id="{{ quote.slug }}">
           {{ dates(quote.year, "when") }}
           <div class="what quote">
             <blockquote><p>{{ nb(quote.text) }}</p></blockquote>
-            <p class="quote__by">{{ nb(quote.attribution) }}<a class="quote__link" href="#{{ quote.slug }}" aria-label="Link to this quotation">§</a></p>
+            <p class="quote__by">{{ nb(quote.attribution) }}<a class="quote__link" href="#{{ quote.slug }}" aria-label="Link to this quotation ({{ quote.attribution.split(', in ')[0] }}: “{{ quote.text|opening }}”)">§</a></p>
   {% if quote.get("note") %}
             <p class="quote__note">{{ nb(quote.note) }}</p>
   {% endif %}

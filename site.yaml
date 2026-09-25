@@ -68,7 +68,7 @@ pages:
   # The four things in the order the page says them: reporting comes second, directly after the aim, which is
   # where the GOV.UK model statement puts it (deep review 2026-09-25, FL-09).
   intro: What this site aims at, how to tell me when it falls short, what was actually done about it, and what is not claimed.
-  description: 'The accessibility statement for the personal site of Itamar Avitan: what it aims at, what was actually done and checked, and how to report a problem.'
+  description: 'The accessibility statement for the personal site of Itamar Avitan: what it aims at, how to report a problem, and what was actually done and checked.'
 
 # Proper nouns and terms of art that must never break across two lines, wherever they occur in the text.
 # A term here must actually occur in the content: a rule that matches nothing is dead configuration, and the
@@ -503,6 +503,12 @@ projects:
 # misdeed as well as the two the old intro fit (deep review 2026-09-25, CS-18 and DI-05). "how to study one"
 # is the agent's phrase for what the lines share, not his: Q-N item 18 asks whether he wants his own sentence
 # here instead. The space before the em dash is a no-break space (U+00A0), so the dash never opens a line.
+# The same tie holds a section numeral to its noun in every attribution below (Part I, Chapter II,
+# Chapter 24, Epistle II), holds each work's year to its title (Phoenix (2003), Scarlet (1887), Pope's
+# title to its span), and holds the Watson line's dash to the word before it: with the permalink at the
+# end, the Watson attribution ran to three lines on a laptop and opened its second on a lone "I", which
+# reads as the pronoun, and the Snape line opened one on "(2003)," on a 320px phone (review of WP-S4,
+# 2026-09-25). tests/test_browser.py measures the line starts.
 quotes_intro: A commonplace book is a notebook of lines worth keeping. These are mine — lines about minds, and about how to study one, that I keep coming back to.
 quotes:
 # The owner was shown that this novel is in copyright and that the single sentence “The mind is not a book…”
@@ -511,7 +517,7 @@ quotes:
 # reading” as two words, and the last sentence carried through to “most minds are” instead of breaking off
 # after “Potter—”.
 - text: “Only Muggles talk of ‘mind reading.’ The mind is not a book, to be opened at will and examined at leisure. Thoughts are not etched on the inside of skulls, to be perused by any invader. The mind is a complex and many-layered thing, Potter—or at least, most minds are.”
-  attribution: Severus Snape, in J.K. Rowling, Harry Potter and the Order of the Phoenix (2003), Chapter 24, “Occlumency”
+  attribution: Severus Snape, in J.K. Rowling, Harry Potter and the Order of the Phoenix (2003), Chapter 24, “Occlumency”
   year: '2003'
   slug: snape-mind-not-a-book
   status: corrected
@@ -536,7 +542,7 @@ quotes:
   # longer extract now says itself, two lines above it. It points back at those words instead of repeating them.
   note: Snape’s retort in Harry’s first Occlumency lesson, after Harry gives Legilimency that name.
 - text: “I consider that a man’s brain originally is like a little empty attic, and you have to stock it with such furniture as you choose.”
-  attribution: Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter II, “The Science of Deduction”
+  attribution: Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter II, “The Science of Deduction”
   year: '1887'
   slug: holmes-brain-attic
   status: verified
@@ -554,7 +560,7 @@ quotes:
 - text: “The proper study of mankind is man.”
   # The poem's span sits after the poem's title, as the novel's year sits after the novel's: Epistle II alone
   # is 1733, and "(1733–34)" is the whole Essay's (deep review 2026-09-25, AK-16).
-  attribution: Dr. John Watson, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter I, “Mr. Sherlock Holmes” — quoting Alexander Pope, An Essay on Man (1733–34), Epistle II
+  attribution: Dr. John Watson, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter I, “Mr. Sherlock Holmes” — quoting Alexander Pope, An Essay on Man (1733–34), Epistle II
   year: '1887'
   slug: watson-proper-study
   status: verified
@@ -577,7 +583,7 @@ quotes:
   # reply would otherwise end the YAML scalar.
   note: 'Watson says it walking away from his first meeting with Holmes, still wondering how Holmes knew, unasked, that he had come from Afghanistan. Stamford, who introduced them, replies: “You must study him, then… You’ll find him a knotty problem, though.”'
 - text: “There is a strong family resemblance about misdeeds, and if you have all the details of a thousand at your finger ends, it is odd if you can’t unravel the thousand and first.”
-  attribution: Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter II, “The Science of Deduction”
+  attribution: Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter II, “The Science of Deduction”
   year: '1887'
   slug: holmes-thousand-and-first
   status: verified
@@ -688,18 +694,19 @@ accessibility:
   # (README: build, then pytest, no CI); the portrait carries alt="" on purpose, so the picture bullet names
   # only what a test asserts -- the figure's description and the three hidden link marks (test_browser.py,
   # test_structure_and_alt_text); and the email sentence no longer gives "harder to harvest" as its reason,
-  # because cv.pdf, linked from every page, prints both addresses as plain links.
-  aim: 'This site aims at WCAG 2.1 Level AA — the middle of the three levels of the Web Content Accessibility Guidelines — and that is the standard I hold it to. It is not a certificate: nobody but me has audited this site, and the list below is what was actually done, not a claim that the whole of AA has been met.'
+  # because cv.pdf, linked from every page, prints both addresses as plain links. Every em dash in this
+  # block follows a no-break space (U+00A0), so none of them opens a line on a phone (review of WP-S4).
+  aim: 'This site aims at WCAG 2.1 Level AA — the middle of the three levels of the Web Content Accessibility Guidelines — and that is the standard I hold it to. It is not a certificate: nobody but me has audited this site, and the list below is what was actually done, not a claim that the whole of AA has been met.'
   done_intro: 'What that has meant in practice. Each of these is checked by an automated test that I run before I publish a change, so the list stays true:'
   done:
-  - 'Nothing loads from anyone else. The fonts are served from this site, and no page asks any other host for anything — no analytics, no trackers, no embedded players, no hosted fonts — so the pages work on a slow or filtered connection, and reading them tells no one but the host, GitHub Pages, that you were here.'
-  - 'Contrast is measured, not judged by eye. Every piece of text painted on every page is sampled in a real browser and checked against the WCAG contrast formula — 4.5 to 1 for ordinary text, 3 to 1 for large text — in both themes, whether the theme comes from your system setting or from the theme button.'
+  - 'Nothing loads from anyone else. The fonts are served from this site, and no page asks any other host for anything — no analytics, no trackers, no embedded players, no hosted fonts — so the pages work on a slow or filtered connection, and reading them tells no one but the host, GitHub Pages, that you were here.'
+  - 'Contrast is measured, not judged by eye. Every piece of text painted on every page is sampled in a real browser and checked against the WCAG contrast formula — 4.5 to 1 for ordinary text, 3 to 1 for large text — in both themes, whether the theme comes from your system setting or from the theme button.'
   - 'Everything you can use, you can reach from a keyboard, and you can see where you are: every link and the theme button draws the same two-pixel ring when it takes focus.'
   - 'The controls are big enough to hit: every link in the navigation strip, in the row of profiles and in the footer is a target at least 24 by 24 pixels, on every screen down to 320 pixels wide. A link set inside a sentence is left at the size of the words around it.'
   - 'Nothing moves on its own. The only motion is a short color fade and smooth scrolling, and both are switched off for a visitor whose system asks for reduced motion.'
   - 'The markup says what things are: one first-level heading per page, headings that never skip a level, lists marked up as lists, the navigation in a named landmark with the current page marked, and a language set on the document.'
   - 'Every picture that carries information has a text alternative: the paper’s figure is described in full for a reader who cannot see it. The portrait beside my name, and the small marks beside Email, GitHub and Bluesky, are hidden from screen readers, because the words beside them already say it.'
-  - 'The site works with JavaScript switched off: the pages are plain HTML joined by ordinary links. Two things need it, and both fail quietly — the theme button, which stays hidden until the script has run rather than sitting there doing nothing, and my email address, which is written as text and made into a link in your browser.'
+  - 'The site works with JavaScript switched off: the pages are plain HTML joined by ordinary links. Two things need it, and both fail quietly — the theme button, which stays hidden until the script has run rather than sitting there doing nothing, and my email address, which is written as text and made into a link in your browser.'
   - 'Body text is set at 16 pixels or larger, the layout reflows into one column on a phone, and no page scrolls sideways at any width down to 320 pixels.'
   limits_intro: 'The gaps I know about, so that the list above is not read for more than it says:'
   limits:
@@ -708,7 +715,7 @@ accessibility:
   - This is a personal site. I write it and keep it working, in the time I have, so a fix may not be quick.
   # "at the foot of this page" first: this section now stands second on the page, under the aim, so the
   # colophon that carries the address is no longer in view when the sentence is read (FL-09, CS-11).
-  report: 'If something here is hard to use, or does not work with whatever you use to read the web, please tell me — that is the fastest way for it to get fixed. My address is at the foot of this page, and at the top of the home page. What helps most: which page you were on, what you were using, and what happened.'
+  report: 'If something here is hard to use, or does not work with whatever you use to read the web, please tell me — that is the fastest way for it to get fixed. My address is at the foot of this page, and at the top of the home page. What helps most: which page you were on, what you were using, and what happened.'
 
 footer:
   updated: September 2026

@@ -72,9 +72,9 @@ stand in for the owner's own words until he replaces them. Every clause in them 
 the site; do not add anything to them that he has not said. The one-sentence descriptions under the courses
 in `teaching` are drafts of the same kind: they say what each course is about, drawn from its own name, and
 say nothing about what he does inside it beyond the role in its `kind` tag, because nothing on record does.
-The one course whose title he has not yet given is described, not titled, and carries no sentence; the two
-rows under Students carry the register's own sentences (the mentoring topics, the tutoring subjects), which
-the CV already prints.
+The one course whose title is not printed yet (WP-S12 prints it) is described, not titled, and carries no
+sentence; the two rows under Students carry the register's own sentences (the mentoring topics, the tutoring
+subjects), which the CV already prints.
 
 The research card's thumbnail is chosen by one line. `site.yaml` holds both pictures under `figure_options`,
 and the card points at one of them:

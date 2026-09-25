@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Accessibility — Itamar Avitan</title>
-<meta name="description" content="The accessibility statement for the personal site of Itamar Avitan: what it aims at, what was actually done and checked, and how to report a problem.">
+<meta name="description" content="The accessibility statement for the personal site of Itamar Avitan: what it aims at, how to report a problem, and what was actually done and checked.">
 <link rel="canonical" href="https://itamar-avitan.github.io/accessibility/">
 <meta property="og:title" content="Accessibility — Itamar Avitan">
-<meta property="og:description" content="The accessibility statement for the personal site of Itamar Avitan: what it aims at, what was actually done and checked, and how to report a problem.">
+<meta property="og:description" content="The accessibility statement for the personal site of Itamar Avitan: what it aims at, how to report a problem, and what was actually done and checked.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://itamar-avitan.github.io/accessibility/">
 <meta property="og:image" content="https://itamar-avitan.github.io/img/og.png">
@@ -121,14 +121,14 @@
     <section id="aim" aria-labelledby="aim-h">
       <h2 id="aim-h" class="inset">The aim</h2>
       <div class="prose inset">
-        <p>This site aims at WCAG 2.1 Level AA — the middle of the three levels of the Web Content Accessibility Guidelines — and that is the standard I hold it to. It is not a certificate: nobody but me has audited this site, and the list below is what was actually done, not a claim that the whole of AA has been met.</p>
+        <p>This site aims at WCAG 2.1 Level AA — the middle of the three levels of the Web Content Accessibility Guidelines — and that is the standard I hold it to. It is not a certificate: nobody but me has audited this site, and the list below is what was actually done, not a claim that the whole of AA has been met.</p>
       </div>
     </section>
 
     <section id="report" aria-labelledby="report-h">
       <h2 id="report-h" class="inset">Reporting a problem</h2>
       <div class="prose inset">
-        <p>If something here is hard to use, or does not work with whatever you use to read the web, please tell me — that is the fastest way for it to get fixed. My address is at the foot of this page, and at the top of the home page. What helps most: which page you were on, what you were using, and what happened.</p>
+        <p>If something here is hard to use, or does not work with whatever you use to read the web, please tell me — that is the fastest way for it to get fixed. My address is at the foot of this page, and at the top of the home page. What helps most: which page you were on, what you were using, and what happened.</p>
       </div>
     </section>
 
@@ -137,14 +137,14 @@
       <div class="prose inset">
         <p>What that has meant in practice. Each of these is checked by an automated test that I run before I publish a change, so the list stays true:</p>
         <ul class="statement" role="list">
-          <li>Nothing loads from anyone else. The fonts are served from this site, and no page asks any other host for anything — no analytics, no trackers, no embedded players, no hosted fonts — so the pages work on a slow or filtered connection, and reading them tells no one but the host, GitHub Pages, that you were here.</li>
-          <li>Contrast is measured, not judged by eye. Every piece of text painted on every page is sampled in a real browser and checked against the WCAG contrast formula — 4.5 to 1 for ordinary text, 3 to 1 for large text — in both themes, whether the theme comes from your system setting or from the theme button.</li>
+          <li>Nothing loads from anyone else. The fonts are served from this site, and no page asks any other host for anything — no analytics, no trackers, no embedded players, no hosted fonts — so the pages work on a slow or filtered connection, and reading them tells no one but the host, GitHub Pages, that you were here.</li>
+          <li>Contrast is measured, not judged by eye. Every piece of text painted on every page is sampled in a real browser and checked against the WCAG contrast formula — 4.5 to 1 for ordinary text, 3 to 1 for large text — in both themes, whether the theme comes from your system setting or from the theme button.</li>
           <li>Everything you can use, you can reach from a keyboard, and you can see where you are: every link and the theme button draws the same two-pixel ring when it takes focus.</li>
           <li>The controls are big enough to hit: every link in the navigation strip, in the row of profiles and in the footer is a target at least 24 by 24 pixels, on every screen down to 320 pixels wide. A link set inside a sentence is left at the size of the words around it.</li>
           <li>Nothing moves on its own. The only motion is a short color fade and smooth scrolling, and both are switched off for a visitor whose system asks for reduced motion.</li>
           <li>The markup says what things are: one first-level heading per page, headings that never skip a level, lists marked up as lists, the navigation in a named landmark with the current page marked, and a language set on the document.</li>
           <li>Every picture that carries information has a text alternative: the paper’s figure is described in full for a reader who cannot see it. The portrait beside my name, and the small marks beside Email, GitHub and Bluesky, are hidden from screen readers, because the words beside them already say it.</li>
-          <li>The site works with JavaScript switched off: the pages are plain HTML joined by ordinary links. Two things need it, and both fail quietly — the theme button, which stays hidden until the script has run rather than sitting there doing nothing, and my email address, which is written as text and made into a link in your browser.</li>
+          <li>The site works with JavaScript switched off: the pages are plain HTML joined by ordinary links. Two things need it, and both fail quietly — the theme button, which stays hidden until the script has run rather than sitting there doing nothing, and my email address, which is written as text and made into a link in your browser.</li>
           <li>Body text is set at 16 pixels or larger, the layout reflows into one column on a phone, and no page scrolls sideways at any width down to 320 pixels.</li>
         </ul>
       </div>

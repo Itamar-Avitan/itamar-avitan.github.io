@@ -26,6 +26,28 @@ ABSOLUTE = re.compile(r"^(?:[a-z][a-z0-9+.-]*:|//|#)")
 SLUG = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 
 
+def opening(text: str, cap: int = 15) -> str:
+    """The first clause of a quotation, for its permalink's accessible name: the words up to the first one
+    that closes a sentence, or up to the first one that closes a clause with "…" in place of its comma, or
+    the first `cap` words and "…" when neither comes sooner. The line's outer quotation marks are the page's
+    house convention (see site.yaml), so they are dropped and the name puts its own around the clause. Four
+    links that all said "Link to this quotation" were four identical entries in a screen reader's list of
+    links (review of WP-S4, 2026-09-25); the speaker alone would not tell two Holmes lines apart."""
+    words = text.strip("“”").split()
+    taken: list[str] = []
+    for word in words:
+        taken.append(word)
+        bare = word.rstrip("’”")
+        if bare.endswith((".", "!", "?")):
+            return " ".join(taken)
+        if bare.endswith((",", ";", ":")):
+            taken[-1] = bare.rstrip(",;:") + "…"
+            return " ".join(taken)
+        if len(taken) == cap and len(words) > cap:
+            return " ".join(taken) + "…"
+    return " ".join(taken)
+
+
 def load_site(path: Path) -> dict:
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
@@ -164,6 +186,7 @@ def environment() -> Environment:
     env = Environment(loader=FileSystemLoader(ROOT / "templates"), undefined=StrictUndefined,
                       autoescape=select_autoescape(["html", "j2"]), trim_blocks=True, lstrip_blocks=True)
     env.filters["local"] = local
+    env.filters["opening"] = opening
     return env
 
 

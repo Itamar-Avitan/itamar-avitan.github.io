@@ -795,10 +795,10 @@ def test_teaching_is_two_sections_and_every_row_is_dated_and_titled():
 
 def test_the_teaching_page_carries_the_course_home_announces():
     """This page is the authority on his teaching, and it did not list the academic writing course that "now"
-    on the home page announces for 2026/27. The course is described, not titled, until he gives its title
-    (deep review 2026-09-25, AK-03 and CS-17), and the list runs newest first like every list on the site
-    (FL-08): it was the one list that ran the other way, so the gutter changed direction between Courses and
-    Students. The order is the CV's."""
+    on the home page announces for 2026/27. The course is described, not titled: its title is not printed
+    yet (deep review 2026-09-25, AK-03 and CS-17; WP-S12 prints the one ruling 13 gave), and the list runs
+    newest first like every list on the site (FL-08): it was the one list that ran the other way, so the
+    gutter changed direction between Courses and Students. The order is the CV's."""
     courses = SITE["teaching"]["courses"]
     writing = next(c for c in courses if "writing" in c["title"].lower())
     assert writing["when"] == "from 2026/27" and "2026/27" in SITE["now"][1]
@@ -845,15 +845,17 @@ def test_quotes_print_the_line_its_attribution_and_its_context_and_nothing_else(
     assert "four" in SITE["elsewhere"][2]["text"] and len(SITE["quotes"]) == 4      # the home page's teaser counts them
     for quote in SITE["quotes"]:
         assert f'<blockquote><p>{quote["text"]}</p></blockquote>' in section         # printed exactly as verified
-        assert quote["attribution"] in shown and quote.get("note", "") in shown
+        # rendered text, with the attribution's U+00A0 ties read as the spaces they print as
+        assert " ".join(quote["attribution"].split()) in shown and quote.get("note", "") in shown
         for private in ("evidence", "status", "copyright"):                          # provenance, not page text
             assert quote[private] not in shown
     assert section.count('<time class="when" datetime="1887">1887</time>') == 3      # the year takes its tick
     assert '<time class="when" datetime="2003">2003</time>' in section
     # the borrowed line keeps its own date in the attribution, where it cannot break at the hyphen -- after the
-    # poem's title, as the novel's year follows the novel's (AK-16); the permalink follows inside the same <p>
-    assert 'An Essay on Man (<span class="nb">1733–34</span>), Epistle II' in section
-    assert 'Epistle II (<span class="nb">1733–34</span>)' not in section
+    # poem's title, as the novel's year follows the novel's (AK-16); the permalink follows inside the same <p>.
+    # The title, its span and the epistle's numeral are tied with U+00A0 (see the numeral test below).
+    assert 'An\u00a0Essay\u00a0on\u00a0Man\u00a0(<span class="nb">1733–34</span>), Epistle\u00a0II' in section
+    assert 'Epistle\u00a0II (<span class="nb">1733–34</span>)' not in section
 
 
 def test_a_quotation_carries_its_own_quotation_marks():
@@ -875,8 +877,8 @@ def test_the_family_resemblance_line_is_the_verified_one():
                              "the details of a thousand at your finger ends, it is odd if you can’t "
                              "unravel the thousand and first.”")
     assert "can't" not in quote["text"]
-    assert quote["attribution"] == ("Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet (1887), "
-                                    "Part I, Chapter II, “The Science of Deduction”")
+    assert quote["attribution"] == ("Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet\u00a0(1887), "
+                                    "Part\u00a0I, Chapter\u00a0II, “The Science of Deduction”")   # year and numerals tied
     assert quote["year"] == "1887" and quote["status"] == "verified" and quote["copyright"] == "public-domain"
 
 
@@ -912,7 +914,7 @@ def test_the_in_copyright_quotation_is_the_long_extract_the_owner_ruled_for():
                      "The mind is a complex and many-layered thing, Potter—"):
         assert sentence in quote["text"]
     assert quote["attribution"] == ("Severus Snape, in J.K. Rowling, Harry Potter and the Order of the "
-                                    "Phoenix (2003), Chapter 24, “Occlumency”")
+                                    "Phoenix\u00a0(2003), Chapter\u00a024, “Occlumency”")           # year and numeral tied
     assert "owner-ruled" in quote["copyright"] and "2026-09-21" in quote["evidence"]
     assert "do not silently shorten it back" in (build.ROOT / "site.yaml").read_text(encoding="utf-8")
 
@@ -943,8 +945,10 @@ def test_the_attribution_is_a_paragraph_not_a_cite():
 def test_every_quotation_has_a_permalink_of_its_own():
     """One line can be shared (deep review 2026-09-25, AS-52): each quotation's slug is the id of its row and
     the address of the small "§" at the end of its attribution. The slug is ASCII, unique, and never changed
-    once published; the link is always painted, since a keyboard or a finger cannot hover; and the entry a
-    link lands on wears the same 2px accent ring a focused control does."""
+    once published; the link is always painted, since a keyboard or a finger cannot hover; each link's
+    accessible name names its own line, so a list of links does not hear four identical entries; and the
+    entry a link lands on stands on a panel of the accent tint (measured in tests/test_browser.py, which is
+    where the plan's ring was found to run through the hanging mark and the date)."""
     slugs = [q["slug"] for q in SITE["quotes"]]
     assert slugs == ["snape-mind-not-a-book", "holmes-brain-attic", "watson-proper-study", "holmes-thousand-and-first"]
     assert len(set(slugs)) == len(slugs) and all(build.SLUG.fullmatch(s) for s in slugs)
@@ -952,10 +956,14 @@ def test_every_quotation_has_a_permalink_of_its_own():
     section = html.partition('<section id="quotes"')[2].partition("</section>")[0]
     rows = re.findall(r'<li class="row" id="([^"]+)">', section)
     assert rows == slugs
-    for slug in slugs:
-        assert section.count(f'id="{slug}"') == 1
-        assert f'<a class="quote__link" href="#{slug}" aria-label="Link to this quotation">§</a></p>' in section
-    assert section.count('class="quote__link"') == len(slugs)
+    names = []
+    for q in SITE["quotes"]:
+        assert section.count(f'id="{q["slug"]}"') == 1
+        speaker = q["attribution"].split(", in ")[0]
+        name = f'Link to this quotation ({speaker}: “{build.opening(q["text"])}”)'
+        assert f'<a class="quote__link" href="#{q["slug"]}" aria-label="{name}">§</a></p>' in section
+        names.append(name)
+    assert len(set(names)) == len(names) and section.count('class="quote__link"') == len(slugs)
     # inside the attribution's own paragraph, at its end, after the source
     for q in SITE["quotes"]:
         by = re.search(r'<p class="quote__by">(.*?)</p>', section[section.index(f'id="{q["slug"]}"'):], re.S).group(1)
@@ -966,7 +974,24 @@ def test_every_quotation_has_a_permalink_of_its_own():
     for hidden in ("display: none", "opacity: 0", "visibility: hidden"):
         assert hidden not in link                                              # never hover-only
     assert ".quote__link:hover, .quote__link:focus-visible {" in css
-    assert ".row:target > .what { outline: 2px solid var(--accent); outline-offset: 0.5rem; }" in css
+    mark = re.search(r"\.row:target \{[^}]*\}", css).group(0)
+    assert "background: var(--target-tint)" in mark and "box-shadow: 0 0 0 0.625rem var(--target-tint)" in mark
+    assert ".row:target > .what" not in css                                # the ring that collided is gone
+    assert css.count("--target-tint: #") == 3                             # a token in the light and both dark blocks
+
+
+def test_a_permalinks_name_opens_with_the_lines_first_clause():
+    """The accessible name ends on the line's first clause: a whole sentence when the first one is short,
+    a cut clause with "…" for its comma, or the first fifteen words when neither comes sooner. The page's
+    own quotation marks around the line are dropped, so the name can put its own around the clause."""
+    assert build.opening(SITE["quotes"][0]["text"]) == "Only Muggles talk of ‘mind reading.’"
+    assert build.opening(SITE["quotes"][1]["text"]) == "I consider that a man’s brain originally is like a little empty attic…"
+    assert build.opening(SITE["quotes"][2]["text"]) == "The proper study of mankind is man."
+    assert build.opening(SITE["quotes"][3]["text"]) == "There is a strong family resemblance about misdeeds…"
+    assert build.opening("“Know then thyself”") == "Know then thyself"          # no punctuation: the whole line
+    assert build.opening("“one two three four”", cap=3) == "one two three…"      # the cap, when nothing closes sooner
+    assert build.opening("“one two three”", cap=3) == "one two three"           # the cap is not a cut when the line ends there
+    assert build.opening("“Wait; then go.”") == "Wait…"                          # a semicolon closes a clause too
 
 
 def test_the_build_refuses_a_quotation_without_a_good_slug():

@@ -51,6 +51,7 @@
   --accent: #0B5F73;        /* petrol ink */
   --accent-strong: #084A5A;
   --accent-tint: #E2EEF1;
+  --target-tint: #D8E5E8;   /* the entry a permalink lands on: the accent at 12% over the ground */
   --btn-fill: #0B5F73;      /* the one filled control per group */
   --btn-fill-hover: #084A5A;
   --btn-ink: #FFFFFF;
@@ -84,6 +85,7 @@
     --accent: #6DB3C4;        /* about 7.7:1 on the ground; quieter than the h1 */
     --accent-strong: #8FD0DE;
     --accent-tint: #14313A;
+    --target-tint: #1A2A30;
     --btn-fill: #1C6678;      /* a filled button must not out-shine the name */
     --btn-fill-hover: #217387;
     --btn-ink: #F2FAFC;
@@ -105,6 +107,7 @@
   --accent: #6DB3C4;
   --accent-strong: #8FD0DE;
   --accent-tint: #14313A;
+  --target-tint: #1A2A30;
   --btn-fill: #1C6678;
   --btn-fill-hover: #217387;
   --btn-ink: #F2FAFC;
@@ -428,6 +431,9 @@ a:focus-visible > .ico { color: var(--accent-strong); }
 .links-row > .links { flex: none; max-width: 100%; }
 
 .prose p + p { margin-top: 0.875rem; }
+/* the statement's bullets are paragraphs too: without this the reduced-motion bullet ended on "motion." alone
+   at 390 and from 1024 up (review of WP-S4) */
+.prose li { text-wrap: pretty; }
 
 /* ---------- Statement lists: the accessibility page ----------
    Sentences, not log rows. Each one is a thing that was done or a thing that is not claimed, and none of them
@@ -751,9 +757,18 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   text-decoration: none;
 }
 .quote__link:hover, .quote__link:focus-visible { color: var(--accent); text-decoration: underline; }
-/* the entry a permalink lands on wears the same 2px accent ring a focused control does, so it is visibly the
-   one meant; the offset keeps the ring off the quotation's hanging mark and inside the row's own air */
-.row:target > .what { outline: 2px solid var(--accent); outline-offset: 0.5rem; }
+/* The entry a permalink lands on stands on a panel of the accent tint. The panel is the whole row, so the
+   date in the gutter, the quotation with its hanging mark, the source and the note all sit on it and nothing
+   has to keep clear of it. A ring around .what alone (the plan's CSS) could not: on a laptop its left stroke
+   ran through the opening mark that hangs 0.42em into the margin, and on a phone its top stroke crossed the
+   date that stacks above the entry (review of WP-S4, 2026-09-25). The box-shadow spread is the panel's
+   padding without a layout change, so the page does not jump when it lands: 0.625rem stays inside the row's
+   own air (rows are 1.75rem apart), clears the hanging mark on a phone (0.42em of 17px is 7.1px) and, at
+   320px, keeps 10px of the page's padding on the right and stops short of the rule on the left. The rule
+   and the ticks are positioned above the panel and run over it, as they run over the page. The colour is a
+   token, not a color-mix(), so the contrast test can read it back as an opaque rgb(); every text on the
+   panel keeps 4.5:1 in both themes. tests/test_browser.py measures all of this. */
+.row:target { background: var(--target-tint); box-shadow: 0 0 0 0.625rem var(--target-tint); border-radius: 2px; }
 /* and the step between two quotations is larger again than any step inside one */
 .log--quotes > .row + .row { margin-top: 1.75rem; }
 
