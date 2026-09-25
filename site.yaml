@@ -97,6 +97,8 @@ nobreak:
 - add-on
 - brain–computer
 - 1733–34
+# "Negev, Israel" (the role line) is NOT here: the label ties it with a no-break space instead, because WebKit lets
+# a nowrap span that holds a space run past the column by up to a space width (see the note over `role`).
 
 # --- content (text verbatim from the fact-checked seed) ---
 name: Itamar Avitan
@@ -106,10 +108,16 @@ role:
 - label: Brains and Machines Lab
   url: https://brainsandmachines.org
 # ", Israel" says which country he is in; before it, no page did (deep review 2026-09-25, RN-07; cv.pdf prints
-# the town and country). Measured: on desktop widths the line has about 5px to spare, so nothing more may be
-# added to it, and at 320px "Israel" takes a third line. `affiliation:` at the top stays without the country:
-# it feeds the JSON-LD.
-- label: Ben-Gurion University of the Negev, Israel
+# the town and country). Measured: at 1024px and above the line is one line with about 5px to spare, so
+# nothing more may be added to it; below that (900–1023px on home, 600–800px on the other pages) this item
+# drops whole to a second line, which reads as a clean break. At 320px each item already has its own line
+# and this one takes two, "Ben-Gurion University of the" / "Negev, Israel": the space before "Israel" is
+# U+00A0 so the country never stands alone on the last line (it did at 320–340px and at 390px with 125%
+# text). A `nobreak` entry would do the same in Chromium and Firefox, but WebKit lets a nowrap span that
+# holds a space overflow by up to a space width, and the item then ran 3.8px past the column at 320px on
+# the interior pages and 2.7px at 340px on home; the no-break space wraps correctly in all three engines.
+# `affiliation:` at the top stays without the country: it feeds the JSON-LD.
+- label: Ben-Gurion University of the Negev, Israel
 identity_line: I study how to tell which neural network models of human vision are right, not just which ones predict best.
 
 # DRAFT, awaiting the owner's own words. Written on 2026-09-21 in answer to his ask for "a proper about me in
