@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Research — Itamar Avitan</title>
-<meta name="description" content="The paper, talks and projects of Itamar Avitan, on identifying the right model of human vision rather than the best-fitting one.">
+<meta name="description" content="Itamar Avitan’s paper, talks and posters on representational alignment between neural networks and human vision, and two neurotechnology team projects.">
 <link rel="canonical" href="https://itamar-avitan.github.io/research/">
 <meta property="og:title" content="Research — Itamar Avitan">
-<meta property="og:description" content="The paper, talks and projects of Itamar Avitan, on identifying the right model of human vision rather than the best-fitting one.">
+<meta property="og:description" content="Itamar Avitan’s paper, talks and posters on representational alignment between neural networks and human vision, and two neurotechnology team projects.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://itamar-avitan.github.io/research/">
 <meta property="og:image" content="https://itamar-avitan.github.io/img/og.png">
@@ -115,7 +115,7 @@
 
     <section id="research" aria-labelledby="research-h">
       <h1 id="research-h" class="inset">Research</h1>
-      <p class="page-intro inset">Neural networks can predict human visual judgments, such as which of three images is the odd one out. I ask when that accuracy means a network represents the world as people do. Our results argue for comparisons built to identify the right model, not only the best-fitting one.</p>
+      <p class="page-intro inset">Neural networks can predict human visual judgments, such as which of three images is the odd one out. I ask when that accuracy means a network represents the world as people do — the question of representational alignment. Our results argue for comparisons built to identify the right model, not only the <span class="nb">best-fitting</span> one.</p>
     </section>
 
     <section id="papers" aria-labelledby="papers-h">
@@ -133,22 +133,23 @@
           </figure>
         </div>
         <div class="paper__body">
-          <h3>Model–Behavior Alignment under Flexible Evaluation: When the <span class="nb">Best-Fitting</span> Model Isn’t the Right One</h3>
+          <h3><a href="https://proceedings.neurips.cc/paper_files/paper/2025/hash/11e1900e680f5fe1893a8e27362dbe2c-Abstract-Conference.html">Model–Behavior Alignment under Flexible Evaluation: When the <span class="nb">Best-Fitting</span> Model Isn’t the Right One</a></h3>
           <p class="authors"><span class="me">Itamar Avitan</span>, Tal Golan</p>
-          <p class="tldr"><span class="runin">Summary</span> To test whether a vision model represents images the way people do, researchers often fit a flexible linear mapping from the model’s features to human judgments and compare how well each model predicts. We simulated responses from each of 20 models fitted to 4.5 million <span class="nb">odd-one-out</span> judgments from the THINGS dataset and found that this comparison picked the model that had generated the data less than 80% of the time, even with millions of trials.</p>
+          <p class="venue paper__venue">Advances in Neural Information Processing Systems 38 (NeurIPS 2025), main track</p>
           <ul class="buttons" role="list">
             <li><a class="btn btn--primary" href="https://proceedings.neurips.cc/paper_files/paper/2025/hash/11e1900e680f5fe1893a8e27362dbe2c-Abstract-Conference.html">Paper</a></li>
             <li><a class="btn" href="https://arxiv.org/abs/2510.23321">arXiv</a></li>
             <li><a class="btn" href="https://github.com/brainsandmachines/oddoneout_model_recovery">Code</a></li>
             <li><a class="btn" href="https://doi.org/10.6084/m9.figshare.30542690.v1">Data</a></li>
-            <li><a class="btn" href="https://www.youtube.com/watch?v=vT-3kV89Rhk&amp;t=715s">CCN 2025 talk video</a></li>
+            <li><a class="btn" href="https://slideslive.com/39047290">NeurIPS 2025 video</a></li>
           </ul>
+          <p class="tldr"><span class="runin">Summary</span> To test whether a vision model represents images the way people do, researchers often fit a flexible linear mapping from the model’s features to human judgments (linear probing) and compare how well each model predicts. We fitted 20 vision models to 4.5 million <span class="nb">odd-one-out</span> judgments from the THINGS dataset, calibrated each to human response variability, let each one in turn generate simulated judgments, and asked whether the comparison would pick out the model that had generated them. It did so less than 80% of the time, even with millions of simulated trials — far above chance (one in twenty), but wrong more than one time in five. Regression analyses linked the errors mainly to how much the linear mapping reshapes each model’s representational geometry.</p>
         </div>
       </article>
     </section>
 
     <section id="talks" aria-labelledby="talks-h">
-      <h2 id="talks-h" class="inset">Talks</h2>
+      <h2 id="talks-h" class="inset">Talks and presentations</h2>
       <ul class="log log--kind" role="list">
         <li class="row">
           <p class="when"><time datetime="2026-09-14">14</time>–<time datetime="2026-09-15">15 Sep 2026</time></p>
@@ -163,9 +164,10 @@
           <p class="when"><time datetime="2025-12-05">5 Dec 2025</time></p>
           <p class="kind"><span class="tag">Poster</span></p>
           <div class="what">
-            <h3>Model–Behavior Alignment under Flexible Evaluation: When the <span class="nb">Best-Fitting</span> Model Isn’t the Right One</h3>
+            <h3>When the <span class="nb">Best-Fitting</span> Model Isn’t the Right One</h3>
             <p class="authors"><span class="me">Itamar Avitan</span>, Tal Golan</p>
             <p class="venue"><a href="https://neurips.cc/virtual/2025/loc/san-diego/poster/116404">Conference on Neural Information Processing Systems <span class="nb">(NeurIPS) 2025</span></a><span class="vh">, </span><span class="place">San Diego, USA</span></p>
+            <p class="note">The poster for the paper above.</p>
           </div>
         </li>
         <li class="row">
@@ -175,7 +177,8 @@
             <h3>Rethinking Representational Alignment: <span class="nb">Linear Probing</span> Fails to Identify the <span class="nb">Ground-Truth</span> Model</h3>
             <p class="authors"><span class="me">Itamar Avitan</span>, Tal Golan</p>
             <p class="venue"><a href="https://2025.ccneuro.org/contributed-talk/?id=65">Cognitive Computational Neuroscience <span class="nb">(CCN) 2025</span></a><span class="vh">, </span><span class="place">University of Amsterdam, the Netherlands</span></p>
-            <p class="note">Preliminary version of the NeurIPS 2025 paper.</p>
+            <p class="note">Preliminary version of the NeurIPS 2025 paper above, where linear probing is the “flexible evaluation” of the title.</p>
+            <ul class="buttons" role="list"><li><a class="btn" href="https://www.youtube.com/watch?v=vT-3kV89Rhk&amp;t=715s">Recording (starts at 11:55)</a></li></ul>
           </div>
         </li>
       </ul>
@@ -187,8 +190,9 @@
         <li class="row">
           <p class="when"><time datetime="2026-07-24">24 Jul</time>–<time datetime="2026-08-06">6 Aug 2026</time></p>
           <div class="what">
-            <h3><a href="https://github.com/Itamar-Avitan/earbetter-ebt-practicum">Embodied Brain Technology Practicum</a></h3>
+            <h3><a href="https://sites.google.com/brown.edu/ebt/2026-practicum">Embodied Brain Technology Practicum</a></h3>
             <p>Two weeks at Brown University in Providence, on a programme run jointly with <span class="nb">Ben-Gurion</span> University: graduate students from the two universities, admitted by competitive selection, work in small teams, each building a piece of neurotechnology and pitching it. Our <span class="nb">five-person</span> team built and pitched EarBetter, an <span class="nb">add-on</span> that works with any headphones, reads biosignals and filters out the sounds that set a person’s anxiety off.</p>
+            <ul class="buttons" role="list"><li><a class="btn" href="https://github.com/Itamar-Avitan/earbetter-ebt-practicum">Code</a></li></ul>
           </div>
         </li>
         <li class="row">

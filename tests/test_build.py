@@ -372,7 +372,7 @@ def test_no_mailto_no_plain_address_no_third_party_hosts():
 def test_removed_items_stay_removed():
     text = " ".join(_visible_text(h) for h in every_page().values())
     assert "Curved Spaces" not in text and "Feb 2026" not in text
-    assert 'BCI4ALS</a>' not in html_of("research/")        # card title is not a link
+    assert 'BCI4ALS</a>' not in html_of("research/")        # BCI4ALS is never linked (ruling)
 
 
 def test_open_graph_points_at_the_site_and_its_card():
@@ -403,13 +403,19 @@ def test_research_card_shows_every_field():
     html = html_of("research/")
     text, card = _visible_text(html), SITE["research"][0]
     shown = [card["title"], card["tldr"], *filter(None, [card["figure"].get("caption")]), *card["authors"],
-             *card["badges"], *(b["label"] for b in card["buttons"])]
+             card["venue"], *card["badges"], *(b["label"] for b in card["buttons"])]
     assert [s for s in shown if " ".join(s.split()) not in text] == []
     # unescaped, because an address with two query parameters carries "&", which a document writes "&amp;"
     assert all(f'href="{b["url"]}"' in unescape(html) for b in card["buttons"])
     assert f'<img src="../{card["figure"]["src"]}" alt="{card["figure"]["alt"]}"' in html
     assert '<span class="me">Itamar Avitan</span>, Tal Golan' in html
     assert html.count("btn btn--primary") == 2              # the paper's Paper button, and the CV in the strip
+    # the title is the card's primary link, to the paper itself (the first button's address)
+    assert f'<h3><a href="{SITE["research"][0]["buttons"][0]["url"]}">' in html
+    assert '<p class="venue paper__venue">' in html
+    # the links stand above the summary: they are why most readers arrive
+    body = html.partition('<div class="paper__body">')[2].partition("</article>")[0]
+    assert body.index('class="authors"') < body.index('class="venue paper__venue"') < body.index('class="buttons"') < body.index('class="tldr"')
     assert '<span class="tag tag--venue">NeurIPS 2025</span>' in html and '<span class="tag">CCN 2025 · Talk</span>' in html
 
 
@@ -550,15 +556,23 @@ def test_every_internal_news_link_lands_on_a_built_page_at_the_id_it_names():
 def test_talks_link_the_venue_and_show_the_note():
     html = html_of("research/")
     assert '<p class="venue"><a href="https://2025.ccneuro.org/contributed-talk/?id=65">' in html
-    assert '<p class="note">Preliminary version of the NeurIPS 2025 paper.</p>' in html
-    assert html.count('<p class="note">') == 1
+    assert ('<p class="note">Preliminary version of the NeurIPS 2025 paper above, where linear probing is the '
+            '“flexible evaluation” of the title.</p>') in html
+    assert '<p class="note">The poster for the paper above.</p>' in html
+    assert html.count('<p class="note">') == 2
+    assert '<h2 id="talks-h" class="inset">Talks and presentations</h2>' in html   # the CVs' heading: one row is a poster
 
 
 def test_project_titles_link_only_when_a_url_is_given():
+    """The title links the programme's own page, as a talk's venue links the venue's; the team's repository
+    is the row's "Code" link, the CVs' label. BCI4ALS stays unlinked (ruling)."""
     html = html_of("research/")
-    assert ('<h3><a href="https://github.com/Itamar-Avitan/earbetter-ebt-practicum">'
+    assert ('<h3><a href="https://sites.google.com/brown.edu/ebt/2026-practicum">'
             'Embodied Brain Technology Practicum</a></h3>') in html
     assert "<h3>BCI4ALS</h3>" in html
+    projects = html.partition('<section id="projects"')[2]
+    assert projects.count('class="buttons"') == 1
+    assert '<li><a class="btn" href="https://github.com/Itamar-Avitan/earbetter-ebt-practicum">Code</a></li>' in projects
 
 
 def test_the_practicum_leads_with_the_programme_and_says_nothing_about_who_did_what():
@@ -618,10 +632,13 @@ def test_the_practicum_leads_with_the_programme_and_says_nothing_about_who_did_w
 def test_optional_keys_may_be_absent():
     site = copy.deepcopy(SITE)
     for entry in site["talks"] + site["projects"] + site["research"] + site["links"] + site["news"]:
-        for key in ("url", "link", "note", "text", "figure", "me", "ongoing", "authors", "badges", "buttons"):
+        for key in ("url", "link", "note", "text", "figure", "me", "ongoing", "authors", "badges", "buttons",
+                    "links"):
             if key == "text" and "date" in entry:
                 continue                                # a news item's sentence is required; its link is not
             entry.pop(key, None)
+    for entry in site["research"]:
+        entry.pop("venue", None)                        # the card's citation line is optional; a talk's venue is not
     for entry in site["pages"]:
         entry.pop("intro", None)
         entry.pop("description", None)
@@ -840,12 +857,18 @@ def test_every_gutter_label_in_the_quotes_section_is_a_plain_date():
 def test_the_talk_video_opens_where_his_own_talk_starts():
     """The recording is one five-talk session with no chapter markers, so the address carries a start time:
     t=715s is 11:55 (the owner's ruling of 2026-09-21, and the timestamp already committed on his CV)."""
-    button = next(b for b in SITE["research"][0]["buttons"] if b["label"] == "CCN 2025 talk video")
-    assert button["url"] == "https://www.youtube.com/watch?v=vT-3kV89Rhk&t=715s"
+    ccn = next(t for t in SITE["talks"] if "(CCN) 2025" in t["venue"])
+    link = ccn["links"][0]                                     # the session recording sits on the CCN row, as on the CV
+    assert link["url"] == "https://www.youtube.com/watch?v=vT-3kV89Rhk&t=715s"
+    assert link["label"] == "Recording (starts at 11:55)"
     html = html_of("research/")
     assert 'href="https://www.youtube.com/watch?v=vT-3kV89Rhk&amp;t=715s"' in html
     assert "&t=715s" not in html                                            # never the bare ampersand
-    assert unescape(re.search(r'href="([^"]*vT-3kV89Rhk[^"]*)"', html).group(1)) == button["url"]
+    assert unescape(re.search(r'href="([^"]*vT-3kV89Rhk[^"]*)"', html).group(1)) == link["url"]
+    # and the card carries the paper's own NeurIPS video, the one cv.pdf prints (FACTS PUB-LINK-TALK)
+    video = SITE["research"][0]["buttons"][-1]
+    assert video == {"label": "NeurIPS 2025 video", "url": "https://slideslive.com/39047290"}
+    assert "CCN 2025 talk video" not in html
 
 
 def _css() -> str:

@@ -1,4 +1,4 @@
-{#- Research: the question, the paper, the talks that carried it, and the things built in teams. -#}
+{#- Research: the question, the paper, the talks and posters around it, and the things built in teams. -#}
 {% extends "base.html.j2" %}
 
 {% block main %}
@@ -45,24 +45,34 @@
           </figure>
   {% endif %}
         </div>
+{# The body runs in a citation's order: what it is, who wrote it, where it appeared, where to get it, then
+   what it found. The title is the card's primary link, to the first button's address (the paper): a title that
+   is not a link is the one thing on the card a reader tries first. The links stand above the summary on every
+   width because they are why most readers arrive; below it they sat under the fold on the commonest laptop. #}
         <div class="paper__body">
-          <h3>{{ m.nb(card.title) }}</h3>
+          <h3>{% if card.get("buttons") %}<a href="{{ card.buttons[0].url }}">{{ m.nb(card.title) }}</a>{% else %}{{ m.nb(card.title) }}{% endif %}</h3>
   {% if card.get("authors") %}
           <p class="authors">{{ m.authors(card.authors, card.get("me") or site.name) }}</p>
   {% endif %}
-          <p class="tldr"><span class="runin">Summary</span> {{ m.nb(card.tldr) }}</p>
+  {% if card.get("venue") %}
+          <p class="venue paper__venue">{{ m.nb(card.venue) }}</p>
+  {% endif %}
           <ul class="buttons" role="list">
   {% for button in card.get("buttons") or [] %}
             <li><a class="btn{{ " btn--primary" if loop.first else "" }}" href="{{ button.url }}">{{ button.label }}</a></li>
   {% endfor %}
           </ul>
+          <p class="tldr"><span class="runin">Summary</span> {{ m.nb(card.tldr) }}</p>
         </div>
       </article>
 {% endfor %}
     </section>
 
+{# "Talks and presentations", the CVs' own heading: the list holds a flash talk, a poster and a contributed
+   talk with its poster, so "Talks" alone misfiled the poster. A row's optional `links` (a recording, a
+   repository) render under it in the paper card's own button style; the projects list uses the same rule. #}
     <section id="talks" aria-labelledby="talks-h">
-      <h2 id="talks-h" class="inset">Talks</h2>
+      <h2 id="talks-h" class="inset">Talks and presentations</h2>
       <ul class="log log--kind" role="list">
 {% for talk in site.talks %}
         <li class="row">
@@ -76,6 +86,9 @@
             <p class="venue">{% if talk.get("url") %}<a href="{{ talk.url }}">{{ m.nb(talk.venue) }}</a>{% else %}{{ m.nb(talk.venue) }}{% endif %}<span class="vh">, </span><span class="place">{{ talk.place }}</span></p>
   {% if talk.get("note") %}
             <p class="note">{{ talk.note }}</p>
+  {% endif %}
+  {% if talk.get("links") %}
+            <ul class="buttons" role="list">{% for link in talk.links %}<li><a class="btn" href="{{ link.url }}">{{ link.label }}</a></li>{% endfor %}</ul>
   {% endif %}
           </div>
         </li>
@@ -92,6 +105,9 @@
           <div class="what">
             <h3>{% if project.get("url") %}<a href="{{ project.url }}">{{ project.title }}</a>{% else %}{{ project.title }}{% endif %}</h3>
             <p>{{ m.nb(project.blurb) }}</p>
+  {% if project.get("links") %}
+            <ul class="buttons" role="list">{% for link in project.links %}<li><a class="btn" href="{{ link.url }}">{{ link.label }}</a></li>{% endfor %}</ul>
+  {% endif %}
           </div>
         </li>
 {% endfor %}

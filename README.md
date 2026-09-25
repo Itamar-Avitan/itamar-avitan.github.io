@@ -34,7 +34,7 @@ things about me and updates and stuff". Nothing was dropped in the split.
 | Page | Address | What is on it |
 | --- | --- | --- |
 | Home | `/` | the masthead, `about`, `elsewhere`, `now`, and the news feed |
-| Research | `/research/` | Papers, Talks, Projects |
+| Research | `/research/` | Papers, Talks and presentations, Projects |
 | Teaching | `/teaching/` | Courses and Students |
 | Commonplace | `/commonplace/` | the quotations, in the owner's order |
 

@@ -30,13 +30,17 @@ pages:
 - slug: research/
   nav: Research
   heading: Research
-  # The intro frames and hands off; it does not summarise the card 250px below it. The mechanism, the method
-  # and the number are stated once, better, in the paper card -- saying them here too put the same argument on
-  # one screen twice in the same order. The closing phrase deliberately echoes the paper title printed just
-  # beneath it. Do not reintroduce the bare noun "identifiability" here: its only definition on this site was
-  # the sentence that was cut, and the plain verb needs no setup.
-  intro: Neural networks can predict human visual judgments, such as which of three images is the odd one out. I ask when that accuracy means a network represents the world as people do. Our results argue for comparisons built to identify the right model, not only the best-fitting one.
-  description: The paper, talks and projects of Itamar Avitan, on identifying the right model of human vision rather than the best-fitting one.
+  # The intro frames and hands off; it does not summarise the card 250px below it. The method, the number, its
+  # chance baseline and the mechanism are stated once, better, in the paper card -- saying them here too put
+  # the same argument on one screen twice in the same order. The second sentence names the field's own term,
+  # "representational alignment", which is the noun the talk titles below and a search use (deep review
+  # 2026-09-25, CS-08 and PR-06). The closing phrase deliberately echoes the paper title printed just beneath
+  # it. Do not reintroduce the bare noun "identifiability" here: its only definition on this site was the
+  # sentence that was cut, and the plain verb needs no setup.
+  intro: Neural networks can predict human visual judgments, such as which of three images is the odd one out. I ask when that accuracy means a network represents the world as people do — the question of representational alignment. Our results argue for comparisons built to identify the right model, not only the best-fitting one.
+  # True of every item on the page: all three talk and poster titles are literally on representational
+  # alignment, and the two projects are neurotechnology, not model identification (CS-08).
+  description: Itamar Avitan’s paper, talks and posters on representational alignment between neural networks and human vision, and two neurotechnology team projects.
 - slug: teaching/
   nav: Teaching
   heading: Teaching
@@ -69,6 +73,9 @@ pages:
 nobreak:
 - Ben-Gurion
 - Best-Fitting
+# nb() is a case-sensitive replace, so the paper title's "Best-Fitting" leaves the research intro's
+# "best-fitting" alone; without this line the intro broke at that hyphen at 1280 (deep review, CS-08).
+- best-fitting
 - Ground-Truth
 - Linear Probing
 - Neuro-AI-Talks
@@ -277,7 +284,16 @@ research:
   - Itamar Avitan
   - Tal Golan
   me: Itamar Avitan
-  tldr: To test whether a vision model represents images the way people do, researchers often fit a flexible linear mapping from the model’s features to human judgments and compare how well each model predicts. We simulated responses from each of 20 models fitted to 4.5 million odd-one-out judgments from the THINGS dataset and found that this comparison picked the model that had generated the data less than 80% of the time, even with millions of trials.
+  # Every clause is the arXiv 2510.23321 abstract (the W source of FACTS RES-DESC, RES-PLATEAU and PUB-NUM):
+  # the method, named by the paper's own term "linear probing"; the number with its chance baseline, one in
+  # twenty being the paper's 1/|M| with |M| = 20 models; and the mechanism, the abstract's regression
+  # sentence. "millions of simulated trials" is the abstract's phrase: without "simulated", the millions read
+  # as the human data named a few words earlier (deep review 2026-09-25, CS-07 with PR-01's calibration clause).
+  tldr: To test whether a vision model represents images the way people do, researchers often fit a flexible linear mapping from the model’s features to human judgments (linear probing) and compare how well each model predicts. We fitted 20 vision models to 4.5 million odd-one-out judgments from the THINGS dataset, calibrated each to human response variability, let each one in turn generate simulated judgments, and asked whether the comparison would pick out the model that had generated them. It did so less than 80% of the time, even with millions of simulated trials — far above chance (one in twenty), but wrong more than one time in five. Regression analyses linked the errors mainly to how much the linear mapping reshapes each model’s representational geometry.
+  # The citation's venue line, under the authors, as academic cards carry it: FACTS PUB-CITATION's compact
+  # wording. The badge above stays "NeurIPS 2025", a venue tag; the track belongs here, not in the badge, where
+  # a " · " would turn it into a neutral presentation tag (PR-08). No rank and no acceptance rate (ruling).
+  venue: Advances in Neural Information Processing Systems 38 (NeurIPS 2025), main track
   badges:
   - NeurIPS 2025
   - CCN 2025 · Talk
@@ -291,12 +307,13 @@ research:
     url: https://github.com/brainsandmachines/oddoneout_model_recovery
   - label: Data
     url: https://doi.org/10.6084/m9.figshare.30542690.v1
-  # The recording is one five-talk session with no chapter markers, so the address carries the start of his
-  # own talk: t=715s is 11:55, confirmed by the owner on 2026-09-21. The same timestamp is on his CV. The "&"
-  # before it is a literal ampersand here; the template escapes it to "&amp;" in the HTML, which is how an
-  # address with two query parameters is written in a document. Do not "fix" it to &amp; in this file.
-  - label: CCN 2025 talk video
-    url: https://www.youtube.com/watch?v=vT-3kV89Rhk&t=715s
+  # The paper's own recording, filed where cv.pdf files it (FACTS PUB-LINK-TALK). Fetched 2026-09-25: the
+  # paper's 4:57 poster video, presenters Itamar Avitan and Tal Golan. "video", not "talk video": it is a
+  # poster video. The CCN session recording is on the CCN row below, as on the CV (deep review PR-04, CS-14).
+  - label: NeurIPS 2025 video
+    url: https://slideslive.com/39047290
+# A talk or project row may carry `links`, a list of {label, url} rendered under the row in the paper card's
+# own button style: a recording, a repository. One mechanism for both lists (deep review 2026-09-25, DP-08).
 talks:
 - date: 14–15 Sep 2026
   kind: Flash talk
@@ -312,10 +329,14 @@ talks:
   kind: Poster
   venue: Conference on Neural Information Processing Systems (NeurIPS) 2025
   place: San Diego, USA
-  title: 'Model–Behavior Alignment under Flexible Evaluation: When the Best-Fitting Model Isn’t the Right One'
+  # The poster is the paper above, so the row prints the title's second half and says whose poster it is,
+  # rather than reprinting the full title a third time on the site unexplained (deep review CS-15; the CV
+  # carries the same tie, FACTS TALK-NEURIPS "presenting the paper listed above").
+  title: When the Best-Fitting Model Isn’t the Right One
   authors:
   - Itamar Avitan
   - Tal Golan
+  note: The poster for the paper above.
   url: https://neurips.cc/virtual/2025/loc/san-diego/poster/116404
 - date: 15 Aug 2025
   kind: Contributed talk and poster
@@ -325,8 +346,18 @@ talks:
   authors:
   - Itamar Avitan
   - Tal Golan
-  note: Preliminary version of the NeurIPS 2025 paper.
+  # "Preliminary version of" is the binding wording (FACTS TALK-CCN: never a second publication); the clause
+  # after it is the bridge between this title's "linear probing" and the paper's "flexible evaluation", which
+  # is the paper's own equivalence (its Fig. 1 caption: model recovery under linear probing) (PR-06).
+  note: Preliminary version of the NeurIPS 2025 paper above, where linear probing is the “flexible evaluation” of the title.
   url: https://2025.ccneuro.org/contributed-talk/?id=65
+  # The recording is one five-talk session with no chapter markers, so the address carries the start of his
+  # own talk: t=715s is 11:55, confirmed by the owner on 2026-09-21. The same timestamp is on his CV. The "&"
+  # before it is a literal ampersand here; the template escapes it to "&amp;" in the HTML, which is how an
+  # address with two query parameters is written in a document. Do not "fix" it to &amp; in this file.
+  links:
+  - label: Recording (starts at 11:55)
+    url: https://www.youtube.com/watch?v=vT-3kV89Rhk&t=715s
 # THE PRACTICUM ENTRY. The owner ruled on this twice on 2026-09-21, and the SECOND ruling is the one in force.
 #
 # RULING IN FORCE (source O, 2026-09-21), his words verbatim: "i think its need to be more of a description of
@@ -369,16 +400,22 @@ talks:
 # the entry was competitive and stops.
 projects:
 # Titled by the programme, not by the product: under a heading a reader's eye reaches first, "EarBetter" would
-# have led and the practicum would have been the clause, which is the ruling upside down. The link stays on
-# this row -- it is the entry's own repository, and its README opens "A 2026 Brown University-Ben-Gurion
-# University Embodied Brain Technology Practicum project" -- and it is the same address the CVs print under
-# the same entry head. The CV entry is laid out the same way: practicum in the head, EarBetter in the bullet.
+# have led and the practicum would have been the clause, which is the ruling upside down. The title links the
+# programme's own page, as the talk rows link a venue's name to the venue's page: link text and destination
+# name the same thing. The team's repository -- its README opens "A 2026 Brown University-Ben-Gurion
+# University Embodied Brain Technology Practicum project", and it is the same address the CVs print under
+# the same entry head, as "Code:" -- is the row's "Code" link, the CVs' label (deep review 2026-09-25, AK-17).
+# The CV entry is laid out the same way: practicum in the head, EarBetter in the bullet. BCI4ALS stays
+# unlinked (ruling): its README prints teammates' personal email addresses.
 - title: Embodied Brain Technology Practicum
   period: 24 Jul–6 Aug 2026
   # 63 words against the 64 of the wording it replaces, so the reframe costs the Research page nothing: this
   # row still sits below the peer-reviewed paper's own summary and still weighs less than it, which is right.
   blurb: 'Two weeks at Brown University in Providence, on a programme run jointly with Ben-Gurion University: graduate students from the two universities, admitted by competitive selection, work in small teams, each building a piece of neurotechnology and pitching it. Our five-person team built and pitched EarBetter, an add-on that works with any headphones, reads biosignals and filters out the sounds that set a person’s anxiety off.'
-  url: https://github.com/Itamar-Avitan/earbetter-ebt-practicum
+  url: https://sites.google.com/brown.edu/ebt/2026-practicum
+  links:
+  - label: Code
+    url: https://github.com/Itamar-Avitan/earbetter-ebt-practicum
 - title: BCI4ALS
   period: 2022–2023
   blurb: In a team of five, we built a brain–computer interface (BCI) that let a person with amyotrophic lateral sclerosis (ALS) answer yes/no questions through the P300 brain response measured with electroencephalography (EEG). The person it was built for used it live.

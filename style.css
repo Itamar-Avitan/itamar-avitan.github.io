@@ -780,21 +780,24 @@ main.opens-with-h1 { margin-top: 2.25rem; }
     border-inline: 0;
     border-radius: 0;
   }
-  /* The card in one column: badges, title, byline, the figure as a plate with its caption at the foot, then
-     the summary and the links. Floated beside the title the figure cut the measure to about two dozen
+  /* The card in one column, in a citation's order: badges, title, byline, the venue, the links, the figure as
+     a plate with its caption at the foot, then the summary -- what it is, who wrote it, where it appeared,
+     where to get it, the plate, what it found. The links come before the summary on every width because they
+     are why most readers arrive; under the summary they sat 54px below the fold on a 1280x800 laptop and 1.6
+     screens down on a phone. Floated beside the title the figure cut the measure to about two dozen
      characters and broke the one line that matters most on the page into four; moved above the title it
-     opened the card with a picture and left a third of that row empty beside it. Below the byline it has the
-     column to itself, the title gets the full measure back, and the order is a paper's own: what it is, who
-     wrote it, the plate, what it found. 13rem is the width at which the running figures still read at arm's
-     length without the plate becoming the loudest thing in the card. */
+     opened the card with a picture and left a third of that row empty beside it. Below the links it has the
+     column to itself and the title gets the full measure back. 13rem is the width at which the running
+     figures still read at arm's length without the plate becoming the loudest thing in the card. */
   .paper { display: grid; grid-template-columns: minmax(0, 1fr); }
   .paper__aside, .paper__body { display: contents; }
   .paper__badges { order: 1; }
   .paper h3 { order: 2; }
   .paper .authors { order: 3; }
-  .paper__fig { order: 4; float: none; width: 13rem; max-width: 100%; margin: 1.125rem 0 0; }
-  .paper .tldr { order: 5; }
-  .paper .buttons { order: 6; }
+  .paper .paper__venue { order: 3; }
+  .paper .buttons { order: 4; }
+  .paper__fig { order: 5; float: none; width: 13rem; max-width: 100%; margin: 1.125rem 0 0; }
+  .paper .tldr { order: 6; }
 }
 
 /* ==========================================================================

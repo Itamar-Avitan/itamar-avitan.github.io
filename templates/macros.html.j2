@@ -1,6 +1,6 @@
 {#- Shared markup for every page. Imported "with context", so the macros can read `site` and `base`.
-    Optional keys (url, note, text, link, ongoing, authors, figure, me, role, nobreak) are tested before use,
-    because the build renders with StrictUndefined. -#}
+    Optional keys (url, note, text, link, links, venue on the paper card, ongoing, authors, figure, me, role,
+    nobreak) are tested before use, because the build renders with StrictUndefined. -#}
 
 {#- Wrap the no-break terms listed in site.yaml; the text is escaped first, so content can never inject markup. -#}
 {%- macro nb(text) -%}
