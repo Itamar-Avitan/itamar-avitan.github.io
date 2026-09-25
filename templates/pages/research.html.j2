@@ -63,6 +63,29 @@
   {% endfor %}
           </ul>
           <p class="tldr"><span class="runin">Summary</span> {{ m.nb(card.tldr) }}</p>
+{# The depth blocks, in the order a reader who stayed wants them: how the test works (the owner's diagram --
+   four marks, each captioned by one of `how`'s steps with a visible counter, so the captions are the labels),
+   what it found, what the paper leaves open, and the citation behind an expander. Only the paper card carries
+   them; a card without the keys renders as it did. The list of stages is an ordered list with role="list",
+   as every list on the site declares itself once its markers are gone. #}
+  {% if card.get("how") %}
+          <p class="tldr"><span class="runin">How the test works</span></p>
+          <ol class="recovery-diagram" role="list" aria-label="How the model-recovery test works">
+    {% for step in card.how %}
+            <li>{{ m.recovery_mark(loop.index) }}<p>{{ m.nb(step) }}</p></li>
+    {% endfor %}
+          </ol>
+  {% endif %}
+  {% if card.get("found") %}
+          <p class="tldr"><span class="runin">What we found</span> {{ m.nb(card.found) }}</p>
+  {% endif %}
+  {% if card.get("open") %}
+          <p class="tldr"><span class="runin">Questions the paper leaves open</span></p>
+          <ul class="open" role="list">{% for q in card.open %}<li>{{ m.nb(q) }}</li>{% endfor %}</ul>
+  {% endif %}
+  {% if card.get("cite") %}
+          <details class="cite"><summary>Cite (BibTeX)</summary><pre>{{ card.cite }}</pre></details>
+  {% endif %}
         </div>
       </article>
 {% endfor %}

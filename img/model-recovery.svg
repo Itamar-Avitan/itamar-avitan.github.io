@@ -1,5 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img">
-<title>Figure 1D, Avitan and Golan (NeurIPS 2025): model-recovery confusion matrix at 1.6M training triplets</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 232 232" role="img">
+<title>Figure 1D, Avitan and Golan (NeurIPS 2025): model-recovery confusion matrix at 1.6M training triplets — adapted, axes labelled</title>
+<rect width="232" height="232" fill="#FFFFFF"/>
+<g font-family="ui-monospace, Menlo, Consolas, monospace" fill="#5B6B75">
+<text x="132" y="13" text-anchor="middle" font-size="14">recovered model →</text>
+<text transform="translate(13 132) rotate(-90)" text-anchor="middle" font-size="14">← generating model</text>
+<text x="37" y="27" text-anchor="middle" font-size="11">1</text>
+<text x="225" y="27" text-anchor="middle" font-size="11">20</text>
+<text x="27" y="37" text-anchor="end" dominant-baseline="central" font-size="11">1</text>
+<text x="27" y="227" text-anchor="end" dominant-baseline="central" font-size="11">20</text>
+</g>
+<g transform="translate(32 32)">
 <rect width="200" height="200" fill="#F2F2FF"/>
 <rect x="0" y="0" width="10" height="10" fill="#800026"/>
 <rect x="10" y="10" width="10" height="10" fill="#800026"/>
@@ -23,4 +33,5 @@
 <rect x="190" y="180" width="10" height="10" fill="#800026"/>
 <rect x="190" y="190" width="10" height="10" fill="#800026"/>
 <path d="M0 0V200M0 0H200M10 0V200M0 10H200M20 0V200M0 20H200M30 0V200M0 30H200M40 0V200M0 40H200M50 0V200M0 50H200M60 0V200M0 60H200M70 0V200M0 70H200M80 0V200M0 80H200M90 0V200M0 90H200M100 0V200M0 100H200M110 0V200M0 110H200M120 0V200M0 120H200M130 0V200M0 130H200M140 0V200M0 140H200M150 0V200M0 150H200M160 0V200M0 160H200M170 0V200M0 170H200M180 0V200M0 180H200M190 0V200M0 190H200M200 0V200M0 200H200" fill="none" stroke="#808080" stroke-width="0.169"/>
+</g>
 </svg>

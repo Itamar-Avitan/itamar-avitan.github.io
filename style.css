@@ -652,6 +652,57 @@ main.opens-with-h1 { margin-top: 2.25rem; }
 }
 .buttons { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 1.125rem; margin-top: 1.125rem; }
 .buttons li { display: flex; }
+/* The depth blocks under the Summary (deep review 2026-09-25, WP-S3). The diagram is a strip of four marks,
+   each captioned by one stage with a visible counter: four columns of 8.5rem in the card body at laptop width
+   (4 x 136 + 3 x 24 = 616px in a 672px body), two rows of two on a phone, one column once the reader's text
+   is large enough that a column would not fit. The auto-fit form with min(..., 100%) is the one grid that
+   passed the 200%-text overflow suite; repeat(4, 1fr) fails it at 768px. The marks take the muted colour of
+   the gutter labels, so the one accent object in each is the only coloured thing in the strip. */
+.recovery-diagram {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(8.5rem, 100%), 1fr));
+  counter-reset: step;
+}
+.recovery-diagram li { display: grid; align-content: start; gap: 0.375rem; counter-increment: step; }
+.recovery-diagram svg { display: block; width: 100%; max-width: 8.5rem; height: auto; color: var(--muted); }
+.recovery-diagram p { font-size: 1rem; line-height: 1.45; }
+.recovery-diagram p::before { content: counter(step) ". "; font: 500 0.8125rem var(--mono); color: var(--accent); }
+/* Between the phone and the laptop the card body is 536px, where auto-fit sets three columns and strands the
+   fourth stage alone on a second row; two rows of two keep the strip's order readable there. */
+@media (min-width: 45rem) and (max-width: 63.99rem) {
+  .recovery-diagram { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* the questions keep their markers: they are a list a reader counts, not a row of links */
+.open { margin: 0.25rem 0 0; padding-left: 1.1rem; list-style: disc; }
+.open li { margin-top: 0.25rem; }
+/* the citation behind an expander set like a link in the mono of the labels; the entry itself wraps rather
+   than scrolls, so an open box on a 320px phone adds no sideways scroll */
+.cite { margin-top: 0.5rem; }
+.cite > summary {
+  display: inline-block;
+  padding-block: 0.5625rem;
+  font: 500 0.8125rem/1 var(--mono);
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  cursor: pointer;
+  list-style: none;
+}
+.cite > summary::-webkit-details-marker { display: none; }
+.cite pre {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  font: 400 0.75rem/1.5 var(--mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+}
 
 /* ---------- Quotes: lines copied out, dated like everything else ----------
    Body face, body size, body colour: a quotation is not a heading and must not read as one -- the paper's
@@ -798,6 +849,10 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   .paper .buttons { order: 4; }
   .paper__fig { order: 5; float: none; width: 13rem; max-width: 100%; margin: 1.125rem 0 0; }
   .paper .tldr { order: 6; }
+  /* the depth blocks share the summary's slot, so DOM order keeps Summary -> How -> the diagram -> What we
+     found -> the open questions; the citation closes the card */
+  .paper .recovery-diagram, .paper .open { order: 6; }
+  .paper .cite { order: 7; }
 }
 
 /* ==========================================================================

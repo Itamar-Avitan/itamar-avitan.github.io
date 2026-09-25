@@ -170,6 +170,40 @@
       </nav>
 {% endmacro -%}
 
+{#- The four marks of the paper card's explanatory diagram, one per stage of the model-recovery test, drawn
+    for the owner's ruling of 2026-09-25 (ruling 3: known generating model -> simulated judgments -> fitted
+    candidates -> the wrong winner). The site's own vocabulary and nothing else: outlined squares for the
+    candidate networks, the odd-one-out triplet of the footer mark for a judgment, bars for a ranking. Rules,
+    kept on purpose (deep review, WP-S3): the marks hold no text and no numeral -- the captions under them
+    (`how` in site.yaml) are the labels, in the page's own font, and the <80% is printed once, in the Summary;
+    every stroke and fill is currentColor (the stylesheet sets the strip's colour) except ONE accent object
+    per stage, set with style="fill:var(--accent)" -- a var() in a presentation attribute is dropped by the
+    sanitizers the footer mark was drawn for, so it stays in a style attribute; stage 3 has no accent, because
+    at that stage the comparison does not know which network generated the answers, which is the point of the
+    test; every stroke is at least 1.5 units; the four share one viewBox, one square size (9 units) and one
+    baseline (y = 60), so they read as one strip. No arrow is drawn between stages: on a phone the strip wraps
+    to two rows, and an arrow glyph in a wrapping grid points the wrong way on the second row -- the counter
+    in the captions keeps the order. aria-hidden: each mark's caption is its accessible text.
+      1  the generator: the 4x5 grid of 20 candidates, one filled in the accent -- the network whose turn it is
+      2  simulated judgments: three odd-one-out triplets, the odd one out in the accent (one path, three
+         squares: the same answer, given millions of times), and two shortening lines below for the rest of
+         the pile
+      3  fitted candidates: the same grid, all outlined, under a thin bracket, with a small arrow entering
+         from the left -- the answers are what they are all fitted to
+      4  the wrong winner: four ranked bars, each with a square at its head; the top bar's square is empty,
+         and the accent-filled one, the generator, sits on the second bar -#}
+{%- macro recovery_mark(n) -%}
+  {%- if n == 1 -%}
+<svg aria-hidden="true" viewBox="0 0 120 64"><path d="M29.5 12h9v9h-9zM42.5 12h9v9h-9zM55.5 12h9v9h-9zM68.5 12h9v9h-9zM81.5 12h9v9h-9zM29.5 25h9v9h-9zM42.5 25h9v9h-9zM55.5 25h9v9h-9zM81.5 25h9v9h-9zM29.5 38h9v9h-9zM42.5 38h9v9h-9zM55.5 38h9v9h-9zM68.5 38h9v9h-9zM81.5 38h9v9h-9zM29.5 51h9v9h-9zM42.5 51h9v9h-9zM55.5 51h9v9h-9zM68.5 51h9v9h-9zM81.5 51h9v9h-9z" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="68.5" y="25" width="9" height="9" style="fill:var(--accent)"/></svg>
+  {%- elif n == 2 -%}
+<svg aria-hidden="true" viewBox="0 0 120 64"><g fill="currentColor"><circle cx="45" cy="12.5" r="4.5"/><circle cx="60" cy="12.5" r="4.5"/><circle cx="45" cy="28.5" r="4.5"/><circle cx="60" cy="28.5" r="4.5"/><circle cx="45" cy="44.5" r="4.5"/><circle cx="60" cy="44.5" r="4.5"/></g><path d="M70.5 8h9v9h-9zM70.5 24h9v9h-9zM70.5 40h9v9h-9z" style="fill:var(--accent)"/><path d="M48 56h24M52 60.5h16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  {%- elif n == 3 -%}
+<svg aria-hidden="true" viewBox="0 0 120 64"><path d="M40 12h9v9h-9zM53 12h9v9h-9zM66 12h9v9h-9zM79 12h9v9h-9zM92 12h9v9h-9zM40 25h9v9h-9zM53 25h9v9h-9zM66 25h9v9h-9zM79 25h9v9h-9zM92 25h9v9h-9zM40 38h9v9h-9zM53 38h9v9h-9zM66 38h9v9h-9zM79 38h9v9h-9zM92 38h9v9h-9zM40 51h9v9h-9zM53 51h9v9h-9zM66 51h9v9h-9zM79 51h9v9h-9zM92 51h9v9h-9z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M40 8.5V5h61v3.5M12 36h20M27 31l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  {%- elif n == 4 -%}
+<svg aria-hidden="true" viewBox="0 0 120 64"><path d="M22 12h9v9h-9zM22 38h9v9h-9zM22 51h9v9h-9z" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="22" y="25" width="9" height="9" style="fill:var(--accent)"/><path d="M36 15h62v3H36zM36 28h46v3H36zM36 41h30v3H36zM36 54h16v3H36z" fill="currentColor"/></svg>
+  {%- endif -%}
+{%- endmacro -%}
+
 {#- Where to go next, on the home page. The gutter carries the page's name as an outlined tag rather than a
     date, because these rows are addresses and not points in time: a tag is the site's label that is never
     clickable, it takes no tick, and so nothing false is put on the margin rule, which stays a time axis. The

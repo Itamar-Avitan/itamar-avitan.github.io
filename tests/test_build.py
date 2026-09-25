@@ -403,8 +403,18 @@ def test_research_card_shows_every_field():
     html = html_of("research/")
     text, card = _visible_text(html), SITE["research"][0]
     shown = [card["title"], card["tldr"], *filter(None, [card["figure"].get("caption")]), *card["authors"],
-             card["venue"], *card["badges"], *(b["label"] for b in card["buttons"])]
+             card["venue"], *card["badges"], *(b["label"] for b in card["buttons"]),
+             *card["how"], card["found"], *card["open"]]
     assert [s for s in shown if " ".join(s.split()) not in text] == []
+    # the depth blocks (deep review 2026-09-25, WP-S3): four stages under "How the test works", each the
+    # caption of one mark of the diagram; what was found; the paper's open questions; the citation last
+    assert len(card["how"]) == 4 and len(card["open"]) == 3
+    assert '<ol class="recovery-diagram" role="list" aria-label="How the model-recovery test works">' in html
+    for runin in ("Summary", "How the test works", "What we found", "Questions the paper leaves open"):
+        assert f'<span class="runin">{runin}</span>' in html, runin
+    body = html.partition('<div class="paper__body">')[2].partition("</article>")[0]
+    assert (body.index('class="tldr"') < body.index("How the test works") < body.index('class="recovery-diagram"')
+            < body.index("What we found") < body.index('class="open"') < body.index('<details class="cite">'))
     # unescaped, because an address with two query parameters carries "&", which a document writes "&amp;"
     assert all(f'href="{b["url"]}"' in unescape(html) for b in card["buttons"])
     assert f'<img src="../{card["figure"]["src"]}" alt="{card["figure"]["alt"]}"' in html
@@ -420,20 +430,76 @@ def test_research_card_shows_every_field():
 
 
 def test_the_card_figure_is_swapped_by_one_line_and_only_a_plot_is_marked_as_one():
-    """site.yaml keeps both thumbnails; research[0].figure points at one of them by YAML alias."""
+    """site.yaml keeps both pictures; research[0].figure points at one of them by YAML alias. The owner chose
+    the paper's own Figure 1D over the lab illustration on 2026-09-25 (deep review, ruling 3)."""
     lab, plot = SITE["figure_options"]["lab_illustration"], SITE["figure_options"]["recovery_matrix"]
     html = html_of("research/")
-    assert SITE["research"][0]["figure"] is lab                              # the lab illustration is live
-    assert f'<picture><source srcset="../{lab["webp"]}" type="image/webp"><img src="../{lab["src"]}"' in html
-    assert '<figure class="paper__fig paper__fig--art">' in html             # a picture, not a plot
-    assert "paper__fig--plot" not in html and "<figcaption" not in html
+    assert SITE["research"][0]["figure"] is plot                             # the labelled matrix is live
+    assert f'<img src="../{plot["src"]}" alt="{plot["alt"]}" width="272" height="272">' in html
+    assert '<figure class="paper__fig paper__fig--plot">' in html            # a plot, whose colour is data
+    assert "<figcaption>Adapted from Fig. 1D" in html
+    assert "paper__fig--art" not in html and lab["webp"] not in html and lab["src"] not in html
     site = copy.deepcopy(SITE)
-    site["research"][0]["figure"] = site["figure_options"]["recovery_matrix"]
+    site["research"][0]["figure"] = site["figure_options"]["lab_illustration"]
     other = html_of("research/", site)
-    assert f'<img src="../{plot["src"]}" alt="{plot["alt"]}" width="272" height="272">' in other
-    assert lab["webp"] not in other and lab["src"] not in other
-    assert '<figure class="paper__fig paper__fig--plot">' in other and "<figcaption>Fig. 1D</figcaption>" in other
-    assert "paper__fig--art" not in other
+    assert f'<picture><source srcset="../{lab["webp"]}" type="image/webp"><img src="../{lab["src"]}"' in other
+    assert '<figure class="paper__fig paper__fig--art">' in other            # a picture, not a plot
+    assert "paper__fig--plot" not in other and "<figcaption" not in other and plot["src"] not in other
+
+
+def test_the_matrix_is_labelled_and_is_the_figure_its_description_says():
+    """Figure 1D adapted: a picture inside <img> cannot use the page's webfont, so the axes are named in real
+    text inside the SVG, small, and the caption carries the meaning. The alt text describes the drawing --
+    twenty rows, most on the diagonal, seven attributed to the last column -- so the drawing is held to it."""
+    svg = (build.ROOT / SITE["figure_options"]["recovery_matrix"]["src"]).read_text(encoding="utf-8")
+    assert svg.count("<text") >= 4 and "adapted, axes labelled" in svg
+    assert "recovered model" in svg and "generating model" in svg           # the axes, named
+    assert re.search(r'font-size="\d+">1</text>', svg) and re.search(r'font-size="\d+">20</text>', svg)
+    cells = [(int(x), int(y)) for x, y in re.findall(r'<rect x="(\d+)" y="(\d+)" width="10" height="10"', svg)]
+    rows = sorted({y for _, y in cells})
+    assert rows == list(range(0, 200, 10))                                    # twenty rows, one model each
+    diagonal = {y for x, y in cells if x == y}
+    last_column = {y for x, y in cells if x == 190 and y != 190}              # off the diagonal, in column 20
+    assert len(diagonal - last_column) + len(last_column) == 20               # every row is one or the other
+    assert len(last_column) == 7                                              # "seven ... in the last column"
+    assert "seven are mostly or entirely attributed to one model in the last column" in SITE["figure_options"]["recovery_matrix"]["alt"]
+
+
+def test_the_diagram_is_four_silent_marks_captioned_by_the_four_stages():
+    """The owner's diagram (ruling 3, 2026-09-25): one mark per stage, no text and no numeral inside any of
+    them -- the captions are the labels, with a visible counter -- and exactly one accent object in a stage,
+    set in a style attribute (a var() in a presentation attribute is what the sanitizers drop). Stage 3 has
+    none: there the comparison does not yet know which network generated the answers."""
+    html = html_of("research/")
+    strip = html.partition('<ol class="recovery-diagram"')[2].partition("</ol>")[0]
+    marks = re.findall(r"<svg.*?</svg>", strip, flags=re.S)
+    assert len(marks) == 4 and strip.count("<li>") == 4
+    for mark in marks:
+        assert 'aria-hidden="true" viewBox="0 0 120 64"' in mark and "<text" not in mark
+        assert 'fill="var(' not in mark and 'stroke="var(' not in mark
+        assert re.search(r'stroke-width="(\d+(?:\.\d+)?)"', mark) is None or all(
+            float(w) >= 1.5 for w in re.findall(r'stroke-width="(\d+(?:\.\d+)?)"', mark))
+    assert [mark.count("var(--accent)") for mark in marks] == [1, 1, 0, 1]
+    captions = re.findall(r"</svg><p>(.*?)</p></li>", strip, flags=re.S)
+    assert [" ".join(_visible_text(c).split()) for c in captions] == [" ".join(s.split()) for s in SITE["research"][0]["how"]]
+    css = _css()
+    assert "grid-template-columns: repeat(auto-fit, minmax(min(8.5rem, 100%), 1fr));" in css
+    assert 'content: counter(step) ". ";' in css
+    phone = _css().partition("Phone: the rule moves")[2].partition("Desktop: the gutter")[0]
+    assert ".paper .recovery-diagram, .paper .open { order: 6; }" in phone and ".paper .cite { order: 7; }" in phone
+
+
+def test_the_citation_is_the_registered_entry_behind_an_expander():
+    """Every field is FACTS PUB-CITATION plus the DOI of PUB-DOI, verbatim, and no page range: the two
+    published paginations disagree, and one of them carries a "12" the privacy guard forbids."""
+    card, html = SITE["research"][0], html_of("research/")
+    assert '<details class="cite"><summary>Cite (BibTeX)</summary><pre>' in html
+    entry = unescape(html.partition('<details class="cite"><summary>Cite (BibTeX)</summary><pre>')[2].partition("</pre>")[0])
+    assert entry == card["cite"]
+    assert entry.startswith("@inproceedings{avitan2025modelbehavior,") and entry.endswith("}")
+    assert "doi       = {10.52202/085713-0404}" in entry and "pages" not in entry
+    assert "author    = {Avitan, Itamar and Golan, Tal}" in entry and "year      = {2025}" in entry
+    assert "12" not in entry
 
 
 def test_a_figure_whose_colour_is_data_is_never_hue_shifted():
@@ -638,7 +704,8 @@ def test_optional_keys_may_be_absent():
                 continue                                # a news item's sentence is required; its link is not
             entry.pop(key, None)
     for entry in site["research"]:
-        entry.pop("venue", None)                        # the card's citation line is optional; a talk's venue is not
+        for key in ("venue", "how", "found", "open", "cite"):    # the card's citation line and depth blocks are
+            entry.pop(key, None)                                # optional; a talk's venue is not
     for entry in site["pages"]:
         entry.pop("intro", None)
         entry.pop("description", None)
@@ -646,9 +713,10 @@ def test_optional_keys_may_be_absent():
         site.pop(key, None)
     pages = every_page(site)
     for slug, html in pages.items():
-        for gone in ('<p class="venue"><a', 'class="note"', "<figure", 'class="authors"', 'class="role"',
-                     'class="nb"', 'rel="me"', 'id="email"', 'class="tag tag--venue"', 'class="btn',
-                     'class="page-intro'):
+        for gone in ('<p class="venue"><a', 'class="venue paper__venue"', 'class="note"', "<figure",
+                     'class="authors"', 'class="role"', 'class="nb"', 'rel="me"', 'id="email"',
+                     'class="tag tag--venue"', 'class="btn', 'class="page-intro', 'class="recovery-diagram"',
+                     'class="open"', 'class="cite"'):
             assert gone not in html, (slug, gone)
     assert "<h3>Embodied Brain Technology Practicum</h3>" in pages["research/"]
     assert "Cognitive Computational Neuroscience (CCN) 2025" in pages["research/"]

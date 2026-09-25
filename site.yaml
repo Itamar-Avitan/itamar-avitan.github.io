@@ -260,11 +260,19 @@ news:
 # cap). Never the word "award": tests/test_build.py forbids it site-wide, with the practicum ruling.
 - date: Nov 2024
   text: Started my PhD in the Brains and Machines Lab at Ben-Gurion University of the Negev, on a Lachish Fellowship for Outstanding Doctoral Students.
-# The two thumbnails prepared for the research card below. To swap one for the other, change the single line
-# "figure: *lab_illustration" to "figure: *recovery_matrix" (or back) and run python3 build.py.
+# The two pictures prepared for the research card below. To swap one for the other, change the single line
+# "figure: *recovery_matrix" to "figure: *lab_illustration" (or back) and run python3 build.py.
 #   plot: true  marks a figure whose colour is data (a heat map, a colour-coded plot). The dark theme may dim
 #   it, but never shifts its hues, so the colours still match the ones printed in the paper. A picture without
 #   the flag is treated as artwork and is dimmed a little further, so it cannot outshine the page in the dark.
+# The owner chose the result over the illustration on 2026-09-25 (deep review, ruling 3): the card shows the
+# paper's own Figure 1D, adapted with both axes labelled so it teaches at the size it is shown, beside his
+# explanatory diagram of the recovery test (`how`, below). The running-robots illustration stays here as an
+# option and is not drawn anywhere by default; its one possible home is the link-preview card, and only if he
+# asks for it there.
+#   caption   a gutter label under the plate, in the gutter's own 12px mono. It carries the meaning of the
+#             matrix; the labels inside the SVG only name the axes, because a picture inside <img> cannot use
+#             the page's webfont and must stay small.
 figure_options:
   lab_illustration: &lab_illustration
     webp: img/paper-lab.webp
@@ -273,10 +281,10 @@ figure_options:
       handing a baton marked 011 to the next, under brain-shaped clouds filled with charts and network graphs.'
   recovery_matrix: &recovery_matrix
     src: img/model-recovery.svg
-    alt: 'Figure 1D of the paper: a 20-by-20 confusion matrix of data-generating model (rows) against recovered
-      model (columns) at 1.6 million training triplets. Most rows fall on the diagonal, but seven are mostly or
-      entirely attributed to one model in the last column.'
-    caption: Fig. 1D
+    alt: 'Figure 1D of the paper, adapted, with both axes labelled: a 20-by-20 matrix of data-generating model
+      (rows) against recovered model (columns) at 1.6 million training triplets. Most rows fall on the diagonal,
+      but seven are mostly or entirely attributed to one model in the last column.'
+    caption: 'Adapted from Fig. 1D of the paper: each row is the model that generated the judgments, each column the model the comparison picked. A dark cell off the diagonal is a wrong winner.'
     plot: true
 research:
 - title: 'Model–Behavior Alignment under Flexible Evaluation: When the Best-Fitting Model Isn’t the Right One'
@@ -285,11 +293,44 @@ research:
   - Tal Golan
   me: Itamar Avitan
   # Every clause is the arXiv 2510.23321 abstract (the W source of FACTS RES-DESC, RES-PLATEAU and PUB-NUM):
-  # the method, named by the paper's own term "linear probing"; the number with its chance baseline, one in
-  # twenty being the paper's 1/|M| with |M| = 20 models; and the mechanism, the abstract's regression
-  # sentence. "millions of simulated trials" is the abstract's phrase: without "simulated", the millions read
-  # as the human data named a few words earlier (deep review 2026-09-25, CS-07 with PR-01's calibration clause).
-  tldr: To test whether a vision model represents images the way people do, researchers often fit a flexible linear mapping from the model’s features to human judgments (linear probing) and compare how well each model predicts. We fitted 20 vision models to 4.5 million odd-one-out judgments from the THINGS dataset, calibrated each to human response variability, let each one in turn generate simulated judgments, and asked whether the comparison would pick out the model that had generated them. It did so less than 80% of the time, even with millions of simulated trials — far above chance (one in twenty), but wrong more than one time in five. Regression analyses linked the errors mainly to how much the linear mapping reshapes each model’s representational geometry.
+  # the method, named by the paper's own term "linear probing", and the number with its chance baseline, one
+  # in twenty being the paper's 1/|M| with |M| = 20 models. The mechanism, the abstract's regression sentence,
+  # is said once, in `found` below (deep review 2026-09-25, WP-S3), not here as well. "millions of simulated
+  # trials" is the abstract's phrase: without "simulated", the millions read as the human data named a few
+  # words earlier (CS-07 with PR-01's calibration clause).
+  tldr: To test whether a vision model represents images the way people do, researchers often fit a flexible linear mapping from the model’s features to human judgments (linear probing) and compare how well each model predicts. We fitted 20 vision models to 4.5 million odd-one-out judgments from the THINGS dataset, calibrated each to human response variability, let each one in turn generate simulated judgments, and asked whether the comparison would pick out the model that had generated them. It did so less than 80% of the time, even with millions of simulated trials — far above chance (one in twenty), but wrong more than one time in five.
+  # The depth blocks under the Summary (deep review 2026-09-25, WP-S3; the diagram is the owner's ruling 3).
+  #   how    the four stages of the model-recovery test, in the order of his diagram (known generating model ->
+  #          simulated judgments -> fitted candidates -> the wrong winner); every clause is the abstract: "For
+  #          each model in turn, we sampled synthetic responses ... fitted all candidate models ... re-emerge
+  #          as the best predictor". Each step is printed as the caption of one mark of the diagram, with a
+  #          visible counter 1-4, so the captions are the diagram's labels in the page's own font: the marks
+  #          themselves hold no text and no numeral (templates/macros.html.j2, recovery_mark).
+  #   found  the plateau, the geometry-shift mechanism (the abstract's regression sentence, moved here from
+  #          the Summary), the accuracy-identifiability trade-off, and the paper's own closed-set caveat.
+  #   open   questions the paper itself raises; each comment names its section of arXiv 2510.23321. Not a
+  #          statement of current work (that is Q-H, the owner's).
+  #   cite   the BibTeX entry, behind a "Cite (BibTeX)" expander. Every field is FACTS PUB-CITATION plus the
+  #          DOI of PUB-DOI; no `pages`, because the two published paginations disagree.
+  how:
+  - Each of the 20 networks, already fitted to the human judgments, takes a turn as the generator.
+  - It answers millions of odd-one-out questions as if it were a participant.
+  - All 20 networks are fitted to those simulated answers, the way they would be fitted to people’s.
+  - The comparison ranks them. One that can be trusted puts the generator on top.
+  found: 'Not reliably, and not for lack of data: recovery improved as the simulated experiment grew, then leveled off. Regression analyses linked the misidentifications mainly to how much the fitted linear mapping reshapes a network’s representational geometry. The flexibility that buys predictive accuracy costs the ability to tell the models apart. And recovering the right model from a closed set is only a necessary condition: in a real experiment the system that made the data — a brain — is not one of the candidates.'
+  open:
+  - How much freedom should an evaluation give the mapping, given what we want the comparison to identify?   # §3.4 and Discussion, the accuracy–identifiability trade-off
+  - How should a recovery test be built when the true system is outside the candidate set?   # Discussion, Limitations
+  - How should a comparison treat the variability of responses within and between people?   # Introduction; Discussion, "Change the metrics"
+  cite: |-
+    @inproceedings{avitan2025modelbehavior,
+      title     = {Model--Behavior Alignment under Flexible Evaluation: When the Best-Fitting Model Isn't the Right One},
+      author    = {Avitan, Itamar and Golan, Tal},
+      booktitle = {Advances in Neural Information Processing Systems},
+      volume    = {38},
+      year      = {2025},
+      doi       = {10.52202/085713-0404}
+    }
   # The citation's venue line, under the authors, as academic cards carry it: FACTS PUB-CITATION's compact
   # wording. The badge above stays "NeurIPS 2025", a venue tag; the track belongs here, not in the badge, where
   # a " · " would turn it into a neutral presentation tag (PR-08). No rank and no acceptance rate (ruling).
@@ -297,7 +338,7 @@ research:
   badges:
   - NeurIPS 2025
   - CCN 2025 · Talk
-  figure: *lab_illustration
+  figure: *recovery_matrix
   buttons:
   - label: Paper
     url: https://proceedings.neurips.cc/paper_files/paper/2025/hash/11e1900e680f5fe1893a8e27362dbe2c-Abstract-Conference.html
