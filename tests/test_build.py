@@ -505,8 +505,10 @@ def test_the_citation_is_the_registered_entry_behind_an_expander():
 
 
 def test_a_figure_whose_colour_is_data_is_never_hue_shifted():
-    """The dark theme may dim a figure, but a plot's colours are its data: only a brightness scale may touch
-    them, because scaling the three channels together leaves every hue and saturation where it was."""
+    """A plot's colours are its data. No theme dims or filters a figure now (the next test pins `none` in
+    every theme); this one keeps the older, weaker line as a floor: if a scale ever came back it could only be
+    a brightness scale, because scaling the three channels together leaves every hue and saturation where it
+    was."""
     css = (build.ROOT / "style.css").read_text(encoding="utf-8")
     assert ".paper__fig--plot img { filter: var(--plot-filter); }" in css
     assert ".paper__fig--art img { filter: var(--art-filter); }" in css
@@ -540,14 +542,19 @@ def test_ongoing_card_gets_an_ongoing_badge_only_when_shown():
 
 
 def test_news_is_split_between_the_list_and_the_details_element():
-    shown, older = build.split_news(SITE["news"], SITE["news_visible"])
-    before, _, after = html_of("").partition('<details class="older">')
+    """Exercised on a fixture, because the live list is shorter than `news_visible` (deep review 2026-09-25,
+    FL-12: the expander hid the CCN 2025 talk and the PhD start, the start of the story the page tells)."""
+    site = copy.deepcopy(SITE)
+    site["news_visible"] = 2
+    shown, older = build.split_news(site["news"], site["news_visible"])
+    before, _, after = html_of("", site).partition('<details class="older">')
     assert older and all(n["text"] in _visible_text(before) for n in shown)
     inside = _visible_text(after.split("</details>")[0])
     assert all(n["text"] in inside for n in older) and f"Older news ({len(older)})" in inside
-    site = copy.deepcopy(SITE)
     site["news_visible"] = 99
     assert "<details" not in html_of("", site)
+    # the live page carries the expander exactly when the list is longer than news_visible
+    assert ('<details class="older">' in html_of("")) == (len(SITE["news"]) > SITE["news_visible"])
 
 
 def _news_rows(html: str) -> list[str]:
