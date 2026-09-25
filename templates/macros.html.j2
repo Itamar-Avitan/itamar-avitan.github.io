@@ -174,12 +174,14 @@
     date, because these rows are addresses and not points in time: a tag is the site's label that is never
     clickable, it takes no tick, and so nothing false is put on the margin rule, which stays a time axis. The
     link is a real thing on the page it leads to -- a paper's title, a course, a speaker -- and the clause
-    after the em dash says what else is there. -#}
+    after the em dash says what else is there. The dash is tied to the label's last word by a no-break
+    space, so it never opens a line: with the Teaching label at the course's full name it stood at the
+    start of a line on 390-400px phones, and the Research row's did at 430 (deep review 2026-09-25). -#}
 {%- macro elsewhere_rows(items) %}
 {% for item in items %}
         <li class="row">
           <p class="kind"><span class="tag">{{ item.page }}</span></p>
-          <p class="what"><a href="{{ item.url|local(base) }}">{{ nb(item.label) }}</a> — {{ nb(item.text) }}</p>
+          <p class="what"><a href="{{ item.url|local(base) }}">{{ nb(item.label) }}</a>&nbsp;— {{ nb(item.text) }}</p>
         </li>
 {% endfor %}
 {% endmacro -%}

@@ -124,11 +124,13 @@ identity_line: I study how to tell which neural network models of human vision a
 # candidate in ...", which is the role line printed directly above it. The third paragraph puts the teaching
 # and the mentoring in the past tense, as he dated them (MENT-YEARS is 2025-2026, his own words), and no
 # longer announces the writing course: `now` and the teaching page do that, and two places are enough.
-# The space before the em dash after "people" in the third paragraph is a no-break space (U+00A0): at 1440
-# the dash otherwise wraps to the start of a line. The three paragraphs sit at 199 of the 200 words the test
-# allows, so nothing may be added without a cut; if the count ever trips, cut "of guessing" first.
+# The space before the em dash in the first paragraph (after "predicts") and in the third (after "people")
+# is a no-break space (U+00A0): the dash otherwise opened a line at 360px (first) and 1440px (third). The
+# word count is unchanged by it, since str.split() breaks on it. The three paragraphs sit at 199 of the 200
+# words the test allows, so nothing may be added without a cut; if the count ever trips, cut "of guessing"
+# first.
 about:
-- 'To ask whether a network sees the way people do, you fit a flexible linear mapping from its features to people’s judgments and check how well it predicts — but the mapping reshapes the network’s features, and that can let the wrong network win. When we let each of twenty networks generate judgments, the comparison picked the right one less than 80% of the time: far above the one in twenty of guessing, but wrong more than one time in five, even with millions of simulated trials. That is our paper at the Conference on Neural Information Processing Systems (NeurIPS) 2025.'
+- 'To ask whether a network sees the way people do, you fit a flexible linear mapping from its features to people’s judgments and check how well it predicts — but the mapping reshapes the network’s features, and that can let the wrong network win. When we let each of twenty networks generate judgments, the comparison picked the right one less than 80% of the time: far above the one in twenty of guessing, but wrong more than one time in five, even with millions of simulated trials. That is our paper at the Conference on Neural Information Processing Systems (NeurIPS) 2025.'
 - I work in NeuroAI and computational cognitive neuroscience. I started my PhD with Dr. Tal Golan in 2024, coming from cognitive and brain sciences and psychology, and expect to finish in 2029.
 - I have been a teaching assistant on courses in cognition and computation, neuroimaging and deep learning, and have mentored two undergraduates in the lab. I like building things with other people — a brain–computer interface that let a person with amyotrophic lateral sclerosis (ALS) answer yes or no, and a headphone add-on for the noises that set anxiety off. And I collect lines about the mind.
 # DRAFT, as above. Short enough to keep true: rewrite it whenever it stops being what you are doing.
@@ -152,7 +154,8 @@ now:
 #          time axis; nothing false is put on it.
 #   label  the link itself, and it must be a real thing on that page -- the paper's short title, the course,
 #          the line -- never "read more" or the page's own name a second time.
-#   text   what else is there, in one clause. The template sets the em dash between the two.
+#   text   what else is there, in one clause. The template sets the em dash between the two, tied to the
+#          label by a no-break space so that it never opens a line.
 # The commonplace row deliberately does not quote the Snape passage again: the novel is in copyright, the
 # house rule keeps such an extract to the page that argued for it, and the full passage is printed there at
 # the owner's ruling. Naming the speaker and the subject gets a reader there without a second reproduction.
@@ -216,7 +219,9 @@ links:
 # The build refuses an item with one key and not the other, and a `link` that is not in its `text`, so a
 # rewritten sentence cannot leave a dead phrase behind: re-choose the phrase when you rewrite the sentence.
 # The template splits the text around the phrase and runs the no-break wrapping on each piece by itself, so a
-# phrase may hold a `nobreak` term (the Sep 2026 one does) and the address is never passed through it.
+# phrase may hold whole `nobreak` terms (the Sep 2026 one holds two) and the address is never passed through
+# it. A phrase must never cut through a term: 'NeurIPS' inside '(NeurIPS) 2025' would split the term across
+# the pieces and silently lose its span, so the build refuses that as well.
 news:
 - date: Sep 2026
   text: Gave a flash talk, “System identification perspective on representational alignment” (with Maya Zach and Tal Golan), at Neuro-AI-Talks (NEAT) 2026 in Osnabrück, Germany.

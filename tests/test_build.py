@@ -247,9 +247,11 @@ def test_every_page_says_whose_site_it_is_without_repeating_the_bio():
         else:
             assert '<div class="masthead">' in html and "byline" not in html
     home = html_of("")
-    for paragraph in SITE["about"]:
-        assert paragraph.split(".")[0] in _visible_text(home)
-    assert sum(1 for h in every_page().values() if SITE["about"][0].split(".")[0] in _visible_text(h)) == 1
+    # the first sentence, its spaces collapsed as _visible_text collapses them: two paragraphs tie their em
+    # dash to the word before it with a no-break space, which str.split() treats as a space
+    first = [" ".join(paragraph.split(".")[0].split()) for paragraph in SITE["about"]]
+    assert all(sentence in _visible_text(home) for sentence in first)
+    assert sum(1 for h in every_page().values() if first[0] in _visible_text(h)) == 1
 
 
 def test_home_hands_the_visitor_on_to_every_other_page():
@@ -516,6 +518,23 @@ def test_the_build_refuses_a_news_link_that_is_not_in_its_sentence():
     item = next(n for n in site["news"] if not n.get("link"))
     item["url"] = "research/"
     assert any(item["date"] in p and "only one of link/url" in p for p in build.validate(site))
+
+
+def test_the_build_refuses_a_news_link_that_cuts_through_a_nobreak_term():
+    """The template wraps the no-break terms in each piece around the phrase, so a phrase may hold whole
+    terms (the Sep 2026 one holds two) but never part of one: "NeurIPS" inside "(NeurIPS) 2025" would leave
+    that term split across the pieces and silently without its span."""
+    assert build.validate(SITE) == []
+    site = copy.deepcopy(SITE)
+    item = next(n for n in site["news"] if "(NeurIPS) 2025" in n["text"])
+    item["link"], item["url"] = "NeurIPS", "research/#papers"
+    problems = build.validate(site)
+    assert any(item["date"] in p and "cuts through" in p and "(NeurIPS) 2025" in p for p in problems), problems
+    item["link"] = "(NeurIPS) 2025"                                   # the whole term inside the phrase is fine
+    assert build.validate(site) == []
+    item["link"] = "Systems (NeurIPS) 2025 in"                        # and so is a phrase around it
+    assert build.validate(site) == []
+    assert build._terms_cut_by("a b-c d", "b", ["b-c"]) == ["b-c"] and build._terms_cut_by("a b-c d", "a b-c", ["b-c"]) == []
 
 
 def test_every_internal_news_link_lands_on_a_built_page_at_the_id_it_names():

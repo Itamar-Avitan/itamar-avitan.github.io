@@ -129,6 +129,10 @@ body {
 h1, h2, h3, p, ul, figure { margin: 0; }
 ul { padding: 0; list-style: none; }
 h3 { text-wrap: balance; }
+/* At every width, not only from 45rem up as before: on phones the About paragraphs ended on "mind." and
+   "2029." alone and the teaching intro on "tutored." (deep review 2026-09-25). A browser without `pretty`
+   sets the paragraph as it did. */
+p { text-wrap: pretty; }
 
 /* A word too long for its column breaks instead of pushing the page. At 175% text on a 320px screen
    "Commonplace", "electroencephalography" and "Itamar Avitan" are each wider than the measure, and with
@@ -363,6 +367,15 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
 /* the address falls under its own label rather than dragging the page sideways when the text is enlarged:
    an inline-flex box cannot break between "Email" and the address unless it is allowed to wrap */
 .links__email { flex-wrap: wrap; }
+/* The front door sets two picked profiles after the address in this same list (`pick`, macros.html.j2).
+   Below 33.75rem the three do not share one row, and a plain wrap then set the address and GitHub on the
+   first line and "Google Scholar" alone on the second at every common phone width from 390 to 500px, with
+   GitHub 2px from the right edge at 390. So under that width the address takes a row of its own and the
+   pair wraps under it as a whole, which is the rule the colophon's lists keep (they wrap as groups).
+   Measured: the three fit one row from 513px up; the 27px of margin covers a font that renders wider. */
+@media (max-width: 33.74rem) {
+  .masthead .links--reach .links__email { flex-basis: 100%; }
+}
 .links a:not(.btn) { position: relative; padding-block: 0.25rem; }
 
 /* Tap target, WCAG 2.2 SC 2.5.8: every profile link must be at least 24 by 24 CSS px to point at. The box is
@@ -789,8 +802,6 @@ main.opens-with-h1 { margin-top: 2.25rem; }
    ========================================================================== */
 @media (min-width: 45rem) {
   :root { --pad: 2rem; }
-
-  p { text-wrap: pretty; }
 
   .topstrip { padding-top: 1.25rem; }
 

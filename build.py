@@ -39,6 +39,24 @@ def _strings(node):
             yield from _strings(v)
 
 
+def _terms_cut_by(text: str, phrase: str, terms: list[str]) -> list[str]:
+    """The no-break terms an occurrence of which straddles either end of `phrase` (its first occurrence in
+    `text`): a term wholly inside or wholly outside the phrase is fine, one that crosses its edge is cut."""
+    start = text.index(phrase)
+    end = start + len(phrase)
+    cut = []
+    for term in terms:
+        at = text.find(term)
+        while at != -1:
+            overlaps = at < end and start < at + len(term)
+            inside = start <= at and at + len(term) <= end
+            if overlaps and not inside:
+                cut.append(term)
+                break
+            at = text.find(term, at + 1)
+    return cut
+
+
 def validate(site: dict) -> list[str]:
     problems = [f"missing key: {k}" for k in REQUIRED if k not in site]
     for s in _strings(site):
@@ -55,6 +73,13 @@ def validate(site: dict) -> list[str]:
             problems.append(f"news item {item.get('date')!r} has only one of link/url")
         elif item.get("link") and item["link"] not in item["text"]:
             problems.append(f"news item {item.get('date')!r}: link {item['link']!r} is not in its text")
+        elif item.get("link"):
+            # The template splits the sentence at the phrase's first occurrence and wraps the no-break terms
+            # in each piece by itself, so a phrase may hold whole terms but must never cut through one:
+            # "NeurIPS" inside "(NeurIPS) 2025" would leave that term split across the pieces, without its
+            # span and without anything to say so.
+            for term in _terms_cut_by(item["text"], item["link"], site.get("nobreak") or []):
+                problems.append(f"news item {item.get('date')!r}: link {item['link']!r} cuts through the nobreak term {term!r}")
     for page in site.get("pages") or []:
         if not template_path(page).exists():
             problems.append(f"page {page['slug']!r} has no template at {template_path(page).relative_to(ROOT)}")
