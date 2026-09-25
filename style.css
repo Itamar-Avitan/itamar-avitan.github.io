@@ -546,8 +546,8 @@ main.opens-with-h1 { margin-top: 2.25rem; }
 /* One or two lines of framing under a page title, in the text column. Ink, not the secondary grey: on the
    research page this line is the research statement, and set quieter than the body copy under it the first
    text under each title was the quietest (DS-12). From 45rem up it takes a step towards the home lede (the
-   sizes are in the two wider blocks); phones keep body size, where at 19px the statement ran to eight lines
-   and pushed the card below the fold. The commonplace page is the exception, below. */
+   sizes are in the two wider blocks); phones keep body size, where at 19px the statement ran to nine lines at
+   390 (eleven at 320) and pushed the card below the fold. The commonplace page is the exception, below. */
 .page-intro { margin: -0.25rem 0 1.5rem; color: var(--ink); }
 /* the commonplace keeps its intro quiet: on that page the quotations are the large ink text */
 #quotes > .page-intro { font-size: inherit; line-height: inherit; color: var(--ink-2); }
@@ -618,7 +618,10 @@ main.opens-with-h1 { margin-top: 2.25rem; }
    The one list whose gutter carries an address instead of a date, so it carries the page's name as the quiet
    mono label the kind tags use -- never clickable, and no longer boxed, because a boxed page name read as a
    button that does nothing (DS-03) -- and no tick. The margin rule stays a time axis; a page name is not a
-   point on it. The link is set like a title (ink, accent underline: the h3 a rule above), and bold. */
+   point on it. The link is set like a title (ink, accent underline: the h3 a rule above), and bold. The
+   selector is a descendant on purpose, so a title that gains a wrapping element keeps the rule -- which means
+   a link under a row that is not its title (the paper and code links the Research row is to carry) lives
+   outside .what, or it would be set as a second bold ink title. */
 .log--go .kind { margin-bottom: 0.375rem; }
 .log--go .what a { font-weight: 600; }
 
@@ -745,8 +748,9 @@ main.opens-with-h1 { margin-top: 2.25rem; }
 /* the questions keep their markers: they are a list a reader counts, not a row of links */
 .open { margin: 0.25rem 0 0; padding-left: 1.1rem; list-style: disc; }
 .open li { margin-top: 0.25rem; }
-/* the citation behind an expander set like a link in the mono of the labels; the entry itself wraps rather
-   than scrolls, so an open box on a 320px phone adds no sideways scroll */
+/* the citation behind an expander set like a link in the mono of the labels, down to the underline (65% of
+   its colour, 1px, full on hover: the a rule), or it was the one heavy underline on the card; the entry
+   itself wraps rather than scrolls, so an open box on a 320px phone adds no sideways scroll */
 .cite { margin-top: 0.5rem; }
 .cite > summary {
   display: inline-block;
@@ -754,10 +758,13 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   font: 500 0.8125rem/1 var(--mono);
   color: var(--accent);
   text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, currentColor 65%, transparent);
   text-underline-offset: 0.25em;
   cursor: pointer;
   list-style: none;
 }
+.cite > summary:hover { text-decoration-color: currentColor; }
 .cite > summary::-webkit-details-marker { display: none; }
 .cite pre {
   margin-top: 0.5rem;
@@ -916,10 +923,25 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   .older > summary { margin-left: calc(-0.5rem - 0.5px); gap: 0.40625rem; }
   .older > .log { border-left: 0; }
 
-  /* the kind follows its date on one line here ("14–15 Sep 2026 · FLASH TALK"): a middle dot opens the label,
-     and its line box matches the date's so the two sit on one baseline */
-  .log--kind .kind .tag::before { content: "\00B7\00A0" / ""; }
-  .log--kind .kind { line-height: 1.5rem; }
+  /* The kind follows its date on one line here ("14–15 Sep 2026 · FLASH TALK"). The middle dot between them is
+     hung, not typed: the date keeps a 1.25rem margin on its right, and the label opens with an inline block of
+     that width pulled back by its own width, the dot centred in it. Beside the date the block fills the gap.
+     When a long date sends the label down a line ("2023/24, 2024/25 and 2025/26" over TEACHING ASSISTANT at
+     every phone width; the CCN kind at 320) the block lands outside the gutter's left edge and overflow-x:
+     clip cuts it off, so the label opens its line with a letter, not a dot. Clip, not hidden: hidden would
+     open a new formatting context and push the whole label out from beside the floated date. The label's line
+     box matches the date's; 13px and 11px text in two 1.5rem lines still put the two baselines 1px apart, and
+     vertical-align takes that up. */
+  .log--kind .when { margin-right: 1.25rem; }
+  .log--kind .kind { line-height: 1.5rem; overflow-x: clip; }
+  .log--kind .kind .tag { vertical-align: 1px; }
+  .log--kind .kind .tag::before {
+    content: "\00B7" / "";
+    display: inline-block;
+    width: 1.25rem;
+    margin-left: -1.25rem;
+    text-align: center;
+  }
 
   /* full-bleed sheet: the card's text stays on the page's left edge */
   .paper {
