@@ -48,6 +48,13 @@ def validate(site: dict) -> list[str]:
             problems.append(f"plain email address in content (use 'name [at] host'): {s[:60]!r}")
         if UNPUBLISHED.search(s):
             problems.append(f"unpublished-work wording in content: {s[:60]!r}")
+    # A news item may link one phrase of its sentence (`link`) to an address (`url`). The two go together, and
+    # the phrase has to be in the sentence verbatim, or a rewrite of the sentence would quietly drop the link.
+    for item in site.get("news") or []:
+        if bool(item.get("link")) != bool(item.get("url")):
+            problems.append(f"news item {item.get('date')!r} has only one of link/url")
+        elif item.get("link") and item["link"] not in item["text"]:
+            problems.append(f"news item {item.get('date')!r}: link {item['link']!r} is not in its text")
     for page in site.get("pages") or []:
         if not template_path(page).exists():
             problems.append(f"page {page['slug']!r} has no template at {template_path(page).relative_to(ROOT)}")

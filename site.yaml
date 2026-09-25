@@ -40,8 +40,8 @@ pages:
 - slug: teaching/
   nav: Teaching
   heading: Teaching
-  intro: Courses I help teach at Ben-Gurion University of the Negev, and the students I work with.
-  description: Courses Itamar Avitan teaches at Ben-Gurion University of the Negev, and the students he mentors.
+  intro: Courses I help teach at Ben-Gurion University of the Negev, and the students I have mentored and tutored.
+  description: Courses Itamar Avitan helps teach at Ben-Gurion University of the Negev, and the students he has mentored and tutored.
 - slug: commonplace/
   nav: Commonplace
   heading: Commonplace
@@ -75,7 +75,6 @@ nobreak:
 - (NEAT) 2026
 - (NeurIPS) 2025
 - (CCN) 2025
-- model-recovery
 - odd-one-out
 - five-person
 - add-on
@@ -102,10 +101,7 @@ identity_line: I study how to tell which neural network models of human vision a
 # Cut back on 2026-09-21, second pass. The first paragraph was an education record written as prose -- direct
 # track, department, school, B.Sc., B.A., M.Sc., 2026 -- which is exactly the online-CV register he rejected
 # ("not make it an online cv but more hey this is me website"), and cv.pdf already carries every one of those
-# facts. It is one sentence now and it points at the CV for the rest. The second paragraph used to ask the
-# lede's question again in the lede's words, 300px below it, so that at 1440 a reader met the same sentence
-# twice on one screen; it carries the question forward instead -- what the measure costs, and what a wrong
-# answer looks like. Do not put the degree list back, and do not let this paragraph restate identity_line.
+# facts. Do not put the degree list back, and do not let any paragraph restate identity_line.
 #
 # The practicum clause in the third paragraph -- "a headphone add-on for the noises that set anxiety off" --
 # was re-read on 2026-09-21 against the owner's programme-first ruling (see the note over `projects`) and
@@ -115,21 +111,35 @@ identity_line: I study how to tell which neural network models of human vision a
 # "about me" carry a programme's name for no reader's benefit -- the Research page says all that, once.
 # The rule the ruling sets for this paragraph is narrow and should be kept: do not add to this clause.
 #
-# Third pass, 2026-09-23: the first sentence opened "I am a PhD candidate in the Brains and Machines Lab at
-# Ben-Gurion University of the Negev", which is the role line printed directly above it, word for word in
-# substance, and it ran on through an em dash into the CV pointer. It now says only what the role line does
-# not -- the advisor and the fields he came from -- in two short sentences.
+# Fourth pass, 2026-09-25 (deep review, WP-S1); the third pass of 2026-09-23 had only stopped the opening from
+# repeating the role line. The order is now: the argument, in plain words, closing on the paper at NeurIPS
+# 2025; then who -- the field, the advisor, the start and the expected end; then what else. The first
+# paragraph used to open on the advisor and a pointer to the CV, and the first "NeurIPS" a reader met stood
+# 1352px down the page at 1280x800; the argument leads now, its number carries its chance baseline (one in
+# twenty), and the paragraph ends on the venue, expanded, so it is the first use on the page. The old
+# "a mapping flexible enough to fit anything" overstated the paper: the mechanism is that the fitted mapping
+# reshapes the network's features, which is what is said. The CV pointer went because the CV chip is in the
+# strip on every page. The field words every CV prints -- "NeuroAI and computational cognitive neuroscience",
+# FACTS ID-FIELD -- enter the site here, in the second paragraph: do not turn this back into "I am a PhD
+# candidate in ...", which is the role line printed directly above it. The third paragraph puts the teaching
+# and the mentoring in the past tense, as he dated them (MENT-YEARS is 2025-2026, his own words), and no
+# longer announces the writing course: `now` and the teaching page do that, and two places are enough.
+# The space before the em dash after "people" in the third paragraph is a no-break space (U+00A0): at 1440
+# the dash otherwise wraps to the start of a line. The three paragraphs sit at 199 of the 200 words the test
+# allows, so nothing may be added without a cut; if the count ever trips, cut "of guessing" first.
 about:
-- My advisor is Dr. Tal Golan, in the Brains and Machines Lab. I came to the lab from cognitive and brain sciences and from psychology; the degrees and the dates are in the CV.
-- The measure is the hard part. To say a network sees the way people do, you fit a mapping from its features to human judgments and check how well it predicts — and a mapping flexible enough to fit anything can make the wrong network look like the winner. In our simulations that comparison recovered the model that had generated the data less than 80% of the time.
-- 'I teach as well: courses on cognition and computation and on deep learning, an academic writing course from next year, and two undergraduate students whose research I mentor. I like building things with other people — an EEG brain–computer interface that let a person with ALS answer yes or no, and a headphone add-on for the noises that set anxiety off. And I collect lines about the mind.'
+- 'To ask whether a network sees the way people do, you fit a flexible linear mapping from its features to people’s judgments and check how well it predicts — but the mapping reshapes the network’s features, and that can let the wrong network win. When we let each of twenty networks generate judgments, the comparison picked the right one less than 80% of the time: far above the one in twenty of guessing, but wrong more than one time in five, even with millions of simulated trials. That is our paper at the Conference on Neural Information Processing Systems (NeurIPS) 2025.'
+- I work in NeuroAI and computational cognitive neuroscience. I started my PhD with Dr. Tal Golan in 2024, coming from cognitive and brain sciences and psychology, and expect to finish in 2029.
+- I have been a teaching assistant on courses in cognition and computation, neuroimaging and deep learning, and have mentored two undergraduates in the lab. I like building things with other people — a brain–computer interface that let a person with amyotrophic lateral sclerosis (ALS) answer yes or no, and a headphone add-on for the noises that set anxiety off. And I collect lines about the mind.
 # DRAFT, as above. Short enough to keep true: rewrite it whenever it stops being what you are doing.
+# Two lines since 2026-09-25 (WP-S1). Line 1 repeats the lede's question on purpose: it is the interim until
+# the owner says what may be said about the current work (Q-H). The mentoring line went because MENT-YEARS is
+# 2025-2026 on his own words, so it is not "now"; the teaching-assistant line went because no source records
+# a 2026/27 assistantship (Q-G). The writing course stays: it is the one forthcoming thing he has dated.
 now_as_of: Sep 2026
 now:
 - 'Carrying the NeurIPS 2025 work forward: can an alignment measure identify the right model of human vision, or only the best-fitting one?'
-- Teaching assistant for Introduction to Cognition and Computation, and joining an academic writing course in 2026/27.
-- Mentoring two undergraduate research students.
-- Still collecting lines about the mind for the commonplace page.
+- From 2026/27, helping teach an academic writing course.
 
 # The front door has to hand a visitor on. Added 2026-09-21: the home page named the commonplace, the teaching
 # and the NeurIPS paper without a way to reach any of them, so the only route into the site was the navigation
@@ -150,18 +160,20 @@ elsewhere:
 - page: Research
   label: When the Best-Fitting Model Isn’t the Right One
   url: research/
-  text: the paper this all comes out of, the three talks that carried it, and the things I build with other people.
-# "the newest from 2026/27", not "and an academic writing course from 2026/27": the writing course is one of
-# the four, not a fifth beside them, and the first wording said there was one more course than there is.
-# The count is a real count -- it has to match the rows on /teaching/, which in turn have to match the CV.
+  text: the paper with its code and data, the talks and posters around it, and two things I built with other people.
+# The label is the course he has helped teach longest (three academic years). The Teaching row names no count
+# on purpose: the course list changes with his answers on the writing course and the 2026/27 assistantship
+# (Q-G), and a stale number in a teaser is worse than none (external review 2). The Commonplace row's "four"
+# is a count the tests already pin to len(quotes): tests/test_build.py asserts the word and the length side
+# by side, so the two move together.
 - page: Teaching
-  label: Four courses, the newest from 2026/27
+  label: Introduction to Cognition and Computation
   url: teaching/
-  text: what each one covers, and the students I work with.
+  text: the course I have helped teach longest, the others beside it, and the students I have mentored and tutored.
 - page: Commonplace
   label: Severus Snape on what a mind is not
   url: commonplace/
-  text: the line I keep coming back to, first of four, each with its source and the place it falls.
+  text: the first of four lines I keep coming back to, each with where it comes from.
 
 # icon: which mark the template draws before the label. The template now holds three, and only three:
 # mail, github, bluesky. The owner ruled on 2026-09-21 that LinkedIn, ORCID, Google Scholar and X carry no
@@ -197,25 +209,45 @@ links:
   url: https://orcid.org/0009-0004-3662-7881
 - label: CV
   url: cv.pdf
+# News runs newest first. Two optional keys on an item turn one phrase of its sentence into a link:
+#   link   a phrase that occurs verbatim in `text`; its first occurrence becomes the link, the rest of the
+#          sentence stays plain. Choose the thing the reader can open -- the preprint, the code, the page.
+#   url    where it leads: a full address, or a path on this site with an anchor ('research/#papers').
+# The build refuses an item with one key and not the other, and a `link` that is not in its `text`, so a
+# rewritten sentence cannot leave a dead phrase behind: re-choose the phrase when you rewrite the sentence.
+# The template splits the text around the phrase and runs the no-break wrapping on each piece by itself, so a
+# phrase may hold a `nobreak` term (the Sep 2026 one does) and the address is never passed through it.
 news:
 - date: Sep 2026
   text: Gave a flash talk, “System identification perspective on representational alignment” (with Maya Zach and Tal Golan), at Neuro-AI-Talks (NEAT) 2026 in Osnabrück, Germany.
+  link: Neuro-AI-Talks (NEAT) 2026
+  url: https://www.kietzmannlab.uni-osnabrueck.de/neat2026/
 # Checked against the owner's programme-first ruling of 2026-09-21 (the long note over `projects` has it in
 # full) and kept, because it already obeyed it: the programme leads the sentence, EarBetter is named in a
 # clause, and nothing here says who did what. One word of repetition went -- the line named Brown University
 # twice in twenty words, once in the programme's name and once as the place -- and nothing else changed.
 - date: Aug 2026
   text: Completed the Embodied Brain Technology Practicum, a joint Brown University–Ben-Gurion University programme held at Brown, where our team of five designed, built and pitched EarBetter, a headphone add-on that filters the sounds that set a person’s anxiety off.
+# The full paper title is not repeated here: it is printed on the card and in the Elsewhere label, and a
+# third copy on the home page said the same thing three times in two screens. The phrase links to the card.
 - date: Dec 2025
-  text: 'Presented our paper with Tal Golan, “Model–Behavior Alignment under Flexible Evaluation: When the Best-Fitting Model Isn’t the Right One”, as a poster at the Conference on Neural Information Processing Systems (NeurIPS) 2025 in San Diego.'
+  text: Presented our paper with Tal Golan as a poster at the Conference on Neural Information Processing Systems (NeurIPS) 2025 in San Diego.
+  link: our paper
+  url: 'research/#papers'
 - date: Nov 2025
   text: Released the code and data for our NeurIPS 2025 paper.
+  link: code and data
+  url: 'research/#papers'
 - date: Oct 2025
-  text: Posted the arXiv preprint of our model-recovery paper, accepted to the NeurIPS 2025 main track.
+  text: Posted the arXiv preprint of the same paper, after its acceptance to the NeurIPS 2025 main track.
+  link: arXiv preprint
+  url: https://arxiv.org/abs/2510.23321
 - date: Aug 2025
   text: Gave a contributed talk and presented a poster at the Cognitive Computational Neuroscience (CCN) 2025 conference in Amsterdam, on a preliminary version of what became our NeurIPS 2025 paper.
+# The fellowship is named here and nowhere else on the home page (FACTS AWD-LACHISH; About is at its word
+# cap). Never the word "award": tests/test_build.py forbids it site-wide, with the practicum ruling.
 - date: Nov 2024
-  text: Started my PhD in the Brains and Machines Lab at Ben-Gurion University of the Negev.
+  text: Started my PhD in the Brains and Machines Lab at Ben-Gurion University of the Negev, on a Lachish Fellowship for Outstanding Doctoral Students.
 # The two thumbnails prepared for the research card below. To swap one for the other, change the single line
 # "figure: *lab_illustration" to "figure: *recovery_matrix" (or back) and run python3 build.py.
 #   plot: true  marks a figure whose colour is data (a heat map, a colour-coded plot). The dark theme may dim

@@ -1,5 +1,5 @@
 {#- Shared markup for every page. Imported "with context", so the macros can read `site` and `base`.
-    Optional keys (url, note, text, ongoing, authors, figure, me, role, nobreak) are tested before use,
+    Optional keys (url, note, text, link, ongoing, authors, figure, me, role, nobreak) are tested before use,
     because the build renders with StrictUndefined. -#}
 
 {#- Wrap the no-break terms listed in site.yaml; the text is escaped first, so content can never inject markup. -#}
@@ -130,14 +130,26 @@
     door, where a visitor who came to write to him is looking; six profile links there do not -- on a phone
     they broke into three ragged rows between the lede and the first word of the page, about 120px of link
     hedge before "About". So the profiles stand in the colophon of every page, the address in the masthead at
-    home and in the colophon everywhere else, and no page says either of them twice. Each page still carries
-    exactly one element with id="email", which is the hook the script in base.html.j2 turns into a mailto. -#}
-{%- macro contact(label, reach=true, profiles=true) %}
+    home and in the colophon everywhere else. Each page still carries exactly one element with id="email",
+    which is the hook the script in base.html.j2 turns into a mailto.
+
+    `pick` (deep review, 2026-09-25, AS-25): the front door may repeat a few of the profiles beside the
+    address -- the ones a recruiter and a peer actually open, GitHub and Google Scholar -- as items of the same
+    reach list, so they share its row and its rhythm, in the order they are picked (GitHub first: it carries a
+    mark, so the marks stay contiguous with the envelope, the rule the colophon row keeps). Those two are then
+    said twice on the home page, top and colophon; the address is still said once. A picked link draws its
+    mark if it has one (GitHub) and none if it does not (Scholar, by the three-mark ruling above). -#}
+{%- macro contact(label, reach=true, profiles=true, pick=none) %}
       <nav class="links-nav" aria-label="{{ label }}">
 {% if reach %}
         <ul class="links links--reach" role="list">
   {% for link in site.links if link.label == "Email" and link.get("text") %}
           <li class="links__email"><span class="links__label">{{ icon(link.get("icon")) }}{{ link.label }}</span> <span id="email">{{ link.text }}</span></li>
+  {% endfor %}
+  {% for label in pick or [] %}
+    {% for link in site.links if link.label == label and link.get("url") %}
+          <li><a rel="me" href="{{ link.url }}">{{ icon(link.get("icon")) }}<span>{{ link.label }}</span></a></li>
+    {% endfor %}
   {% endfor %}
         </ul>
 {% endif %}
@@ -190,11 +202,21 @@
 {% endfor %}
 {% endmacro -%}
 
+{#- A news item is one sentence; with `link` and `url` one phrase of it is a link to the thing it names (the
+    preprint, the code, the paper's card). The text is split around the phrase and each piece goes through
+    nb() on its own, so a no-break term inside the phrase is still wrapped and the address is never touched.
+    build.validate() refuses a phrase that is not in the text, so the else branch is only for items without
+    a link. -#}
 {%- macro news_rows(items) %}
 {% for item in items %}
         <li class="row">
           {{ dates(item.date, "when") }}
+  {% if item.get("link") and item.get("url") and item.link in item.text %}
+    {% set parts = item.text.split(item.link, 1) %}
+          <p class="what">{{ nb(parts[0]) }}<a href="{{ item.url|local(base) }}">{{ nb(item.link) }}</a>{{ nb(parts[1]) }}</p>
+  {% else %}
           <p class="what">{{ nb(item.text) }}</p>
+  {% endif %}
         </li>
 {% endfor %}
 {% endmacro -%}

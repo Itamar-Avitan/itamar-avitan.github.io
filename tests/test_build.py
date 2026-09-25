@@ -19,6 +19,8 @@ SLUGS = list(PAGES)
 # these lists (build.validate holds that), and SLUGS is still every page the site builds and sitemaps.
 NAV_SLUGS = [page["slug"] for page in SITE["pages"] if page.get("nav")]
 COLOPHON_SLUGS = [page["slug"] for page in SITE["pages"] if page.get("colophon")]
+# The two profiles the home page repeats beside the address (the `pick` of `contact`, templates/pages/home.html.j2).
+PICK = ["GitHub", "Google Scholar"]
 
 
 def page(slug: str, site: dict | None = None) -> dict:
@@ -271,11 +273,18 @@ def test_home_hands_the_visitor_on_to_every_other_page():
 def test_the_address_is_said_at_the_top_and_the_profiles_at_the_foot():
     """Six profile links between the lede and the first word of the home page cost about 120px of a phone
     screen, and they are not what a visitor comes to a front door for. The address keeps the masthead; the
-    profiles stand in the colophon of every page. Each page still says each of them exactly once -- and only
-    one element on any page carries id="email", which is the hook the script turns into a mailto."""
+    profiles stand in the colophon of every page. Each page still says each of them exactly once, except the
+    two the front door repeats beside the address (GitHub and Google Scholar, the ones a recruiter and a peer
+    open first: deep review 2026-09-25, AS-25) -- and only one element on any page carries id="email", which
+    is the hook the script turns into a mailto."""
     home = html_of("")
     masthead = home.partition('<div class="masthead">')[2].partition("<main")[0]
     assert 'class="links links--reach"' in masthead and 'class="links-row"' not in masthead
+    # the two picked profiles are items of the reach list itself, after the address, in the order picked:
+    # GitHub with its mark first, so the marks stay together at the row's left as they do in the colophon
+    assert re.findall(r'<span>([^<]+)</span></a>', masthead) == PICK
+    for slug in SLUGS[1:]:
+        assert 'rel="me"' not in html_of(slug).partition("<main")[0], slug     # only the front door does this
     foot = home.partition("<footer")[2]
     assert 'class="links-row"' in foot and "links--reach" not in foot
     for slug, html in every_page().items():
@@ -335,11 +344,12 @@ def test_every_content_string_is_rendered_on_one_page_or_another():
     wanted = {k: SITE[k] for k in ("identity_line", "about", "now", "elsewhere", "news", "talks", "projects",
                                    "teaching", "accessibility")}
     wanted["intros"] = [p.get("intro") for p in SITE["pages"] if p.get("intro")]
-    # an address is not text: full ones start with http, and the "elsewhere" rows point at this site's own
-    # slugs, which the template turns into a relative link rather than printing
+    # an address is not text: full ones start with http, and the "elsewhere" rows and the news links point at
+    # this site's own slugs, with or without an anchor ("research/#papers"), which the template turns into a
+    # relative link rather than printing
     addresses = set(SLUGS)
     missing = [s for s in _values(wanted)
-               if not s.startswith("http") and s not in addresses and " ".join(s.split()) not in text]
+               if not s.startswith("http") and s.split("#")[0] not in addresses and " ".join(s.split()) not in text]
     assert missing == []
 
 
@@ -464,6 +474,60 @@ def test_news_is_split_between_the_list_and_the_details_element():
     assert "<details" not in html_of("", site)
 
 
+def _news_rows(html: str) -> list[str]:
+    section = html.partition('<section id="news"')[2].partition("</section>")[0]
+    return re.findall(r'<li class="row">(.*?)</li>', section, re.S)
+
+
+def test_a_news_item_links_the_thing_it_names_and_nothing_else():
+    """Four items name an artefact a reader can open -- the NEAT page, the paper's card, the code and data,
+    the arXiv preprint -- and each links that one phrase; the other items carry no link at all. The phrase
+    is the first occurrence of `link` in the sentence, and the address is `url` made relative to the page.
+    The sentence has to survive the split: the pieces around the link go through nb() one by one."""
+    rows = _news_rows(html_of(""))
+    assert len(rows) == len(SITE["news"])
+    assert {n["date"] for n in SITE["news"] if n.get("link")} == {"Sep 2026", "Dec 2025", "Nov 2025", "Oct 2025"}
+    for item, row in zip(SITE["news"], rows):
+        anchors = re.findall(r'<a href="([^"]*)">(.*?)</a>', row, re.S)
+        if item.get("link"):
+            assert len(anchors) == 1 and row.count("<a ") == 1, item["date"]
+            href, label = anchors[0]
+            assert href == build.local(item["url"], "") and _visible_text(label) == item["link"], item["date"]
+            assert " ".join(item["text"].split()) in _visible_text(row), item["date"]
+        else:
+            assert "<a " not in row, item["date"]
+    # the Sep 2026 phrase holds two no-break terms, and they are still wrapped inside the link
+    neat = next(r for i, r in zip(SITE["news"], rows) if i["date"] == "Sep 2026")
+    assert '<span class="nb">Neuro-AI-Talks</span> <span class="nb">(NEAT) 2026</span></a>' in neat
+
+
+def test_the_build_refuses_a_news_link_that_is_not_in_its_sentence():
+    """A rewritten sentence must re-choose its phrase: a `link` the text no longer contains is a dead key,
+    and a `link` without a `url`, or the reverse, is half an instruction."""
+    site = copy.deepcopy(SITE)
+    item = next(n for n in site["news"] if n.get("link"))
+    item["link"] = "a phrase the sentence does not contain"
+    assert any(item["date"] in p and "is not in its text" in p for p in build.validate(site))
+    site = copy.deepcopy(SITE)
+    item = next(n for n in site["news"] if n.get("link"))
+    del item["url"]
+    assert any(item["date"] in p and "only one of link/url" in p for p in build.validate(site))
+    site = copy.deepcopy(SITE)
+    item = next(n for n in site["news"] if not n.get("link"))
+    item["url"] = "research/"
+    assert any(item["date"] in p and "only one of link/url" in p for p in build.validate(site))
+
+
+def test_every_internal_news_link_lands_on_a_built_page_at_the_id_it_names():
+    pages = every_page()
+    internal = [n for n in SITE["news"] if n.get("url") and not n["url"].startswith("http")]
+    assert internal                                   # the paper's card is reached from the news at least once
+    for item in internal:
+        slug, _, fragment = item["url"].partition("#")
+        assert slug in pages and fragment, item["date"]
+        assert f'id="{fragment}"' in pages[slug], (item["date"], item["url"])
+
+
 def test_talks_link_the_venue_and_show_the_note():
     html = html_of("research/")
     assert '<p class="venue"><a href="https://2025.ccneuro.org/contributed-talk/?id=65">' in html
@@ -534,8 +598,10 @@ def test_the_practicum_leads_with_the_programme_and_says_nothing_about_who_did_w
 
 def test_optional_keys_may_be_absent():
     site = copy.deepcopy(SITE)
-    for entry in site["talks"] + site["projects"] + site["research"] + site["links"]:
-        for key in ("url", "note", "text", "figure", "me", "ongoing", "authors", "badges", "buttons"):
+    for entry in site["talks"] + site["projects"] + site["research"] + site["links"] + site["news"]:
+        for key in ("url", "link", "note", "text", "figure", "me", "ongoing", "authors", "badges", "buttons"):
+            if key == "text" and "date" in entry:
+                continue                                # a news item's sentence is required; its link is not
             entry.pop(key, None)
     for entry in site["pages"]:
         entry.pop("intro", None)
@@ -583,7 +649,7 @@ def test_the_now_block_is_dated_once_and_its_lines_are_not_events():
     and get no dates of their own -- they are a list in the text column, beside that single tick."""
     section = html_of("").partition('<section id="now"')[2].partition("</section>")[0]
     assert section.count('class="when"') == 1 and '<time class="when" datetime="2026-09">' in section
-    assert section.count("<li>") == len(SITE["now"]) == 4
+    assert section.count("<li>") == len(SITE["now"]) == 2
     assert '<ul class="what now" role="list">' in section
     text = _visible_text(section)
     assert all(" ".join(line.split()) in text for line in SITE["now"])
@@ -595,7 +661,7 @@ def test_the_about_and_now_drafts_are_marked_as_drafts_in_site_yaml():
     yaml_text = (build.ROOT / "site.yaml").read_text(encoding="utf-8")
     assert yaml_text.count("DRAFT, awaiting the owner") == 1 and "DRAFT, as above" in yaml_text
     assert 150 <= sum(len(p.split()) for p in SITE["about"]) <= 200
-    assert 3 <= len(SITE["now"]) <= 5
+    assert 2 <= len(SITE["now"]) <= 5
 
 
 def test_teaching_is_two_sections_and_every_row_is_dated_and_titled():
@@ -627,7 +693,7 @@ def test_the_teaching_page_carries_the_course_home_announces():
     courses = SITE["teaching"]["courses"]
     writing = next(c for c in courses if "writing" in c["title"].lower())
     assert writing["when"] == "from 2026/27" and "2026/27" in SITE["now"][1]
-    assert "academic writing course" in SITE["about"][2]
+    assert "academic writing course" in SITE["now"][-1]
     assert writing["title"] in _visible_text(html_of("teaching/"))
     assert [c["title"] for c in courses][0] == "Introduction to Cognition and Computation"
 
@@ -648,6 +714,7 @@ def test_quotes_print_the_line_its_attribution_and_its_context_and_nothing_else(
     section = html.partition('<section id="quotes"')[2].partition("</section>")[0]
     shown = _visible_text(section)
     assert section.count("<blockquote>") == len(SITE["quotes"]) == 4
+    assert "four" in SITE["elsewhere"][2]["text"] and len(SITE["quotes"]) == 4      # the home page's teaser counts them
     for quote in SITE["quotes"]:
         assert f'<blockquote><p>{quote["text"]}</p></blockquote>' in section         # printed exactly as verified
         assert quote["attribution"] in shown and quote.get("note", "") in shown
@@ -859,11 +926,13 @@ def test_portrait_and_calm_rows_of_links():
     assert html.count('<ul class="links ') == 3 and "monogram" not in html
     email_row = html.partition('<li class="links__email">')[2].partition("</li>")[0]
     assert email_row.count("<svg") == 1 and ">Email</span>" in email_row       # the envelope leads the block
-    page_html = unescape(html)
-    for link in SITE["links"]:
-        if link["label"] not in ("Email", "CV"):
-            assert page_html.count(f'<a rel="me" href="{link["url"]}">') == 1
-            assert page_html.count(f'<span>{link["label"]}</span></a>') == 1
+    # each profile once per page -- except the two the home page also sets beside the address (PICK), twice
+    for slug, page_html in ((s, unescape(h)) for s, h in every_page().items()):
+        for link in SITE["links"]:
+            if link["label"] not in ("Email", "CV"):
+                expected = 2 if (slug == "" and link["label"] in PICK) else 1
+                assert page_html.count(f'<a rel="me" href="{link["url"]}">') == expected, (slug, link["label"])
+                assert page_html.count(f'<span>{link["label"]}</span></a>') == expected, (slug, link["label"])
     assert 'class="links links--reach"' in html and "btn--primary" in html
 
 
@@ -871,7 +940,10 @@ def test_each_marked_link_carries_a_silent_mark_beside_its_visible_label():
     page_html = unescape(html_of(""))
     marked = [link for link in SITE["links"] if link.get("icon")]
     assert len(marked) == 3
-    assert page_html.count('<svg class="ico ') == 3                           # every mark, and nothing else
+    # every mark, and nothing else: three per page, four at home, where GitHub's link is set beside the
+    # address as well as in the colophon and draws its mark both times
+    for slug, html in every_page().items():
+        assert unescape(html).count('<svg class="ico ') == (4 if slug == "" else 3), slug
     for link in marked:
         opens = f'href="{link["url"]}">' if link.get("url") else 'class="links__label">'
         after = page_html.partition(opens)[2]

@@ -7,9 +7,10 @@
       <h1>{{ site.name }}</h1>
       {{ m.role_line()|trim }}
       <p class="lede">{{ site.identity_line }}</p>
-{# The address only. The six profile links that used to stand here are in the colophon now, on every page:
-   see the note over `contact` in macros.html.j2. #}
-      {{ m.contact("Contact", reach=true, profiles=false)|trim }}
+{# The address, and beside it the two profiles a recruiter and a peer open first. The full row of six stands
+   in the colophon of every page, this one included: see the note over `contact` in macros.html.j2. The two
+   labels are the exact ones in site.yaml's `links`; a label that is not there is silently not drawn. #}
+      {{ m.contact("Contact", reach=true, profiles=false, pick=["GitHub", "Google Scholar"])|trim }}
     </div>
 {% endblock %}
 

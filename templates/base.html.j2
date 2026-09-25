@@ -115,7 +115,8 @@
    first word of the page pushed the content of a phone screen down by about 120px, and they are not what a
    visitor came to the front door for. The address is the half that is worth the top of the home page, so
    there it stays in the masthead and only the profiles are down here; every other page says both, since its
-   masthead is a two-line byline. Either way each page says each of them exactly once. #}
+   masthead is a two-line byline. Each page says the address exactly once, and each profile once -- except
+   GitHub and Google Scholar, which the home page also sets beside the address (the `pick` of `contact`). #}
 {% set deep = page.get("heading")|default("", true)|length > 0 %}
     {{ m.contact("Contact and profiles" if deep else "Profiles", reach=deep, profiles=true)|trim }}
     <p class="row"><span class="when">Last updated</span> {{ m.dates(site.footer.updated, "what") }}</p>

@@ -93,7 +93,8 @@ def test_structure_and_alt_text(browser, slug):
     assert page.locator("h1").count() == 1 and page.inner_text("h1").strip() == heading
     assert page.evaluate("[...document.images].every(i => i.alt && i.complete && i.naturalWidth > 0)")
     assert page.evaluate("[...document.querySelectorAll('svg.ico')].every(s => s.getAttribute('aria-hidden') === 'true')")
-    assert page.locator("svg.ico").count() == 3       # Email, GitHub, Bluesky, and nothing else
+    # Email, GitHub, Bluesky, and nothing else -- GitHub twice at home, beside the address and in the colophon
+    assert page.locator("svg.ico").count() == (4 if slug == "" else 3)
     assert page.locator("main section").count() >= 1
 
 
@@ -170,15 +171,23 @@ HIT_TEST_JS = """
 """
 
 
+# The profile links in document order: at home the reach line under the name (the address, then the two
+# picked profiles) and the colophon row; on every other page the colophon alone, address first.
+HOME_TARGETS = ["avitanit [at] post.bgu.ac.il", "GitHub", "Google Scholar",
+                "GitHub", "Bluesky", "Google Scholar", "LinkedIn", "X", "ORCID"]
+DEEP_TARGETS = ["avitanit [at] post.bgu.ac.il", "GitHub", "Bluesky", "Google Scholar", "LinkedIn", "X", "ORCID"]
+
+
+@pytest.mark.parametrize("slug", SLUGS)
 @pytest.mark.parametrize("width", WIDTHS)
-def test_every_profile_link_is_at_least_a_24px_target(browser, width):
+def test_every_profile_link_is_at_least_a_24px_target(browser, width, slug):
     """WCAG 2.2 SC 2.5.8, at every viewport and not only on a phone: the desktop "X" was an 8.6 by 32 px
     target. A 23px box centred on each link has to land on that link at all four of its corners, which is
-    what the overlay gives it without widening its box and opening a hole in the row."""
-    page, _, _ = _page(browser, width)
+    what the overlay gives it without widening its box and opening a hole in the row. The two profiles the
+    home page repeats beside the address are held to the same rule there."""
+    page, _, _ = _page(browser, width, slug=slug)
     links = page.evaluate(HIT_TEST_JS, ".links a")
-    assert [l["label"] for l in links] == ["avitanit [at] post.bgu.ac.il", "GitHub", "Bluesky",
-                                           "Google Scholar", "LinkedIn", "X", "ORCID"]
+    assert [l["label"] for l in links] == (HOME_TARGETS if slug == "" else DEEP_TARGETS)
     assert [l for l in links if l["height"] < 24 or not l["covered"]] == []
 
 
