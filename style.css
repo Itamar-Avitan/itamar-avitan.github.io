@@ -9,12 +9,21 @@
    of every page is the same device one floor up: the page you are on carries a
    2px ink tick on the strip's hairline, exactly as a section carries one on the
    margin rule. Moving between pages is the same gesture as moving between
-   sections, and the tick is the only thing that moves.
+   sections, and the tick is the only thing that moves. Two tones, on purpose:
+   the strip's hairline is a divider and keeps --rule; the margin rule is the
+   axis and is drawn in --spine, the card-border tone, because at the hairline
+   tone (1.29:1 on the light page) the site's signature was the faintest mark
+   on it (deep review 2026-09-25, DS-11).
 
    One visual language for three jobs:
-     outlined box   = label only (venue and kind tags), never clickable
+     outlined box   = venue badge on the paper card, never clickable. A kind
+                      or a page name in a log's gutter is not a box: it is a
+                      small uppercase mono label in the muted colour of the
+                      dates (DS-03: twelve of fourteen boxes were not venues)
      underlined text = link: body sans in the masthead row and in running text,
-                       mono for a card's link labels
+                       mono for a card's link labels. The underline is drawn
+                       at 65% of the link colour and comes up to full on hover;
+                       a link that is a title is set in ink (DS-04)
      filled box     = the one primary action in its group (CV, Paper)
    ========================================================================== */
 
@@ -45,8 +54,9 @@
   --ink: #14212B;           /* blue-black */
   --ink-2: #41525D;         /* secondary text */
   --muted: #52636E;         /* dates, labels */
-  --rule: #D3DCE1;          /* margin rule */
+  --rule: #D3DCE1;          /* hairlines: the strip's divider, the BibTeX box */
   --rule-strong: #B7C4CC;   /* card border */
+  --spine: var(--rule-strong);   /* the margin rule and its phone-edge form: the axis, one tone up from a hairline */
   --tag-line: #7D8F9A;      /* neutral tag outline */
   --accent: #0B5F73;        /* petrol ink */
   --accent-strong: #084A5A;
@@ -145,14 +155,19 @@ h1, h2, h3, p, li, blockquote { overflow-wrap: break-word; }
 
 h1, h2, h3 { font-weight: 600; color: var(--ink); }
 
+/* The underline is the cue that says "link" on this site -- accent against ink is only 2.26:1, so colour
+   alone could not -- but drawn at full strength on every link a page of them read as a link farm. At 65%
+   of the link colour it is 3.13:1 against the light page and 3.94:1 against the dark one, above the 3:1 a
+   non-text cue needs (45%, the first proposal, was 2.11:1), and it comes up to full on hover. */
 a {
   color: var(--accent);
   text-decoration: underline;
   text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, currentColor 65%, transparent);
   text-underline-offset: 0.2em;
   transition: color 120ms ease, background-color 120ms ease, border-color 120ms ease;
 }
-a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
+a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; text-decoration-color: currentColor; }
 
 :focus-visible {
   outline: 2px solid var(--accent);
@@ -209,14 +224,19 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
   align-items: center;
   gap: 1.125rem;
 }
+/* No underline in the strip: it is a named navigation landmark, not running text, and three underlined page
+   names competed with the tick for "this one is special". The underline returns on hover. The page you are
+   on keeps no underline even then, as before: its tick is its mark. */
 .sitenav a:not(.btn) {
   position: relative;
   display: inline-block;
   padding-block: 0.25rem;
   font: 500 0.8125rem/1.6 var(--mono);
   color: var(--accent);
+  text-decoration: none;
 }
-.sitenav a[aria-current="page"] {
+.sitenav a:not(.btn):hover { text-decoration: underline; text-decoration-color: currentColor; }
+.sitenav a[aria-current="page"], .sitenav a[aria-current="page"]:hover {
   color: var(--ink);
   text-decoration: none;
 }
@@ -438,7 +458,7 @@ a:focus-visible > .ico { color: var(--accent-strong); }
 /* ---------- Statement lists: the accessibility page ----------
    Sentences, not log rows. Each one is a thing that was done or a thing that is not claimed, and none of them
    is an event, so none takes the gutter or a tick on the margin rule. They borrow the "Now" list's mark -- the
-   minor tick lying down -- because that is this site's shape for "a list of lines under one heading"; the step
+   small accent dot -- because that is this site's shape for "a list of lines under one heading"; the step
    between two of them is wider than "Now" gives, since each here runs to two or three lines of prose. */
 .prose > .statement { margin-top: 0.875rem; }
 .statement li { position: relative; padding-left: 1.125rem; }
@@ -446,14 +466,17 @@ a:focus-visible > .ico { color: var(--accent-strong); }
 .statement li::before {
   content: "";
   position: absolute;
-  left: 0;
-  top: calc(0.5lh - 1px);
-  width: 0.5rem;
-  height: 1px;
+  left: 0.125rem;
+  top: calc(0.5lh - 0.15625rem);
+  width: 0.3125rem;
+  height: 0.3125rem;
+  border-radius: 50%;
   background: var(--accent);
 }
 
-/* ---------- Tags: outlined, mono, never clickable ---------- */
+/* ---------- Tags: outlined, mono, never clickable ----------
+   The box belongs to the paper card's venue badges (and its "Ongoing"). A kind under a talk's date or a
+   page name in the hand-off rows takes the same class and is unboxed by the log rule further down. */
 .tag {
   display: inline-block;
   max-width: 100%;
@@ -503,8 +526,11 @@ h2 {
   margin-bottom: 1.125rem;
 }
 h3 { font-size: 1.125rem; line-height: 1.35; }
-h3 a { text-decoration-color: color-mix(in srgb, currentColor 45%, transparent); }
-h3 a:hover { text-decoration-color: currentColor; }
+/* A link that is a title stays a title: ink, with the underline in the accent so it still says "link". Two
+   project titles side by side used to be set in two colours, because one had an address and one did not.
+   Descendant selectors, so a title that gains a wrapping element keeps the rule. */
+h3 a, .log--go .what a { color: var(--ink); text-decoration-color: color-mix(in srgb, var(--accent) 65%, transparent); }
+h3 a:hover, .log--go .what a:hover { color: var(--accent-strong); text-decoration-color: currentColor; }
 
 /* The page's own title, on every page but the home page, where the name in the masthead is the h1. It is a
    step above a section heading and takes the same tick, because it is the first section of its page. */
@@ -517,25 +543,34 @@ main > section > h1 {
 /* a page that opens on its own title needs less air above it: the byline has just said whose site this is */
 main.opens-with-h1 { margin-top: 2.25rem; }
 
-/* one or two lines of framing under a page title, in the text column */
-.page-intro { margin: -0.25rem 0 1.5rem; color: var(--ink-2); }
+/* One or two lines of framing under a page title, in the text column. Ink, not the secondary grey: on the
+   research page this line is the research statement, and set quieter than the body copy under it the first
+   text under each title was the quietest (DS-12). From 45rem up it takes a step towards the home lede (the
+   sizes are in the two wider blocks); phones keep body size, where at 19px the statement ran to eight lines
+   and pushed the card below the fold. The commonplace page is the exception, below. */
+.page-intro { margin: -0.25rem 0 1.5rem; color: var(--ink); }
+/* the commonplace keeps its intro quiet: on that page the quotations are the large ink text */
+#quotes > .page-intro { font-size: inherit; line-height: inherit; color: var(--ink-2); }
 /* A page-intro that ends its page (the 404 page) must not push its margin out past main, or the margin rule
    breaks for that height between main's foot and the colophon's first segment. Elsewhere it ends only its
    own section, and the next section's larger top margin sets that gap, so nothing else moves. */
 .page-intro:last-child { margin-bottom: 0; }
 
 /* ---------- Now: what he is doing, under one date ----------
-   Not events, so no dates of their own and no ticks of their own; the accent hairline before each line is the
-   minor tick lying down, which is what says these belong to the tick in the gutter above them. */
+   Not events, so no dates of their own and no ticks of their own. The mark before each line is a 5px accent
+   dot, the circle of the site's own mark: it used to be an accent hairline, the same colour, height and
+   centre as the minor tick that crosses the rule 10px to its left, so the first line read "Sep 2026 -- --"
+   (DS-05). A dot says "item" without repeating the tick. */
 .now li { position: relative; padding-left: 1.125rem; }
 .now li + li { margin-top: 0.625rem; }
 .now li::before {
   content: "";
   position: absolute;
-  left: 0;
-  top: calc(0.5lh - 1px);
-  width: 0.5rem;
-  height: 1px;
+  left: 0.125rem;
+  top: calc(0.5lh - 0.15625rem);
+  width: 0.3125rem;
+  height: 0.3125rem;
+  border-radius: 50%;
   background: var(--accent);
 }
 
@@ -556,6 +591,21 @@ main.opens-with-h1 { margin-top: 2.25rem; }
 .log--kind .when { float: left; margin: 0 0.625rem 0 0; line-height: 1.5rem; }
 .log--kind .kind { min-height: 1.5rem; }
 .log--kind .what { clear: left; }
+/* The kind is a label, not a badge: small uppercase mono in the muted colour of the dates, the register of
+   the card's "Summary" run-in. Boxed, twelve of the site's fourteen boxes were not venues, the teaching
+   gutter was a column of form fields, and "Contributed talk and poster" wrapped inside its box into a
+   two-line 192x41px block (DS-03). Unboxed it wraps as two right-aligned lines of text. Muted on the page is
+   5.79:1 light and 7.38:1 dark, which the contrast suite checks. */
+.log .kind .tag {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  font: 500 0.6875rem/1.35 var(--mono);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
 .log--kind h3 { font-size: 1.0625rem; }   /* the paper card keeps the only large title */
 .authors { color: var(--ink-2); font-size: 1rem; margin-top: 0.25rem; }
 .me { color: var(--ink); font-weight: 600; }
@@ -565,10 +615,12 @@ main.opens-with-h1 { margin-top: 2.25rem; }
 .what > h3 + p:not([class]) { margin-top: 0.375rem; }
 
 /* ---------- Elsewhere on this site: the home page's hand-off ----------
-   The one list whose gutter carries an address instead of a date, so it carries the site's outlined label --
-   never clickable -- and no tick. The margin rule stays a time axis; a page name is not a point on it. */
+   The one list whose gutter carries an address instead of a date, so it carries the page's name as the quiet
+   mono label the kind tags use -- never clickable, and no longer boxed, because a boxed page name read as a
+   button that does nothing (DS-03) -- and no tick. The margin rule stays a time axis; a page name is not a
+   point on it. The link is set like a title (ink, accent underline: the h3 a rule above), and bold. */
 .log--go .kind { margin-bottom: 0.375rem; }
-.log--go .what > a { font-weight: 600; }
+.log--go .what a { font-weight: 600; }
 
 /* ---------- The expander: the older end of the news list ----------
    The commonplace had one of these too, while it shared a page with everything else. It has a page of its own
@@ -847,7 +899,7 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   .older > summary { padding-block: 0.625rem; }
   .btn { padding-block: 0.875rem; }
 
-  .log { border-left: 1px solid var(--rule); padding-left: 0.875rem; }
+  .log { border-left: 1px solid var(--spine); padding-left: 0.875rem; }
   .log .when { position: relative; }
   .log .when::before {
     content: "";
@@ -860,9 +912,14 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   }
 
   /* the rule runs on through the expander, whose box sits on it */
-  .older { margin-top: 0; padding-top: 1rem; border-left: 1px solid var(--rule); }
+  .older { margin-top: 0; padding-top: 1rem; border-left: 1px solid var(--spine); }
   .older > summary { margin-left: calc(-0.5rem - 0.5px); gap: 0.40625rem; }
   .older > .log { border-left: 0; }
+
+  /* the kind follows its date on one line here ("14–15 Sep 2026 · FLASH TALK"): a middle dot opens the label,
+     and its line box matches the date's so the two sit on one baseline */
+  .log--kind .kind .tag::before { content: "\00B7\00A0" / ""; }
+  .log--kind .kind { line-height: 1.5rem; }
 
   /* full-bleed sheet: the card's text stays on the page's left edge */
   .paper {
@@ -938,8 +995,11 @@ main.opens-with-h1 { margin-top: 2.25rem; }
     bottom: 0;
     left: calc(var(--gutter) + var(--gap) / 2);
     width: 1px;
-    background: var(--rule);
+    background: var(--spine);
   }
+
+  /* the framing line under a page title: one step up from the body, still under the home lede */
+  .page-intro { font-size: 1.1875rem; line-height: 1.5; }
 
   .inset { margin-left: calc(var(--gutter) + var(--gap)); }
   .colophon .links-nav, .colophon-nav { margin-left: calc(var(--gutter) + var(--gap)); }
@@ -1043,6 +1103,14 @@ main.opens-with-h1 { margin-top: 2.25rem; }
      longer the same size as its own footnote, which left the loudest thing on the page the word
      "Commonplace". The phone stays as it was: at 400px the measure cannot afford the step. */
   .quote blockquote { font-size: 1.25rem; line-height: 1.5; }
+  /* On this page the tick meets the rule and stops instead of crossing it. Every row opens with a quotation
+     mark hung 0.42em into the margin -- at 22px, 6.8px right of the rule -- and a tick that ran 4px past the
+     rule left 2.8px between the two, so "2003 --“" read as one glyph on every row (DS-06). Ten pixels ending
+     on the rule give the mark about 7px of air. And the list stands 2.25rem under the intro (it collapses
+     with the intro's own 1.5rem to 36px), wider than the step between two quotations, so the first quotation
+     opens the collection rather than hanging off the intro. */
+  .log--quotes > .row > .when::after { right: calc(var(--gap) / -2); width: 0.625rem; }
+  .log--quotes { margin-top: 2.25rem; }
 
   /* the rule ends at the last tick: "Last updated" */
   .colophon { padding-block: 4.5rem 4rem; }
@@ -1059,7 +1127,7 @@ main.opens-with-h1 { margin-top: 2.25rem; }
     top: calc(-1 * (4.5rem + 1.25rem));   /* .colophon padding-top + .links-nav margin-top -> main's foot */
     bottom: -1.75rem;                     /* .colophon .links-nav margin-bottom -> the row's top */
     width: 1px;
-    background: var(--rule);
+    background: var(--spine);
   }
   .colophon .row { position: relative; }
   .colophon .row::before {
@@ -1069,7 +1137,7 @@ main.opens-with-h1 { margin-top: 2.25rem; }
     top: 0;
     height: 0.5lh;                        /* was: top: -4.5rem; height: calc(4.5rem + 0.5lh) */
     width: 1px;
-    background: var(--rule);
+    background: var(--spine);
   }
   .colophon .when { display: block; }
 }
@@ -1098,6 +1166,7 @@ main.opens-with-h1 { margin-top: 2.25rem; }
 
   .masthead h1 { font-size: 3.25rem; }
   .lede { font-size: 1.5rem; }
+  .page-intro { font-size: 1.25rem; }     /* the step under the lede's 1.5rem; the commonplace intro is exempt */
   main > section > h1 { font-size: 2.25rem; }
   h2.inset { font-size: 1.625rem; }
   h3 { font-size: 1.25rem; }
@@ -1107,13 +1176,19 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   .quote__by { font-size: 1.0625rem; }   /* the three steps of the commonplace keep their order: 22 / 17 / 16 */
   .quote__note { font-size: 1rem; }
 
-  /* The mono labels come up with the body, or the gutter reads as dust beside it. The navigation strip is
-     the one thing here that does NOT move: the tick that marks the current page is placed by the strip's own
-     padding and lands on its hairline, and changing the height of a strip link moves the tick off the rule.
-     It is a utility strip one floor above the page, and it is allowed to keep its own scale. */
+  /* The mono labels come up with the body, or the gutter reads as dust beside it. The navigation strip takes
+     the same 14px step as the gutter dates it is meant to match (13px beside an 18px body was the one mono
+     label left behind; external review 2026-09-25, AS-19), and the toggle follows one step under it. The tick
+     that marks the current page still lands on the hairline: it is placed from its own link's box by the
+     strip's padding, and the link is the tallest thing in the strip at either size, so its foot is the
+     strip's foot (tests/test_browser.py measures it at 1280). 15px is not taken: it would put the strip
+     above the dates. */
+  .sitenav a:not(.btn) { font-size: 0.875rem; }
+  .toggle { font-size: 0.8125rem; }
   .when, .colophon .row, .colophon-nav { font-size: 0.875rem; }
   .buttons .btn, .older > summary { font-size: 0.875rem; }
   .tag { font-size: 0.8125rem; }
+  .log .kind .tag { font-size: 0.75rem; }
   .authors, .venue, .note, .role, .links { font-size: 1.0625rem; }
 }
 

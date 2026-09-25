@@ -68,8 +68,10 @@ cannot be told from the other Itamar Avitan's.
 
 **Every page names its sections**, and every section takes a 2px ink tick on the margin rule. `elsewhere`
 on the home page is the hand-off: one row per other page, each carrying a real line from it. Its gutter
-holds the page's name as an outlined tag rather than a date, because these rows are addresses and not points
-in time — the margin rule stays a time axis, and a tag takes no tick.
+holds the page's name as a tag rather than a date, because these rows are addresses and not points in time —
+the margin rule stays a time axis, and a tag takes no tick. A tag in a log's gutter (a page name here, a role
+or a talk's kind elsewhere) is a small uppercase mono label; the outlined box is the paper card's venue badge
+alone.
 
 The list under `pages` in `site.yaml` **is** the site. Each entry's `slug` is three things at once: the
 address under `site_url`, the folder the file is written into, and the name of its template in

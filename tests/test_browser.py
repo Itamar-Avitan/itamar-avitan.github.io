@@ -375,10 +375,20 @@ def test_the_laptop_gets_a_composition_of_its_own(browser):
     # the measure in ems, which is what a reader actually feels, moves by less than a tenth
     ems = lambda p: p.evaluate("document.querySelector('.prose p').getBoundingClientRect().width") / p.evaluate(size)
     assert abs(ems(wide) - ems(narrow)) < 3, (ems(narrow), ems(wide))
-    # and the navigation strip keeps its own scale, because the tick that marks the current page is placed
-    # by the strip's padding and lands on its hairline: a taller strip link moves the tick off the rule
+    # The navigation strip takes the same one-pixel step as the gutter dates it is meant to match (13px beside
+    # an 18px body was the one mono label left behind; deep review 2026-09-25, AS-19). The tick that marks the
+    # current page is placed from its own link's box by the strip's padding, and the link is the strip's
+    # tallest item at either size, so the tick's foot still lands on the strip's hairline: measured here at
+    # both widths, because that is what used to be the reason for keeping the strip at 13px.
     nav = "parseFloat(getComputedStyle(document.querySelector('.sitenav a')).fontSize)"
-    assert wide.evaluate(nav) == narrow.evaluate(nav) == 13
+    assert (narrow.evaluate(nav), wide.evaluate(nav)) == (13, 14)
+    tick_foot = """() => {
+      const a = document.querySelector('.sitenav a[aria-current="page"]');
+      const t = getComputedStyle(a, '::before');
+      const foot = a.getBoundingClientRect().bottom - parseFloat(t.bottom);   /* the tick's bottom edge */
+      return foot - document.querySelector('.topstrip').getBoundingClientRect().bottom;
+    }"""
+    assert abs(narrow.evaluate(tick_foot)) <= 0.5 and abs(wide.evaluate(tick_foot)) <= 0.5
 
 
 @pytest.mark.parametrize("width", [320, 400])

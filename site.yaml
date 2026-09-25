@@ -210,10 +210,12 @@ now:
 # strip, and at laptop width the whole left gutter of the home page sat empty. These three rows use the grid
 # the rest of the site is built on -- a label in the gutter, the line in the text column -- and each one says
 # something real about where it goes rather than "read more".
-#   page   the gutter label. It is an outlined tag, not a date: this list is the one place on the site where
-#          the gutter carries an address instead of a point in time, so it takes a tag (a label that is never
+#   page   the gutter label. It is a tag, not a date: this list is the one place on the site where the
+#          gutter carries an address instead of a point in time, so it takes a tag (a label that is never
 #          clickable) and no tick, exactly as the "kind" tag under a talk's date does. The margin rule stays a
-#          time axis; nothing false is put on it.
+#          time axis; nothing false is put on it. The tag is set as a small uppercase mono label, not an
+#          outlined box: boxed, a page name read as a button that does nothing (deep review 2026-09-25,
+#          DS-03); the box now belongs to the paper card's venue badges alone.
 #   label  the link itself, and it must be a real thing on that page -- the paper's short title, the course,
 #          the line -- never "read more" or the page's own name a second time.
 #   text   what else is there, in one clause. The template sets the em dash between the two, tied to the
@@ -679,7 +681,9 @@ quotes:
 # one direction down the whole page, and the CV prints the courses in the same order.
 #   title  the course, or the students -- or, for the one course whose registrar title is not printed yet, a
 #          description of it (see the note over that row).
-#   kind   what he is in it: an outlined tag in the gutter, under the dates -- the same label a talk carries.
+#   kind   what he is in it: a tag in the gutter, under the dates -- the same label a talk carries, set as a
+#          small uppercase mono label rather than an outlined box (deep review 2026-09-25, DS-03: six
+#          identical boxes were the loudest thing in this page's gutter).
 #          A role noun in every row (Teaching assistant, Teaching team, Mentor, Tutor): a gerund there read as
 #          an activity, and "Joining" read as attending (deep review 2026-09-25, CS-17).
 #   when   the years. Lifted into the gutter and ticked on the margin rule like every other date on the site.

@@ -206,9 +206,12 @@
   {%- endif -%}
 {%- endmacro -%}
 
-{#- Where to go next, on the home page. The gutter carries the page's name as an outlined tag rather than a
-    date, because these rows are addresses and not points in time: a tag is the site's label that is never
-    clickable, it takes no tick, and so nothing false is put on the margin rule, which stays a time axis. The
+{#- Where to go next, on the home page. The gutter carries the page's name as a tag rather than a date,
+    because these rows are addresses and not points in time: a tag is the site's label that is never
+    clickable, it takes no tick, and so nothing false is put on the margin rule, which stays a time axis.
+    The stylesheet sets a tag in a log's gutter as a small uppercase mono label, not an outlined box -- a
+    boxed page name read as a button that does nothing (deep review 2026-09-25, DS-03); the box is the
+    paper card's venue badge alone. The link is set like a title, in ink with the accent underline. The
     link is a real thing on the page it leads to -- a paper's title, a course, a speaker -- and the clause
     after the em dash says what else is there. The dash is tied to the label's last word by a no-break
     space, so it never opens a line: with the Teaching label at the course's full name it stood at the
