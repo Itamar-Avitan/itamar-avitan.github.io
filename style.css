@@ -634,7 +634,10 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   margin-top: 0.375rem;
   font: 400 0.75rem/1.4 var(--mono);
   color: var(--muted);
-  text-wrap: pretty;   /* no lone word on the last line: "wrong winner.", not "winner." (WP-S3 review) */
+  /* A shorter last line where the engine has it (Chromium, WebKit); Firefox 151 has no `pretty`, so what
+     keeps "wrong winner." together in every engine is the no-break space in the caption itself (site.yaml,
+     figure_options.recovery_matrix), the same tie as "Fig. 1D" (WP-S3 reviews 1 and 2). */
+  text-wrap: pretty;
 }
 .paper h3 {
   font-size: 1.25rem;

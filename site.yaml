@@ -274,8 +274,11 @@ news:
 #             aside is 192px there, so the label is two short sentences: where the picture comes from and
 #             what a dark cell off the diagonal means). Which axis is which is said by the labels inside the
 #             SVG and by the alt text; a picture inside <img> cannot use the page's webfont, so those labels
-#             only name the axes and stay small. "Fig. 1D" is tied with a no-break space so the number never
-#             opens a line.
+#             only name the axes and stay small. "Fig. 1D" and "wrong winner." are each tied with a no-break
+#             space (U+00A0): the number never opens a line, and the last line never holds "winner." alone.
+#             The figcaption's `text-wrap: pretty` (style.css) does the second of those only in Chromium and
+#             WebKit; Firefox (151) has no `pretty`, so the tie is what keeps the pair together in every
+#             engine (deep review, WP-S3 second review).
 figure_options:
   lab_illustration: &lab_illustration
     webp: img/paper-lab.webp
@@ -287,7 +290,7 @@ figure_options:
     alt: 'Figure 1D of the paper, adapted, with both axes labelled: a 20-by-20 matrix of data-generating model
       (rows) against recovered model (columns) at 1.6 million training triplets. Most rows fall on the diagonal,
       but seven are mostly or entirely attributed to one model in the last column.'
-    caption: 'Adapted from Fig. 1D of the paper. A dark cell off the diagonal is a wrong winner.'
+    caption: 'Adapted from Fig. 1D of the paper. A dark cell off the diagonal is a wrong winner.'
     plot: true
 research:
 - title: 'Model–Behavior Alignment under Flexible Evaluation: When the Best-Fitting Model Isn’t the Right One'
@@ -312,7 +315,11 @@ research:
   #   found  the plateau, the geometry-shift mechanism (the abstract's regression sentence, moved here from
   #          the Summary), the accuracy-identifiability trade-off, and the paper's own closed-set caveat.
   #   open   questions the paper itself raises; each comment names its section of arXiv 2510.23321. Not a
-  #          statement of current work (that is Q-H, the owner's).
+  #          statement of current work (that is Q-H, the owner's). The last two words of the second and third
+  #          are tied with a no-break space (U+00A0): `.open li` is not a <p>, so the page's `p { text-wrap:
+  #          pretty }` does not reach it, and "set?" (at 390) and "people?" (at 1280 and 1440) stood alone on
+  #          their last line in Chromium, Firefox and WebKit (deep review, WP-S3 second review). The words do
+  #          not change, and the tests split on whitespace, so they read the items as before.
   #   cite   the BibTeX entry, behind a "Cite (BibTeX)" expander. Every field is FACTS PUB-CITATION plus the
   #          DOI of PUB-DOI; no `pages`, because the two published paginations disagree.
   how:
@@ -323,8 +330,8 @@ research:
   found: 'Not reliably, and not for lack of data: recovery improved as the simulated experiment grew, then leveled off. Regression analyses linked the misidentifications mainly to how much the fitted linear mapping reshapes a network’s representational geometry. The flexibility that buys predictive accuracy costs the ability to tell the models apart. And recovering the right model from a closed set is only a necessary condition: in a real experiment the system that made the data — a brain — is not one of the candidates.'
   open:
   - How much freedom should an evaluation give the mapping, given what we want the comparison to identify?   # §3.4 and Discussion, the accuracy–identifiability trade-off
-  - How should a recovery test be built when the true system is outside the candidate set?   # Discussion, Limitations
-  - How should a comparison treat the variability of responses within and between people?   # Introduction; Discussion, "Change the metrics"
+  - How should a recovery test be built when the true system is outside the candidate set?   # Discussion, Limitations
+  - How should a comparison treat the variability of responses within and between people?   # Introduction; Discussion, "Change the metrics"
   cite: |-
     @inproceedings{avitan2025modelbehavior,
       title     = {Model--Behavior Alignment under Flexible Evaluation: When the Best-Fitting Model Isn't the Right One},
