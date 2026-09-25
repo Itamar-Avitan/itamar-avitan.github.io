@@ -1,4 +1,6 @@
+import copy
 import http.server
+import io
 import re
 import subprocess
 import sys
@@ -8,6 +10,13 @@ from pathlib import Path
 import pytest
 import yaml
 from playwright.sync_api import sync_playwright
+
+try:
+    import pypdf                       # only for counting the pages of a print; the print itself needs nothing
+except ImportError:                    # pragma: no cover
+    pypdf = None
+
+import build
 
 ROOT = Path(__file__).resolve().parents[1]
 SITE = yaml.safe_load((ROOT / "site.yaml").read_text(encoding="utf-8"))
@@ -311,6 +320,9 @@ def test_the_theme_toggle_is_invisible_until_the_script_unhides_it(browser):
     assert page.locator("#theme-toggle").count() == 1
     assert not page.locator("#theme-toggle").is_visible()      # in the markup, not on the page
     assert page.locator("span#email").is_visible()             # and the address is still readable as text
+    page.set_viewport_size({"width": 400, "height": 900})      # nor is the phone's, in the colophon
+    assert page.locator(".colophon-nav .toggle--foot").count() == 1
+    assert not page.locator(".colophon-nav .toggle--foot").is_visible()
     ctx.close()
     page, _, _ = _page(browser, 1280)                          # with the script, the control arrives
     assert page.locator("#theme-toggle").is_visible()
@@ -321,9 +333,10 @@ def test_the_theme_toggle_is_invisible_until_the_script_unhides_it(browser):
 def test_the_current_page_tick_sits_on_the_strip_rule(browser, width, slug):
     """The tick that marks the page you are on is the section tick of the margin rule, one floor up: 2px of
     ink lying on the hairline under the strip. That is exactly true while the strip is one line, which it is
-    from about 360px up -- and it is why the strip stacks the toggle above the links rather than beside them.
-    Below that the five items wrap, the tick can no longer reach the hairline, and what it must do instead is
-    stay an underline under its own link and keep off the line beneath it."""
+    from 356px up now that a phone's theme button stands in the colophon and the five items have the line
+    to themselves (deep review 2026-09-25, PA-04). Below that the CV chip drops to a second line, the tick
+    can no longer reach the hairline, and what it must do instead is stay an underline under its own link
+    and keep off the line beneath it."""
     page, _, _ = _page(browser, width, slug=slug)
     measured = page.evaluate("""() => {
       const a = document.querySelector('.sitenav a[aria-current="page"]');
@@ -392,30 +405,43 @@ def test_the_laptop_gets_a_composition_of_its_own(browser):
 
 
 @pytest.mark.parametrize("width", [320, 400])
-def test_a_phone_meets_the_name_before_the_preferences(browser, width):
-    """The strip used to stack, which put the theme toggle on the first line of the page -- above the
-    navigation and above his name. The strip is one row now: the nav keeps the line and wraps inside it, and
-    the toggle is a 44px square holding only its mark. The label stays in the DOM, because it is the button's
-    accessible name and the script writes to it.
+@pytest.mark.parametrize("scheme", ["light", "dark"])
+def test_a_phone_meets_the_name_before_the_preferences(browser, width, scheme):
+    """On a phone the strip carries only the way around the site; the theme button stands in the colophon,
+    labelled, beside "Accessibility" (deep review 2026-09-25, PA-04). The system setting is followed until a
+    visitor chooses, so the one control a phone visitor rarely needs is not the first thing on the page. The
+    button there is a real one: its label is painted, its box clears the 24px a target needs, its text keeps
+    4.5:1 on the page in both themes, and a tap flips the theme as the strip's button does on a laptop."""
+    page, _, _ = _page(browser, width, scheme)
+    assert not page.locator("#theme-toggle").is_visible()
+    foot = page.locator(".colophon-nav .toggle--foot")
+    assert foot.is_visible() and foot.inner_text().strip() == ("Use dark theme" if scheme == "light" else "Use light theme")
+    box = foot.bounding_box()
+    assert box["height"] >= 24 and box["width"] >= 24, box
+    assert page.evaluate("document.querySelector('.toggle--foot span').getBoundingClientRect().width") > 40   # painted, not clipped
+    colour = page.evaluate("""() => { const b = document.querySelector('.toggle--foot');
+      return [getComputedStyle(b).color, getComputedStyle(document.body).backgroundColor]; }""")
+    assert _contrast(*colour) >= 4.5, colour
+    # after the row's link, on its line: the row reads "Accessibility · Use dark theme"
+    link = page.locator(".colophon-nav a").first.bounding_box()
+    assert box["x"] > link["x"] and abs((box["y"] + box["height"] / 2) - (link["y"] + link["height"] / 2)) <= 2, (box, link)
+    foot.click()
+    assert page.evaluate("document.documentElement.getAttribute('data-theme')") == ("dark" if scheme == "light" else "light")
+    assert foot.inner_text().strip() == ("Use light theme" if scheme == "light" else "Use dark theme")
 
-    What this buys is order at every width, and height where it was worst: the strip measures 110.6px at 320
-    against the stacked 156.6, and 108.8 against 105.8 at 400, where the five items used to fit on one line
-    precisely because the toggle had taken a row of its own above them. Three pixels there for forty-six
-    here, and on both the first thing met is the way around the site rather than a preference."""
-    page, _, _ = _page(browser, width)
-    box = page.evaluate("""() => {
-      const t = document.querySelector('#theme-toggle').getBoundingClientRect();
-      const nav = document.querySelector('.sitenav a').getBoundingClientRect();
-      const label = document.querySelector('#theme-toggle span');
-      return {toggleTop: t.top, toggleW: t.width, toggleH: t.height, navTop: nav.top,
-              strip: document.querySelector('.topstrip').getBoundingClientRect().height,
-              painted: label.getBoundingClientRect().width, text: label.textContent};
-    }""")
-    assert abs(box["toggleTop"] - box["navTop"]) <= 1             # beside the navigation, not above it
-    assert box["toggleW"] >= 44 and box["toggleH"] >= 44          # still a finger-sized target
-    assert box["painted"] <= 1 and box["text"] == "Use dark theme"
-    assert page.get_attribute("#theme-toggle", "aria-label") is None      # the span is the accessible name
-    assert box["strip"] <= 112, box["strip"]
+
+@pytest.mark.parametrize("width", [360, 390, 414, 430])
+@pytest.mark.parametrize("slug", NAV_SLUGS)
+def test_the_strip_is_one_line_on_a_phone(browser, width, slug):
+    """With the theme button out of the strip the five items fit one line from 356px up -- every common
+    phone width -- where they wrapped to two at all of them before (deep review 2026-09-25, PA-04, measured
+    in Chromium and WebKit). The line is about 60px tall; the strip used to be 109-111px."""
+    page, _, _ = _page(browser, width, slug=slug)
+    tops = page.evaluate("[...document.querySelectorAll('.sitenav li')].map(l => Math.round(l.getBoundingClientRect().top))")
+    assert max(tops) - min(tops) <= 2, (width, slug, tops)
+    strip = page.evaluate("document.querySelector('.topstrip').getBoundingClientRect().height")
+    assert strip <= 64, (width, slug, strip)
+    assert page.evaluate("document.querySelector('.topstrip .toggle').checkVisibility()") is False
 
 
 @pytest.mark.parametrize("width", [768, 1280])
@@ -572,11 +598,13 @@ def test_text_contrast_meets_wcag_aa(browser, theme, by_toggle):
 
 @pytest.mark.parametrize("slug", SLUGS)
 def test_focus_is_visible_on_every_control(browser, slug):
-    """Keyboard use has to be seen. Every link and the toggle draw the same 2px accent ring when focused."""
+    """Keyboard use has to be seen. Every link and the toggle draw the same 2px accent ring when focused --
+    every one that is on the page: the colophon's theme button is display: none from 45rem up and cannot take
+    focus there, so it is not a control at this width."""
     page, _, _ = _page(browser, 1280, slug=slug)
     outlines = page.evaluate("""() => {
       const out = [];
-      for (const el of document.querySelectorAll('a, button')) {
+      for (const el of [...document.querySelectorAll('a, button')].filter(el => el.checkVisibility())) {
         el.focus();
         const s = getComputedStyle(el);
         out.push({what: el.textContent.trim().slice(0, 24), width: s.outlineWidth, style: s.outlineStyle});
@@ -588,6 +616,103 @@ def test_focus_is_visible_on_every_control(browser, slug):
 
 def parse_px(value):
     return float(value.replace("px", "") or 0)
+
+
+@pytest.mark.parametrize("slug", SLUGS)
+def test_the_first_tab_stop_skips_to_the_content(browser, slug):
+    """A keyboard reader pressed Tab eight times on the home page before reaching a word of it (deep review
+    2026-09-25, PA-06). Now the first Tab lands on "Skip to content", painted inside the viewport at the top
+    left only while it holds focus; Enter puts the focus on <main>, which draws no ring of its own; and the
+    next Tab goes on from there, past the strip and the identity, never back into the header."""
+    page, _, _ = _page(browser, 1280, slug=slug)
+    before = page.evaluate("document.querySelector('.skip').getBoundingClientRect().bottom")
+    assert before <= 0, before                                                   # above the viewport until then
+    page.keyboard.press("Tab")
+    assert page.evaluate("document.activeElement.className") == "skip"
+    box = page.evaluate("document.querySelector('.skip').getBoundingClientRect().toJSON()")
+    assert 0 <= box["y"] <= 24 and box["x"] <= 24 and box["height"] >= 24, box    # painted, at the top left
+    ring = page.evaluate("getComputedStyle(document.activeElement).outlineWidth")
+    assert parse_px(ring) >= 2
+    page.keyboard.press("Enter")
+    assert page.evaluate("document.activeElement.id") == "content"
+    assert page.evaluate("getComputedStyle(document.activeElement).outlineStyle") == "none"
+    page.keyboard.press("Tab")
+    assert page.evaluate("document.activeElement.closest('header') === null")
+    assert page.evaluate("document.activeElement.className") != "skip"
+
+
+@pytest.mark.parametrize("scheme, by_toggle", [("dark", False), ("light", True)])
+def test_paper_is_the_light_palette_whatever_the_screen_showed(browser, scheme, by_toggle):
+    """The dark theme -- chosen with the toggle, or taken from the system -- used to print its name and lede
+    in rgb(148,152,155), 2.91:1 on white; the light theme printed the CV and Paper chips as faint boxes and
+    no address anywhere (deep review 2026-09-25, PA-01). On paper: black ink, the light colour scheme, the
+    strip and the skip link gone, the Paper button a plain link, each button's address after it, and
+    /research/ within its measured sheets at Chrome's default margins."""
+    page, _, _ = _page(browser, 1280, scheme, "research/")
+    if by_toggle:
+        page.click("#theme-toggle")
+        page.wait_for_timeout(300)
+    assert page.evaluate("document.documentElement.getAttribute('data-theme')") == ("dark" if by_toggle else None)
+    page.emulate_media(media="print")
+    page.wait_for_timeout(300)                                                  # colour transitions take 120ms
+    inks = page.evaluate("""() => ({
+      body: getComputedStyle(document.body).color, h1: getComputedStyle(document.querySelector('h1')).color,
+      h3: getComputedStyle(document.querySelector('.paper h3')).color,
+      scheme: getComputedStyle(document.documentElement).colorScheme,
+      ground: getComputedStyle(document.body).backgroundColor,
+      strip: getComputedStyle(document.querySelector('.topstrip')).display,
+      skip: getComputedStyle(document.querySelector('.skip')).display,
+      foot: getComputedStyle(document.querySelector('.colophon-nav')).display,
+      mark: getComputedStyle(document.querySelector('.mark-row')).display,
+      root: getComputedStyle(document.documentElement).fontSize,
+      chip: getComputedStyle(document.querySelector('.buttons .btn--primary')).backgroundColor,
+      chipInk: getComputedStyle(document.querySelector('.buttons .btn--primary')).color,
+      after: getComputedStyle(document.querySelector('.buttons a[href^="http"]'), '::after').content,
+      href: document.querySelector('.buttons a[href^="http"]').getAttribute('href'),
+      portrait: getComputedStyle(document.querySelector('.byline__who img')).filter,
+      figure: getComputedStyle(document.querySelector('.paper__fig img')).filter,
+    })""")
+    assert inks["body"] == inks["h1"] == inks["h3"] == "rgb(0, 0, 0)", inks
+    assert inks["scheme"] == "light" and inks["ground"] == "rgb(255, 255, 255)", inks
+    assert inks["strip"] == inks["skip"] == inks["foot"] == inks["mark"] == "none", inks
+    assert parse_px(inks["root"]) == 14                                          # 87.5% of the 16px default
+    assert inks["chip"] == "rgba(0, 0, 0, 0)" and inks["chipInk"] == "rgb(11, 95, 115)", inks   # a plain link, in the accent
+    assert inks["after"] == f'" <{inks["href"]}>"', inks["after"]              # the address, after the label
+    assert inks["portrait"] == "none" and inks["figure"] == "none", inks
+    page.evaluate("window.dispatchEvent(new Event('beforeprint'))")             # page.pdf() does not fire it
+    sheet = page.pdf(format="A4", margin={"top": "0.4in", "right": "0.4in", "bottom": "0.4in", "left": "0.4in"})
+    if pypdf is not None:
+        assert len(pypdf.PdfReader(io.BytesIO(sheet)).pages) <= 3, "the research page grew past its measured sheets"
+
+
+def test_the_older_news_prints_open_and_closes_again_afterwards(browser, tmp_path):
+    """A closed <details> hides its content in the browser itself, not through a rule a stylesheet could
+    override, so the printed home page used to leave out whatever stood behind "Older news" (deep review
+    2026-09-25, PA-01). The script opens it on beforeprint and closes it again on afterprint -- and only what
+    it opened: a list the reader had opened stays open. The live list is shorter than `news_visible`, so the
+    expander is exercised on a page built from a copy of site.yaml that shows two items."""
+    site = copy.deepcopy(SITE)
+    site["news_visible"] = 2
+    fixture = tmp_path / "index.html"
+    fixture.write_text(build.render(site, site["pages"][0]), encoding="utf-8")
+    ctx = browser.new_context(viewport={"width": 1280, "height": 900})
+    page = ctx.new_page()
+    page.goto(fixture.as_uri())
+    page.wait_for_timeout(300)
+    assert page.locator("details.older").count() == 1
+    assert page.evaluate("document.querySelector('details.older').open") is False
+    page.evaluate("window.dispatchEvent(new Event('beforeprint'))")
+    assert page.evaluate("document.querySelector('details.older').open") is True
+    assert page.evaluate("document.querySelector('details.older').hasAttribute('data-print-opened')")
+    assert page.locator("details.older .row").first.is_visible()                  # the older items are on the page
+    page.evaluate("window.dispatchEvent(new Event('afterprint'))")
+    assert page.evaluate("document.querySelector('details.older').open") is False
+    assert not page.evaluate("document.querySelector('details.older').hasAttribute('data-print-opened')")
+    page.evaluate("document.querySelector('details.older').open = true")           # the reader's own choice
+    page.evaluate("window.dispatchEvent(new Event('beforeprint'))")
+    page.evaluate("window.dispatchEvent(new Event('afterprint'))")
+    assert page.evaluate("document.querySelector('details.older').open") is True    # is left as it was
+    ctx.close()
 
 
 # --- The accessibility statement: its own page, linked from the colophon of every page ---------------------

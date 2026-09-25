@@ -57,9 +57,13 @@
   {% if card.get("venue") %}
           <p class="venue paper__venue">{{ m.nb(card.venue) }}</p>
   {% endif %}
+{# A button's optional `context` (site.yaml) follows its label in a hidden span, so a screen reader's list of
+   links says "Paper (NeurIPS 2025)" and "Code for the NeurIPS 2025 paper" where the eye reads the card
+   around the word (deep review 2026-09-25, PA-05). Per button, from site.yaml, because one suffix for all of
+   them would call the CCN recording part of the NeurIPS paper, which the ruling forbids. #}
           <ul class="buttons" role="list">
   {% for button in card.get("buttons") or [] %}
-            <li><a class="btn{{ " btn--primary" if loop.first else "" }}" href="{{ button.url }}">{{ button.label }}</a></li>
+            <li><a class="btn{{ " btn--primary" if loop.first else "" }}" href="{{ button.url }}">{{ button.label }}{% if button.get("context") %}<span class="vh"> {{ button.context }}</span>{% endif %}</a></li>
   {% endfor %}
           </ul>
           <p class="tldr"><span class="runin">Summary</span> {{ m.nb(card.tldr) }}</p>

@@ -408,8 +408,8 @@ def test_home_hands_the_visitor_on_to_every_other_page():
     paper = card["buttons"][0]
     code = next(b for b in card["buttons"] if b["label"] == "Code")
     assert paper["label"] == "Paper"
-    assert (f'<p class="go-links"><a href="{paper["url"]}">Paper</a> · <a href="{code["url"]}">Code</a></p>'
-            in unescape(research_row))
+    assert (f'<p class="go-links"><a href="{paper["url"]}">Paper<span class="vh"> {paper["context"]}</span></a> · '
+            f'<a href="{code["url"]}">Code<span class="vh"> {code["context"]}</span></a></p>') in unescape(research_row)
     assert re.findall(r'<a href="([^"]+)">', unescape(research_row))[1:] == [paper["url"], code["url"]]
     assert research_row.index('class="go-venue"') < research_row.index('class="what"') < research_row.index('class="go-links"')
     assert "go-links" not in research_row.partition('class="what"')[2].partition("</p>")[0]   # outside .what: not a title
@@ -1229,7 +1229,8 @@ def test_the_talk_video_opens_where_his_own_talk_starts():
     assert unescape(re.search(r'href="([^"]*vT-3kV89Rhk[^"]*)"', html).group(1)) == link["url"]
     # and the card carries the paper's own NeurIPS video, the one cv.pdf prints (FACTS PUB-LINK-TALK)
     video = SITE["research"][0]["buttons"][-1]
-    assert video == {"label": "NeurIPS 2025 video", "url": "https://slideslive.com/39047290"}
+    assert (video["label"], video["url"]) == ("NeurIPS 2025 video", "https://slideslive.com/39047290")
+    assert "talk" not in video["context"]                                   # a poster video, not a talk
     assert "CCN 2025 talk video" not in html
 
 
@@ -1238,12 +1239,120 @@ def _css() -> str:
 
 
 def test_the_theme_toggle_is_not_painted_when_the_script_has_not_run():
-    """The markup writes the button hidden and the script unhides it, so a visitor whose browser ran no
+    """The markup writes both buttons hidden -- the strip's, and the colophon's that a phone shows in its
+    place (deep review 2026-09-25, PA-04) -- and the script unhides them, so a visitor whose browser ran no
     JavaScript is not shown a control that does nothing. .toggle sets display from a class, which outranks the
     browser's own [hidden] rule, so the attribute has to be honoured in the stylesheet in so many words."""
-    assert all('<button id="theme-toggle" class="toggle" type="button" hidden>' in h for h in every_page().values())
-    assert re.search(r"\.toggle\[hidden\] \{[^}]*display: none", _css())
-    assert "btn.hidden = false" in (build.ROOT / "templates" / "base.html.j2").read_text(encoding="utf-8")
+    for slug, html in every_page().items():
+        assert '<button id="theme-toggle" class="toggle" type="button" data-theme-toggle hidden>' in html, slug
+        assert '<button class="toggle toggle--foot" type="button" data-theme-toggle hidden>' in html, slug
+        assert html.count("data-theme-toggle hidden>") == 2 and html.count('id="theme-toggle"') == 1, slug
+        # the colophon's is an item of the row about the site, after its links, so it goes with the row
+        row = html.partition('<nav class="colophon-nav"')[2].partition("</nav>")[0]
+        assert row.index("Accessibility</a>") < row.index('<li class="colophon-nav__theme"><button'), slug
+    css = _css()
+    assert re.search(r"\.toggle\[hidden\] \{[^}]*display: none", css)
+    assert "btns[i].hidden = false" in (build.ROOT / "templates" / "base.html.j2").read_text(encoding="utf-8")
+    # one button at a time: the colophon's does not exist for layout from 45rem up, the strip's below it
+    base, _, rest = css.partition("Phone: the rule moves")
+    phone = rest.partition("Desktop: the gutter")[0]
+    assert ".colophon-nav__theme { display: none; }" in base
+    assert ".topstrip > .toggle { display: none; }" in phone and ".colophon-nav__theme { display: list-item; }" in phone
+    assert ".sitenav ul { justify-content: space-between; column-gap: 0.5rem; }" in phone   # the five items spread across the line
+
+
+def test_a_link_says_where_it_leads_to_a_reader_who_cannot_see_the_card():
+    """A screen reader's list of links read "Paper, arXiv, Code, Data" on the research page and three bare
+    titles on the home page's hand-off (deep review 2026-09-25, PA-05). Each paper button carries a `context`
+    in site.yaml -- per button, never one suffix for all, which would have called a CCN recording part of
+    the NeurIPS paper -- printed after the label in a hidden span; the hand-off link names its page the same
+    way; the home Research row's Paper and Code carry the card's own contexts. The two generated glyphs the
+    stylesheet draws, the role line's dots and the attribution's dash, carry empty alternative text so they
+    are not read either."""
+    card, research = SITE["research"][0], html_of("research/")
+    contexts = {b["label"]: b.get("context") for b in card["buttons"]}
+    assert contexts == {"Paper": "(NeurIPS 2025)", "arXiv": "preprint of the NeurIPS 2025 paper",
+                        "Code": "for the NeurIPS 2025 paper", "Data": "for the NeurIPS 2025 paper",
+                        "NeurIPS 2025 video": "of the poster presentation of the paper"}
+    for label, context in contexts.items():
+        assert f'>{label}<span class="vh"> {context}</span></a></li>' in research, label
+    assert "CCN" not in " ".join(contexts.values())                       # a preliminary version, never the paper
+    buttons = research.partition('<ul class="buttons" role="list">')[2].partition("</ul>")[0]
+    assert buttons.count('<span class="vh">') == len(card["buttons"])
+    site = copy.deepcopy(SITE)
+    for button in site["research"][0]["buttons"]:
+        button.pop("context", None)
+    bare = html_of("research/", site).partition('<ul class="buttons" role="list">')[2].partition("</ul>")[0]
+    assert 'class="vh"' not in bare                                        # the key is optional
+    home = html_of("")
+    section = home.partition('<section id="elsewhere"')[2].partition("</section>")[0]
+    for row in SITE["elsewhere"]:
+        # the page's name closes the link, inside it, before the dash that opens the clause
+        assert section.count(f'<span class="vh"> ({row["page"]} page)</span></a>&nbsp;—') == 1, row["page"]
+        assert re.search(rf'<a href="{row["url"]}">(?:(?!</a>).)*{re.escape(row["label"][-12:])}<span class="vh"> \({row["page"]} page\)</span></a>', section), row["page"]
+    assert section.count('class="vh"') == len(SITE["elsewhere"]) + 2          # the three pages, then Paper and Code
+    css = _css()
+    assert re.search(r'\.role li::before \{[^}]*content: "\\00B7" / "";', css)
+    assert '.quote__by::before { content: "\\2014\\00A0" / ""; }' in css
+
+
+def test_the_first_thing_on_every_page_is_a_way_past_the_strip():
+    """A keyboard reader pressed Tab eight times on the home page before reaching a word of it (deep review
+    2026-09-25, PA-06). The skip link is the first element in <body>, leads to <main id="content">, which
+    can take focus (tabindex -1: a link can land on it, Tab does not stop on it) and draws no ring of its
+    own; the link is kept above the viewport until it holds focus. tests/test_browser.py presses the keys."""
+    for slug, html in every_page().items():
+        body = html.partition("<body>")[2]
+        assert body.lstrip().startswith('<a class="skip" href="#content">Skip to content</a>'), slug
+        assert html.count('<a class="skip"') == 1 and html.count('id="content"') == 1, slug
+        assert re.search(r'<main id="content" tabindex="-1"( class="opens-with-h1")?>', html), slug
+    not_found = (build.ROOT / "404.html").read_text(encoding="utf-8")
+    assert '<a class="skip" href="#content">Skip to content</a>' in not_found       # the 404 page inherits it
+    css = _css()
+    skip = re.search(r"\.skip \{[^}]*\}", css).group(0)
+    assert "position: absolute" in skip and "top: -3rem" in skip and "z-index: 10" in skip
+    assert ".skip:focus { top: 0.75rem; }" in css and "main:focus { outline: none; }" in css
+    assert "a “Skip to content” link is the first stop on every page" in SITE["accessibility"]["done"][2]
+
+
+def test_paper_gets_the_light_palette_and_the_addresses_whatever_the_screen_showed():
+    """The print block (deep review 2026-09-25, PA-01): the light palette set on the three root selectors,
+    the system-dark block's own among them, because a bare `:root` loses to it on specificity and a
+    dark-theme page then printed its name in a 2.91:1 grey; one scale step down on the root, not body, so
+    the rem-set lines shrink with the text; the screen furniture off the paper, the skip link, the phone's
+    theme button and the mark's caption included; the filled button a plain link; addresses after the links
+    that lead off the site; the older news opened by the script on beforeprint and closed after. The
+    portrait's dark-theme dimming goes with the palette. tests/test_browser.py measures the inks and the
+    page count."""
+    css = _css()
+    block = css.partition("@media print {")[2]
+    assert block.count("@media") == 0                                       # the last block in the file
+    assert ':root, :root:not([data-theme="light"]), :root[data-theme="dark"] {' in block
+    root = block.partition(':root[data-theme="dark"] {')[2].partition("}")[0]
+    for token in ("color-scheme: light;", "--bg: #fff;", "--ink: #000;", "--accent: #0B5F73;",
+                  "--accent-tint: transparent;", "--mat: transparent;", "--target-tint: transparent;",
+                  "--portrait-filter: none;"):
+        assert token in root, token
+    assert "html { font-size: 87.5%; }" in block and "body { background: #fff; }" in block
+    hidden = re.search(r"\n  (\.skip,[^{]*)\{ display: none !important; \}", block).group(1)
+    for furniture in (".skip", ".topstrip", ".colophon-nav", ".mark", ".mark-row", "main::before",
+                      ".colophon .links-nav::before", ".colophon .row::before", "h1.inset::before",
+                      "h2.inset::before", ".row > .when::after"):
+        assert furniture in [s.strip() for s in hidden.split(",")], furniture
+    assert ".btn--primary { color: var(--accent); background: none; border: 0; padding-inline: 0; text-decoration: underline; }" in block
+    addresses = re.search(r"(\.buttons a\[href\^=\"http\"\]::after[^{]*)\{([^}]*)\}", block)
+    assert addresses and 'content: " <" attr(href) ">";' in addresses.group(2)
+    for where in ('.venue a[href^="http"]::after', 'h3 a[href^="http"]::after', '.go-links a[href^="http"]::after'):
+        assert where in addresses.group(1), where
+    # the card is taller than a sheet, so its pieces keep whole rather than the card (which only emptied sheet 1)
+    assert ".paper__aside, .paper .tldr, .recovery-diagram li, .paper .open, .log > .row, .quote { break-inside: avoid; }" in block
+    assert ".paper .recovery-diagram, .paper .open { break-before: avoid; }" in block and "h2, h3 { break-after: avoid; }" in block
+    assert not re.search(r"\n  \.paper,", block)
+    assert "--plot-filter" not in block and "--art-filter" not in block   # a figure is printed as it is, on paper too
+    script = (build.ROOT / "templates" / "base.html.j2").read_text(encoding="utf-8")
+    assert 'window.addEventListener("beforeprint"' in script and 'window.addEventListener("afterprint"' in script
+    assert 'querySelectorAll("details.older:not([open])")' in script and 'd.setAttribute("data-print-opened", "")' in script
+    assert 'querySelectorAll("details[data-print-opened]")' in script
 
 
 def test_the_current_page_tick_is_the_section_tick_and_lands_on_the_strip_rule():

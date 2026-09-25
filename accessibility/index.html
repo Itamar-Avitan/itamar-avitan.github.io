@@ -44,19 +44,36 @@
       em.parentNode.replaceChild(a, em);
     }
 
-    var btn = document.getElementById("theme-toggle");
-    if (!btn) return;
-    var label = btn.querySelector("span");
-    function paint() { label.textContent = "Use " + (current() === "dark" ? "light" : "dark") + " theme"; }
-    btn.hidden = false;
+    /* Two buttons carry data-theme-toggle -- the strip's, and the colophon's, which the stylesheet paints in
+       its place on a phone (deep review 2026-09-25, PA-04) -- and only one of them is ever shown. Both are
+       unhidden and both are painted, so whichever one the width shows carries the right label. */
+    var btns = document.querySelectorAll("[data-theme-toggle]");
+    if (!btns.length) return;
+    function paint() {
+      for (var i = 0; i < btns.length; i++)
+        btns[i].querySelector("span").textContent = "Use " + (current() === "dark" ? "light" : "dark") + " theme";
+    }
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].hidden = false;
+      btns[i].addEventListener("click", function () {
+        var next = current() === "dark" ? "light" : "dark";
+        root.setAttribute("data-theme", next);
+        try { localStorage.setItem(KEY, next); } catch (e) {}
+        paint();
+      });
+    }
     paint();
-    btn.addEventListener("click", function () {
-      var next = current() === "dark" ? "light" : "dark";
-      root.setAttribute("data-theme", next);
-      try { localStorage.setItem(KEY, next); } catch (e) {}
-      paint();
-    });
     if (mq && mq.addEventListener) mq.addEventListener("change", paint);
+  });
+  /* On paper nothing can be expanded, so the older news prints open, and closes again afterwards (deep
+     review 2026-09-25, PA-01). Only a list this handler opened is closed again: one the reader had opened
+     stays as it was. A print stylesheet alone cannot do this -- the browser hides a closed details' content
+     itself, not through a rule a stylesheet could override. */
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details.older:not([open])").forEach(function (d) { d.open = true; d.setAttribute("data-print-opened", ""); });
+  });
+  window.addEventListener("afterprint", function () {
+    document.querySelectorAll("details[data-print-opened]").forEach(function (d) { d.open = false; d.removeAttribute("data-print-opened"); });
   });
 })();
 </script>
@@ -108,6 +125,7 @@
 }</script>
 </head>
 <body>
+<a class="skip" href="#content">Skip to content</a>
 <div class="page">
 
   <header>
@@ -121,7 +139,7 @@
           <li class="sitenav__cv"><a class="btn btn--primary" href="../cv.pdf" type="application/pdf">CV<span class="vh"> (PDF, 2 pages)</span></a></li>
         </ul>
       </nav>
-      <button id="theme-toggle" class="toggle" type="button" hidden>
+      <button id="theme-toggle" class="toggle" type="button" data-theme-toggle hidden>
         <svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.75a6.25 6.25 0 0 1 0 12.5z" fill="currentColor"/></svg>
         <span>Use dark theme</span>
       </button>
@@ -140,7 +158,7 @@
     </div>
   </header>
 
-  <main class="opens-with-h1">
+  <main id="content" tabindex="-1" class="opens-with-h1">
 
     <section id="accessibility" aria-labelledby="accessibility-h">
       <h1 id="accessibility-h" class="inset">Accessibility</h1>
@@ -168,7 +186,7 @@
         <ul class="statement" role="list">
           <li><strong class="lead">Nothing loads from anyone else.</strong> The fonts are served from this site, and no page asks any other host for anything — no analytics, no trackers, no embedded players, no hosted fonts — so the pages work on a slow or filtered connection, and reading them tells no one but the host, GitHub Pages, that you were here.</li>
           <li><strong class="lead">Contrast is measured, not judged by eye.</strong> Every piece of text painted on every page is sampled in a real browser and checked against the WCAG contrast formula — 4.5 to 1 for ordinary text, 3 to 1 for large text — in both themes, whether the theme comes from your system setting or from the theme button.</li>
-          <li><strong class="lead">Everything you can use, you can reach from a keyboard, and you can see where you are:</strong> every link and the theme button draws the same two-pixel ring when it takes focus.</li>
+          <li><strong class="lead">Everything you can use, you can reach from a keyboard, and you can see where you are:</strong> a “Skip to content” link is the first stop on every page, and every link and the theme button draws the same two-pixel ring when it takes focus.</li>
           <li><strong class="lead">The controls are big enough to hit:</strong> every link in the navigation strip, in the row of profiles and in the footer is a target at least 24 by 24 pixels, on every screen down to 320 pixels wide. A link set inside a sentence is left at the size of the words around it.</li>
           <li><strong class="lead">Nothing moves on its own.</strong> The only motion is a short color fade and smooth scrolling, and both are switched off for a visitor whose system asks for reduced motion.</li>
           <li><strong class="lead">The markup says what things are:</strong> one first-level heading per page, headings that never skip a level, lists marked up as lists, the navigation in a named landmark with the current page marked, and a language set on the document.</li>
@@ -215,6 +233,10 @@
     <nav class="colophon-nav" aria-label="About this site">
       <ul role="list">
         <li><a href="../accessibility/" aria-current="page">Accessibility</a></li>
+        <li class="colophon-nav__theme"><button class="toggle toggle--foot" type="button" data-theme-toggle hidden>
+          <svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.75a6.25 6.25 0 0 1 0 12.5z" fill="currentColor"/></svg>
+          <span>Use dark theme</span>
+        </button></li>
       </ul>
     </nav>
     <p class="mark-row inset"><svg class="mark" aria-hidden="true" viewBox="0 0 42 10" width="63" height="15"><circle cx="5" cy="5" r="5"/><circle cx="21" cy="5" r="5"/><rect x="32" width="10" height="10"/></svg><span class="mark-note">Two alike and one odd one out: the task behind our NeurIPS 2025 paper.</span></p>

@@ -44,19 +44,36 @@
       em.parentNode.replaceChild(a, em);
     }
 
-    var btn = document.getElementById("theme-toggle");
-    if (!btn) return;
-    var label = btn.querySelector("span");
-    function paint() { label.textContent = "Use " + (current() === "dark" ? "light" : "dark") + " theme"; }
-    btn.hidden = false;
+    /* Two buttons carry data-theme-toggle -- the strip's, and the colophon's, which the stylesheet paints in
+       its place on a phone (deep review 2026-09-25, PA-04) -- and only one of them is ever shown. Both are
+       unhidden and both are painted, so whichever one the width shows carries the right label. */
+    var btns = document.querySelectorAll("[data-theme-toggle]");
+    if (!btns.length) return;
+    function paint() {
+      for (var i = 0; i < btns.length; i++)
+        btns[i].querySelector("span").textContent = "Use " + (current() === "dark" ? "light" : "dark") + " theme";
+    }
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].hidden = false;
+      btns[i].addEventListener("click", function () {
+        var next = current() === "dark" ? "light" : "dark";
+        root.setAttribute("data-theme", next);
+        try { localStorage.setItem(KEY, next); } catch (e) {}
+        paint();
+      });
+    }
     paint();
-    btn.addEventListener("click", function () {
-      var next = current() === "dark" ? "light" : "dark";
-      root.setAttribute("data-theme", next);
-      try { localStorage.setItem(KEY, next); } catch (e) {}
-      paint();
-    });
     if (mq && mq.addEventListener) mq.addEventListener("change", paint);
+  });
+  /* On paper nothing can be expanded, so the older news prints open, and closes again afterwards (deep
+     review 2026-09-25, PA-01). Only a list this handler opened is closed again: one the reader had opened
+     stays as it was. A print stylesheet alone cannot do this -- the browser hides a closed details' content
+     itself, not through a rule a stylesheet could override. */
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details.older:not([open])").forEach(function (d) { d.open = true; d.setAttribute("data-print-opened", ""); });
+  });
+  window.addEventListener("afterprint", function () {
+    document.querySelectorAll("details[data-print-opened]").forEach(function (d) { d.open = false; d.removeAttribute("data-print-opened"); });
   });
 })();
 </script>
@@ -136,6 +153,7 @@
 }</script>
 </head>
 <body>
+<a class="skip" href="#content">Skip to content</a>
 <div class="page">
 
   <header>
@@ -149,7 +167,7 @@
           <li class="sitenav__cv"><a class="btn btn--primary" href="../cv.pdf" type="application/pdf">CV<span class="vh"> (PDF, 2 pages)</span></a></li>
         </ul>
       </nav>
-      <button id="theme-toggle" class="toggle" type="button" hidden>
+      <button id="theme-toggle" class="toggle" type="button" data-theme-toggle hidden>
         <svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.75a6.25 6.25 0 0 1 0 12.5z" fill="currentColor"/></svg>
         <span>Use dark theme</span>
       </button>
@@ -168,7 +186,7 @@
     </div>
   </header>
 
-  <main class="opens-with-h1">
+  <main id="content" tabindex="-1" class="opens-with-h1">
 
     <section id="research" aria-labelledby="research-h">
       <h1 id="research-h" class="inset">Research</h1>
@@ -195,11 +213,11 @@
           <p class="authors"><span class="me">Itamar Avitan</span>, Tal Golan</p>
           <p class="venue paper__venue">Advances in Neural Information Processing Systems 38 (NeurIPS 2025), main track</p>
           <ul class="buttons" role="list">
-            <li><a class="btn btn--primary" href="https://proceedings.neurips.cc/paper_files/paper/2025/hash/11e1900e680f5fe1893a8e27362dbe2c-Abstract-Conference.html">Paper</a></li>
-            <li><a class="btn" href="https://arxiv.org/abs/2510.23321">arXiv</a></li>
-            <li><a class="btn" href="https://github.com/brainsandmachines/oddoneout_model_recovery">Code</a></li>
-            <li><a class="btn" href="https://doi.org/10.6084/m9.figshare.30542690.v1">Data</a></li>
-            <li><a class="btn" href="https://slideslive.com/39047290">NeurIPS 2025 video</a></li>
+            <li><a class="btn btn--primary" href="https://proceedings.neurips.cc/paper_files/paper/2025/hash/11e1900e680f5fe1893a8e27362dbe2c-Abstract-Conference.html">Paper<span class="vh"> (NeurIPS 2025)</span></a></li>
+            <li><a class="btn" href="https://arxiv.org/abs/2510.23321">arXiv<span class="vh"> preprint of the NeurIPS 2025 paper</span></a></li>
+            <li><a class="btn" href="https://github.com/brainsandmachines/oddoneout_model_recovery">Code<span class="vh"> for the NeurIPS 2025 paper</span></a></li>
+            <li><a class="btn" href="https://doi.org/10.6084/m9.figshare.30542690.v1">Data<span class="vh"> for the NeurIPS 2025 paper</span></a></li>
+            <li><a class="btn" href="https://slideslive.com/39047290">NeurIPS 2025 video<span class="vh"> of the poster presentation of the paper</span></a></li>
           </ul>
           <p class="tldr"><span class="runin">Summary</span> To test whether a vision model represents images the way people do, researchers often fit a flexible linear mapping from the model’s features to human judgments (linear probing) and compare how well each model predicts. We fitted 20 vision models to 4.5 million <span class="nb">odd-one-out</span> judgments from the THINGS dataset, calibrated each to human response variability, let each one in turn generate simulated judgments, and asked whether the comparison would pick out the model that had generated them. It did so less than 80% of the time, even with millions of simulated trials — far above chance (one in twenty), but wrong more than one time in five.</p>
           <p class="tldr"><span class="runin">How the test works</span></p>
@@ -305,6 +323,10 @@
     <nav class="colophon-nav" aria-label="About this site">
       <ul role="list">
         <li><a href="../accessibility/">Accessibility</a></li>
+        <li class="colophon-nav__theme"><button class="toggle toggle--foot" type="button" data-theme-toggle hidden>
+          <svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.75a6.25 6.25 0 0 1 0 12.5z" fill="currentColor"/></svg>
+          <span>Use dark theme</span>
+        </button></li>
       </ul>
     </nav>
     <p class="mark-row inset"><svg class="mark" aria-hidden="true" viewBox="0 0 42 10" width="63" height="15"><circle cx="5" cy="5" r="5"/><circle cx="21" cy="5" r="5"/><rect x="32" width="10" height="10"/></svg><span class="mark-note">Two alike and one odd one out: the task behind our NeurIPS 2025 paper.</span></p>

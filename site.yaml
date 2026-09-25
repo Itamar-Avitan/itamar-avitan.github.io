@@ -445,20 +445,33 @@ research:
   - NeurIPS 2025
   - CCN 2025 · Talk
   figure: *recovery_matrix
+  # `context` (optional, per button): what a screen reader hears after the label, in a hidden span, so its
+  # list of links says "Paper (NeurIPS 2025)" and "Code for the NeurIPS 2025 paper" where the eye reads the
+  # card around the word (deep review 2026-09-25, PA-05). Per button, and never a suffix the template adds to
+  # all of them: one wording for every link would have called the CCN recording, when it stood here, part of
+  # the NeurIPS paper, and the ruling keeps CCN a preliminary version. The home page's Paper and Code links
+  # under the Research row carry the same two contexts (templates/macros.html.j2, elsewhere_rows).
   buttons:
   - label: Paper
     url: https://proceedings.neurips.cc/paper_files/paper/2025/hash/11e1900e680f5fe1893a8e27362dbe2c-Abstract-Conference.html
+    context: (NeurIPS 2025)
   - label: arXiv
     url: https://arxiv.org/abs/2510.23321
+    context: preprint of the NeurIPS 2025 paper
   - label: Code
     url: https://github.com/brainsandmachines/oddoneout_model_recovery
+    context: for the NeurIPS 2025 paper
   - label: Data
     url: https://doi.org/10.6084/m9.figshare.30542690.v1
+    context: for the NeurIPS 2025 paper
   # The paper's own recording, filed where cv.pdf files it (FACTS PUB-LINK-TALK). Fetched 2026-09-25: the
   # paper's 4:57 poster video, presenters Itamar Avitan and Tal Golan. "video", not "talk video": it is a
   # poster video. The CCN session recording is on the CCN row below, as on the CV (deep review PR-04, CS-14).
+  # Its context does not name the venue again: the label already does, and "NeurIPS 2025 video poster
+  # presentation of the NeurIPS 2025 paper" said it twice in one breath.
   - label: NeurIPS 2025 video
     url: https://slideslive.com/39047290
+    context: of the poster presentation of the paper
 # A talk or project row may carry `links`, a list of {label, url} rendered under the row in the paper card's
 # own button style: a recording, a repository. One mechanism for both lists (deep review 2026-09-25, DP-08).
 talks:
@@ -790,7 +803,9 @@ accessibility:
   done:
   - 'Nothing loads from anyone else. The fonts are served from this site, and no page asks any other host for anything — no analytics, no trackers, no embedded players, no hosted fonts — so the pages work on a slow or filtered connection, and reading them tells no one but the host, GitHub Pages, that you were here.'
   - 'Contrast is measured, not judged by eye. Every piece of text painted on every page is sampled in a real browser and checked against the WCAG contrast formula — 4.5 to 1 for ordinary text, 3 to 1 for large text — in both themes, whether the theme comes from your system setting or from the theme button.'
-  - 'Everything you can use, you can reach from a keyboard, and you can see where you are: every link and the theme button draws the same two-pixel ring when it takes focus.'
+  # The skip link is the first Tab stop on every page (deep review 2026-09-25, PA-06; tests/test_browser.py
+  # presses Tab and Enter on every page and checks where they land).
+  - 'Everything you can use, you can reach from a keyboard, and you can see where you are: a “Skip to content” link is the first stop on every page, and every link and the theme button draws the same two-pixel ring when it takes focus.'
   - 'The controls are big enough to hit: every link in the navigation strip, in the row of profiles and in the footer is a target at least 24 by 24 pixels, on every screen down to 320 pixels wide. A link set inside a sentence is left at the size of the words around it.'
   - 'Nothing moves on its own. The only motion is a short color fade and smooth scrolling, and both are switched off for a visitor whose system asks for reduced motion.'
   - 'The markup says what things are: one first-level heading per page, headings that never skip a level, lists marked up as lists, the navigation in a named landmark with the current page marked, and a language set on the document.'

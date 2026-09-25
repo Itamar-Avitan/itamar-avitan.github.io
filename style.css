@@ -191,6 +191,26 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; text-deco
   border-radius: 2px;
 }
 
+/* The first Tab stop: a link past the strip, the identity and the contact line to the page's content, kept
+   above the viewport until it holds focus and painted then, in the mono of the labels on the card colour,
+   at the top left where a keyboard reader looks for it (deep review 2026-09-25, PA-06). :focus, not
+   :focus-visible: nothing can point at a link that is off the screen, so any focus it takes is a keyboard's.
+   <main> takes the focus the link hands it (tabindex -1 in the markup) and draws no ring: the ring says
+   "this control", and the whole page is not a control. (0,1,1) beats the :focus-visible ring's (0,1,0). */
+.skip {
+  position: absolute;
+  left: 1rem;
+  top: -3rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--surface);
+  color: var(--accent);
+  border: 1px solid var(--rule-strong);
+  font: 500 0.8125rem/1 var(--mono);
+  z-index: 10;
+}
+.skip:focus { top: 0.75rem; }
+main:focus { outline: none; }
+
 /* proper nouns and terms of art never break at their hyphen or space */
 .nb { white-space: nowrap; }
 
@@ -228,9 +248,10 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; text-deco
   padding-block: 1rem var(--strip-pad);
   border-bottom: 1px solid var(--rule);
 }
-/* The row gap is wider than the tick is long. On a phone the five items do not fit beside the 44px theme
-   toggle -- measured 2026-09-23, they wrap at every width from 320px to 430px (they need about 355px, and the
-   nav gets 294px at 390) -- and the tick under a link on the first line then hangs into the gap under it;
+/* The row gap is wider than the tick is long. On a phone the five items have the whole line to themselves
+   now that the theme button stands in the colophon there (the phone block below; deep review 2026-09-25,
+   PA-04), and the strip is one line from 356px up. Below that -- 320 to 352px -- the CV chip alone drops
+   to a second line, and the tick under a link on the first line then hangs into the gap under it;
    1.125rem of gap against 0.6875rem of overhang keeps it clear of the line below, so it still reads as an
    underline and never lands on another link. From 45rem up the strip is one line and the tick lies on the
    hairline, which is the point of it. */
@@ -282,10 +303,11 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; text-deco
   cursor: pointer;
   transition: color 120ms ease, border-color 120ms ease;
 }
-/* The button is written hidden and the script unhides it, so a visitor whose browser ran no JavaScript is
-   never shown a control that cannot do anything. The rule above sets display from a class, which outranks the
-   browser's own [hidden] rule, so the attribute has to be honoured here in so many words: without this line
-   the dead button is painted. The topbar keeps its height either way, so nothing moves when the script runs. */
+/* Both buttons -- the strip's and the colophon's -- are written hidden and the script unhides them, so a
+   visitor whose browser ran no JavaScript is never shown a control that cannot do anything. The rule above
+   sets display from a class, which outranks the browser's own [hidden] rule, so the attribute has to be
+   honoured here in so many words: without this line the dead button is painted. The topbar keeps its height
+   either way, so nothing moves when the script runs. */
 .toggle[hidden] { display: none; }
 .toggle:hover { color: var(--ink); border-color: var(--tag-line); }
 
@@ -374,8 +396,11 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; text-deco
    and pushes a 320px page sideways; the proper noun is kept whole by the nb() span the macro now wraps it in,
    which protects the hyphen without making the whole phrase rigid. */
 .role li { position: relative; padding-left: 1.25em; }
+/* The empty alternative text after the slash keeps the separator out of the accessible text: without it a
+   screen reader read the role line as "· PhD candidate", "· Brains and Machines Lab" (deep review
+   2026-09-25, PA-05). The dot is drawn for the eye; the list items are already separate for the ear. */
 .role li::before {
-  content: "\00B7";
+  content: "\00B7" / "";
   position: absolute;
   left: 0.625em;
   transform: translateX(-50%);
@@ -828,7 +853,9 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   color: var(--ink-2);
   text-wrap: pretty;
 }
-.quote__by::before { content: "\2014\00A0"; }
+/* the dash is drawn, not read: the empty alternative text keeps it out of the attribution's accessible
+   text, as the role line's dots are kept out of the role line's (PA-05) */
+.quote__by::before { content: "\2014\00A0" / ""; }
 .quote__note {
   margin-top: 0.5rem;
   font-size: 0.875rem;
@@ -892,6 +919,10 @@ main.opens-with-h1 { margin-top: 2.25rem; }
 }
 /* the page you are on, when it is one of these: ink rather than accent, the strip's rule one floor down */
 .colophon-nav a[aria-current="page"] { color: var(--ink); text-decoration-color: var(--rule-strong); }
+/* The row's last item is the theme button a phone shows in place of the strip's (deep review 2026-09-25,
+   PA-04). From 45rem up the strip's button is the one shown and this item does not exist for layout; the
+   phone block turns the two around. */
+.colophon-nav__theme { display: none; }
 /* The mark: two of a kind and the odd one out, the task behind the paper above -- and, since 2026-09-25, the
    line that says so beside it, in the colophon's own mono register, because the mark had stood on every page
    unexplained (DI-01). One and a half times its old size (63x15; at 42x10 the accent square was a speck,
@@ -906,33 +937,26 @@ main.opens-with-h1 { margin-top: 2.25rem; }
    Phone: the rule moves to the left edge and keeps its ticks
    ========================================================================== */
 @media (max-width: 44.99rem) {
-  /* The strip stays one row. It used to stack, which put a preference control on the first line of the page,
-     above the navigation and above his name: the first thing a visitor met on a phone was the theme toggle,
-     and it cost about 56px of a fold that is already crowded. Now the nav keeps the line and wraps inside its
-     own column, and the toggle comes down to a 44px square holding only its mark -- the label is still in the
-     DOM (it is the button's accessible name, and the script writes to it), just not painted. */
-  /* nowrap, and a basis of 0 on the nav: with the nav's natural width (it wants about 400px) as its basis it
-     was wider than the line, so the toggle was pushed onto a line of its own below -- the same whole row the
-     stacked strip used to take, only underneath. A basis of 0 lets the nav take what is left beside the
-     toggle and wrap inside itself, which is where the wrapping belongs. */
-  .topstrip { flex-wrap: nowrap; align-items: flex-start; gap: 0.75rem; }
+  /* The strip carries only the way around the site. The theme button used to stand beside the navigation
+     as a 44px square holding its mark alone, and the five items wrapped around it at every phone width --
+     two lines from 320 to 430px, five lines at 200% text, where the strip was 70% of the screen (deep
+     review 2026-09-25, PA-04). On a phone it stands in the colophon instead, labelled in full, beside the
+     link about the site (the rules further down), and the navigation has the line to itself: one line and
+     60px tall from 356px up, the items spread across it; two lines only at 320-352px, the CV chip alone on
+     the second. The system setting is followed until a visitor chooses, so the one control a phone visitor
+     rarely needs is no longer the first thing on the page. "Home" stays in the strip on a phone: dropping
+     it, with the name above each page as the way home, is the owner's question (Q-L). A basis of 0 on the
+     nav lets it take the whole line and wrap inside itself, which is where any wrapping belongs. */
+  .topstrip > .toggle { display: none; }
   .sitenav { flex: 1 1 0; min-width: 0; }
-  .toggle {
-    flex: none;
-    display: grid;
-    place-items: center;
-    min-width: 2.75rem;
-    min-height: 2.75rem;
-    padding: 0.5rem;
-  }
-  .toggle span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
+  .sitenav ul { justify-content: space-between; column-gap: 0.5rem; }
+  /* The colophon's button: the row's own mono register at the row's own size, a button's box (28.8px tall,
+     above the 24px a target needs) on the row's text line, and its label painted -- it is the one place
+     the label is read by eye. The [hidden] rule keeps the no-JavaScript case: the button is written hidden
+     and the script unhides it, as the strip's is. */
+  .colophon-nav ul { align-items: center; }
+  .colophon-nav__theme { display: list-item; }
+  .colophon-nav .toggle--foot { margin: 0; padding: 0.25rem 0.5rem; font: 400 0.8125rem/1.6 var(--mono); max-width: 100%; text-align: left; }
 
   /* tap targets: a finger asks for more height than a pointer does. The width is already settled for every
      viewport by the overlay on .links a, so nothing here has to widen a box. */
@@ -1281,7 +1305,56 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   html { scroll-behavior: auto; }
 }
 
+/* ==========================================================================
+   Print: the light palette on white, one scale step down, the screen's
+   furniture gone, and every address a link leads to printed after it
+   (deep review 2026-09-25, PA-01). The older news prints open: the script in
+   base.html.j2 opens it on beforeprint, since a closed details' content is
+   hidden by the browser itself and no rule here can reach it.
+   ========================================================================== */
 @media print {
-  .toggle { display: none; }
+  /* Paper is always the light palette, whatever the screen was showing. The second selector is the
+     system-dark block's own selector (0,2,0) and wins by coming later; the third is the toggle's. A bare
+     `:root` would lose to the system-dark block on specificity, and a dark-theme page then printed its
+     name and lede in a grey of 2.91:1 on white. The portrait's dark-theme dimming is switched off with the
+     palette, and the tints go: a print dialog drops backgrounds by default, and an outlined badge or a
+     bordered plate reads the same with or without them. */
+  :root, :root:not([data-theme="light"]), :root[data-theme="dark"] {
+    color-scheme: light;
+    --bg: #fff; --surface: #fff; --ink: #000; --ink-2: #222; --muted: #444;
+    --rule: #bbb; --rule-strong: #999; --tag-line: #666;
+    --accent: #0B5F73; --accent-strong: #084A5A; --accent-tint: transparent; --mat: transparent;
+    --target-tint: transparent;
+    --portrait-filter: none;
+  }
+  /* One scale step down for the whole sheet: the root, not body, so the rem-set lines (authors, venue,
+     role) shrink with the text around them. Media queries still read the browser default. */
+  html { font-size: 87.5%; }
   body { background: #fff; }
+  /* Screen furniture: the skip link, the strip, the colophon's row about the site with the phone's theme
+     button, the mark and its caption. The margin rule and its ticks are backgrounds, which the print dialog
+     drops by default; left in, they printed as white notches in the card's border and the strip's hairline. */
+  .skip, .topstrip, .colophon-nav, .mark, .mark-row,
+  main::before, .colophon .links-nav::before, .colophon .row::before,
+  h1.inset::before, h2.inset::before, .row > .when::after { display: none !important; }
+  /* The filled button prints as a plain link: its white-on-fill text is what the dialog greys out. */
+  .btn--primary { color: var(--accent); background: none; border: 0; padding-inline: 0; text-decoration: underline; }
+  /* On paper a link is only as good as its address: the card's and the rows' buttons, a venue, a title that
+     is a link, and the home page's Paper and Code under the Research row. Not the links inside sentences --
+     an address in the middle of a line of prose is noise, and the ones that matter are also on the card. */
+  .buttons a[href^="http"]::after, .venue a[href^="http"]::after, h3 a[href^="http"]::after,
+  .go-links a[href^="http"]::after {
+    content: " <" attr(href) ">"; font: 400 0.6875rem/1.4 var(--mono); color: #444; word-break: break-all;
+  }
+  main, section + section { margin-top: 2.25rem; }
+  .colophon { padding-block: 2.25rem 0; }
+  .colophon .links-nav { margin-bottom: 1rem; }
+  /* The paper card is taller than a sheet since its depth blocks landed (WP-S3), so it breaks across sheets
+     whatever is asked of it; asked not to, it was pushed whole onto the second sheet and left the first
+     three-quarters empty. Its pieces keep whole instead -- the aside, each paragraph, each stage of the
+     diagram with its mark, the open questions -- and a list stays with the label over it. A row of a log and
+     a quotation never break inside. */
+  .paper__aside, .paper .tldr, .recovery-diagram li, .paper .open, .log > .row, .quote { break-inside: avoid; }
+  .paper .recovery-diagram, .paper .open { break-before: avoid; }
+  h2, h3 { break-after: avoid; }
 }

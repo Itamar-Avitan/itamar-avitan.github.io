@@ -85,10 +85,21 @@ one folder down), so the built site can be opened straight off the disk.
 
 **The navigation strip** is ordinary links, and works with JavaScript switched off. The page you are on is
 the one set in ink rather than accent; it carries `aria-current="page"` and a 2px ink tick on the strip's
-hairline — the same tick the margin rule uses to mark a section, one floor up. Below about 360px the five
-items wrap and the tick becomes a plain underline under its own link; the row gap is wider than the tick is
-long, so it never lands on the line below. The CV is the strip's one filled element, by the rule the site has
-kept throughout: a filled box is the single primary action in its group.
+hairline — the same tick the margin rule uses to mark a section, one floor up. On a phone the strip carries
+only the five items: the theme button stands in the colophon there, labelled, beside the accessibility link
+(both buttons are in the markup, written hidden; the script unhides them and the stylesheet shows one at a
+time), so the strip is one line from 356px up. Below that the CV chip alone drops to a second line and the
+tick becomes a plain underline under its own link; the row gap is wider than the tick is long, so it never
+lands on the line below. The CV is the strip's one filled element, by the rule the site has kept throughout:
+a filled box is the single primary action in its group. Before the strip, the first Tab stop on every page
+is a "Skip to content" link, painted only while it holds focus.
+
+**Print** gets the light palette on white whatever the screen was showing (the dark theme, chosen by the
+toggle or by the system, used to print its name and lede in a 2.91:1 grey), one scale step down, with the
+strip, the colophon row and the mark left off the paper and the address printed after every link on the
+card, in the rows and under a title, so a link on paper still leads somewhere. The older news prints open:
+the script opens the expander on `beforeprint` and closes it again after. Measured with Chrome's default
+margins: home and `/research/` take two A4 sheets, `/teaching/` one, `/commonplace/` two.
 
 **The `about` and `now` blocks are drafts** written on 2026-09-21 and marked as such in `site.yaml`. They
 stand in for the owner's own words until he replaces them. Every clause in them comes from a fact already on
@@ -117,7 +128,7 @@ card behind it, `--mat` in `style.css`. A figure whose colour is the data still 
 the distinction is real and the `--plot-filter` hook is what a future change has to go through in the open.
 The portrait is the one image that is not a figure, and the one the dark theme dims: `--portrait-filter`
 in `style.css` takes it down a shade there (its white wall was the brightest thing on the dark first
-screen), and leaves it alone in the light theme (and, once WP-S9's print stylesheet lands, in print).
+screen), and leaves it alone in the light theme and in print.
 
 **Five faces, all self-hosted** under `fonts/` (Fira Sans 400, 600 and 400 italic; Fira Mono 400 and 500),
 so no page asks another host for anything. The italic is used for the titles of works alone: the `works`

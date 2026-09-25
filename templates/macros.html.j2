@@ -230,7 +230,11 @@
     card's first button (Paper) and its Code link (deep review 2026-09-25, DS-09 and AS-02). The links
     row stands outside .what on purpose: inside it, the title rule (.log--go .what a) would set them as
     two more bold ink titles. Every key is tested before use;
-    a card without badges or buttons draws neither. -#}
+    a card without badges or buttons draws neither.
+    What a screen reader hears (deep review 2026-09-25, PA-05): the link's name is the label and then, in a
+    hidden span, the page it leads to -- "When the Best-Fitting Model Isn't the Right One (Research page)"
+    -- because a list of links that read as three bare titles said nothing about where they go; and the
+    Paper and Code links carry the card's own `context` the same way, as they do on the card. -#}
 {%- macro elsewhere_rows(items) %}
 {% for item in items %}
         <li class="row">
@@ -242,12 +246,12 @@
   {% if venue.badge %}
           <p class="go-venue"><span class="tag tag--venue">{{ venue.badge }}</span></p>
   {% endif %}
-          <p class="what"><a href="{{ item.url|local(base) }}">{{ nb(item.label) }}</a>&nbsp;— {{ nb(item.text) }}</p>
+          <p class="what"><a href="{{ item.url|local(base) }}">{{ nb(item.label) }}<span class="vh"> ({{ item.page }} page)</span></a>&nbsp;— {{ nb(item.text) }}</p>
   {% if item.url == "research/" and research and research[0].get("badges") %}
     {% set buttons = research[0].get("buttons") or [] %}
     {% set code = buttons|selectattr("label", "equalto", "Code")|list %}
     {% if buttons %}
-          <p class="go-links"><a href="{{ buttons[0].url }}">{{ buttons[0].label }}</a>{% if code %} · <a href="{{ code[0].url }}">Code</a>{% endif %}</p>
+          <p class="go-links"><a href="{{ buttons[0].url }}">{{ buttons[0].label }}{% if buttons[0].get("context") %}<span class="vh"> {{ buttons[0].context }}</span>{% endif %}</a>{% if code %} · <a href="{{ code[0].url }}">Code{% if code[0].get("context") %}<span class="vh"> {{ code[0].context }}</span>{% endif %}</a>{% endif %}</p>
     {% endif %}
   {% endif %}
         </li>
