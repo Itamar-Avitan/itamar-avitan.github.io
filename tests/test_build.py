@@ -402,7 +402,8 @@ def test_home_hands_the_visitor_on_to_every_other_page():
     assert section.count("<a ") == 5
     card = SITE["research"][0]
     research_row = section.partition('<span class="tag">Research</span>')[2].partition("</li>")[0]
-    assert f'<p class="go-venue"><span class="tag tag--venue">{card["badges"][0]}</span></p>' in research_row
+    venue = next(b for b in card["badges"] if " · " not in b)       # the card's own condition: a " · " is a presentation
+    assert f'<p class="go-venue"><span class="tag tag--venue">{venue}</span></p>' in research_row
     assert section.count('class="tag tag--venue"') == 1
     paper = card["buttons"][0]
     code = next(b for b in card["buttons"] if b["label"] == "Code")
@@ -412,6 +413,14 @@ def test_home_hands_the_visitor_on_to_every_other_page():
     assert re.findall(r'<a href="([^"]+)">', unescape(research_row))[1:] == [paper["url"], code["url"]]
     assert research_row.index('class="go-venue"') < research_row.index('class="what"') < research_row.index('class="go-links"')
     assert "go-links" not in research_row.partition('class="what"')[2].partition("</p>")[0]   # outside .what: not a title
+    # the box goes to the first venue, not to the first badge: with the card's list turned round, the talk
+    # ("CCN 2025 · Talk", a neutral tag on the card) stays off the row and the venue still takes the box
+    talk = next(b for b in card["badges"] if " · " in b)
+    turned = copy.deepcopy(SITE)
+    turned["research"][0]["badges"] = list(reversed(card["badges"]))
+    turned_section = html_of("", turned).partition('<section id="elsewhere"')[2].partition("</section>")[0]
+    assert f'<p class="go-venue"><span class="tag tag--venue">{venue}</span></p>' in turned_section
+    assert talk not in turned_section and turned_section.count('class="tag tag--venue"') == 1
     for slug in SLUGS[1:]:                            # and only the home page hands off; no page does it twice
         assert 'id="elsewhere"' not in html_of(slug), slug
 
@@ -1335,7 +1344,10 @@ def test_the_colophon_mark_carries_its_caption_on_every_page():
     beside it is one line from site.yaml, and the mark keeps the owner's row of three shapes at one and a
     half times its old size (DS-10) -- the same drawing the favicon is made from."""
     note = SITE["footer"]["mark_note"]
-    assert "our NeurIPS 2025 paper" in note and "odd one out" in note      # every word is already on the site
+    assert "our NeurIPS\u00a02025 paper" in note and "odd one out" in note  # every word is already on the site;
+    assert "NeurIPS 2025" not in note      # the venue and its year are tied with a no-break space: the caption
+    # is printed raw, so the nobreak list cannot reach it, and untied it broke "NeurIPS / 2025" at 760-1023px
+    # and on phones (WP-S8 review). "odd one out" is not tied: at 320px that would make the caption four lines.
     for slug, html in every_page().items():
         foot = html.partition('<footer class="colophon">')[2]
         assert foot.count('<p class="mark-row inset">') == 1, slug

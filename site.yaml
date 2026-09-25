@@ -136,7 +136,7 @@ nobreak:
 # Titles of works that are set in italic wherever they occur in the text, the way a book-length work or a long
 # poem is set in running prose (Chicago 8.171, MLA, APA), while a chapter title keeps its quotation marks. The
 # template wraps each in <i class="work"> after the no-break wrapping (macros.html.j2, nb()); the italic face is
-# fonts/fira-sans-latin-400-italic.woff2, self-hosted like the other three, so the page still asks no other host
+# fonts/fira-sans-latin-400-italic.woff2, self-hosted like the other four, so the page still asks no other host
 # for anything (deep review 2026-09-25, DS-07). Not <cite>: the attributions are paragraphs that open with a
 # speaker, and a test forbids <cite> on that page. A title here must occur in the content exactly as written,
 # spaces included -- "An Essay on Man" is tied with no-break spaces in the Pope attribution, so it is tied here
@@ -238,12 +238,13 @@ now:
 # the owner's ruling. Naming the speaker and the subject gets a reader there without a second reproduction.
 # The Research row is the one row that says more than its label and its line (deep review 2026-09-25, DS-09
 # and AS-02). Under its gutter label it carries the paper's first venue badge -- "NeurIPS 2025", the one
-# outlined box outside the paper card, drawn from `research[0].badges` -- and under its line a small mono row
-# with the paper's first button (Paper) and its Code link, drawn from `research[0].buttons`. Nothing is
-# written here for it: the badge and the addresses are the card's own, so they cannot drift from it. That
-# gives the row three ways out (the page, the paper, the code) where the other two keep one; the work is what
-# a visitor came to the front door for, and until this it was two clicks away. tests/test_build.py pins the
-# count and the two addresses.
+# outlined box outside the paper card, drawn from `research[0].badges` as the first badge without " · " (a
+# presentation badge such as "CCN 2025 · Talk" is a neutral tag on the card and stays off this row, whatever
+# the order of the list) -- and under its line a small mono row with the paper's first button (Paper) and its
+# Code link, drawn from `research[0].buttons`. Nothing is written here for it: the badge and the addresses are
+# the card's own, so they cannot drift from it. That gives the row three ways out (the page, the paper, the
+# code) where the other two keep one; the work is what a visitor came to the front door for, and until this it
+# was two clicks away. tests/test_build.py pins the count and the two addresses.
 elsewhere:
 - page: Research
   label: When the Best-Fitting Model Isn’t the Right One
@@ -810,6 +811,13 @@ footer:
   # The caption beside the colophon's mark, which had stood on every page unexplained: two of a kind and the
   # odd one out is the task of the paper (deep review 2026-09-25, DI-01). "our", as every line on the site
   # that names the paper says it; every word is already on the site (the research intro's "odd one out", the
-  # news items' "our NeurIPS 2025 paper"). The mark itself is drawn in templates/base.html.j2; the favicon and
-  # the arrangement of the three shapes are the owner's (Q-L) and this line does not touch them.
-  mark_note: 'Two alike and one odd one out: the task behind our NeurIPS 2025 paper.'
+  # news items' "our NeurIPS 2025 paper"). The venue and its year are tied with a literal no-break space, as
+  # "Negev, Israel" is in `role`: the line is printed raw by templates/base.html.j2, not through nb(), so the
+  # `nobreak` list cannot reach it, and untied the caption broke "NeurIPS / 2025" at 760-1023px (an iPad held
+  # upright) and on phones (WP-S8 review). Do not tie "odd one out" as well: at 320px that makes the caption
+  # four lines instead of three. "NeurIPS" stands unexpanded here, as it does in a venue badge: the caption is
+  # a label beside a mark, not running text, and the rule that each page expands the acronym at its first
+  # use is a rule for the text (on the research page the card's badge precedes the venue line's expansion in
+  # the same way). The mark itself is drawn in templates/base.html.j2; the favicon and the arrangement of the
+  # three shapes are the owner's (Q-L) and this line does not touch them.
+  mark_note: 'Two alike and one odd one out: the task behind our NeurIPS 2025 paper.'

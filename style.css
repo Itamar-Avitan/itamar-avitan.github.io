@@ -498,8 +498,9 @@ a:focus-visible > .ico { color: var(--accent-strong); }
 .statement .lead { font-weight: 600; color: var(--ink); }
 
 /* ---------- Tags: outlined, mono, never clickable ----------
-   The box belongs to the paper card's venue badges (and its "Ongoing"). A kind under a talk's date or a
-   page name in the hand-off rows takes the same class and is unboxed by the log rule further down. */
+   The box belongs to the paper card's venue badges (and its "Ongoing"), and to the paper's venue badge set
+   once more under the home page's Research hand-off (DS-09). A kind under a talk's date or a page name in
+   the hand-off rows takes the same class and is unboxed by the log rule further down. */
 .tag {
   display: inline-block;
   max-width: 100%;

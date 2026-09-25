@@ -117,9 +117,9 @@ card behind it, `--mat` in `style.css`. A figure whose colour is the data still 
 the distinction is real and the `--plot-filter` hook is what a future change has to go through in the open.
 The portrait is the one image that is not a figure, and the one the dark theme dims: `--portrait-filter`
 in `style.css` takes it down a shade there (its white wall was the brightest thing on the dark first
-screen), and leaves it alone in the light theme and in print.
+screen), and leaves it alone in the light theme (and, once WP-S9's print stylesheet lands, in print).
 
-**Four faces, all self-hosted** under `fonts/` (Fira Sans 400, 600 and 400 italic; Fira Mono 400 and 500),
+**Five faces, all self-hosted** under `fonts/` (Fira Sans 400, 600 and 400 italic; Fira Mono 400 and 500),
 so no page asks another host for anything. The italic is used for the titles of works alone: the `works`
 list in `site.yaml` names them, and the templates set each in `<i class="work">` wherever the text names it,
 the way a book or a long poem is set in prose. A title listed there must occur in the content; a test fails

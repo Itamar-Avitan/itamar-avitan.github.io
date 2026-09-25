@@ -224,17 +224,23 @@
     start of a line on 390-400px phones, and the Research row's did at 430 (deep review 2026-09-25).
     The Research row carries two things more, both drawn from the first paper card (`research[0]`) so
     that nothing is written twice: the paper's first venue badge under the gutter label -- the one
-    outlined box outside the card, set in the gutter exactly as the card sets its badges -- and, under
-    the line, a small mono row with the card's first button (Paper) and its Code link (deep review
-    2026-09-25, DS-09 and AS-02). The links row stands outside .what on purpose: inside it, the title
-    rule (.log--go .what a) would set them as two more bold ink titles. Every key is tested before use;
+    outlined box outside the card, set in the gutter exactly as the card sets its badges; a venue is a
+    badge without " · ", the card's own condition, so a presentation badge ("CCN 2025 · Talk") never
+    takes the box here whatever the order of the list -- and, under the line, a small mono row with the
+    card's first button (Paper) and its Code link (deep review 2026-09-25, DS-09 and AS-02). The links
+    row stands outside .what on purpose: inside it, the title rule (.log--go .what a) would set them as
+    two more bold ink titles. Every key is tested before use;
     a card without badges or buttons draws neither. -#}
 {%- macro elsewhere_rows(items) %}
 {% for item in items %}
         <li class="row">
           <p class="kind"><span class="tag">{{ item.page }}</span></p>
-  {% if item.url == "research/" and research and research[0].get("badges") %}
-          <p class="go-venue"><span class="tag tag--venue">{{ research[0].badges[0] }}</span></p>
+  {% set venue = namespace(badge=none) %}
+  {% if item.url == "research/" and research %}
+    {% for badge in research[0].get("badges") or [] %}{% if venue.badge is none and " · " not in badge %}{% set venue.badge = badge %}{% endif %}{% endfor %}
+  {% endif %}
+  {% if venue.badge %}
+          <p class="go-venue"><span class="tag tag--venue">{{ venue.badge }}</span></p>
   {% endif %}
           <p class="what"><a href="{{ item.url|local(base) }}">{{ nb(item.label) }}</a>&nbsp;— {{ nb(item.text) }}</p>
   {% if item.url == "research/" and research and research[0].get("badges") %}
