@@ -897,3 +897,15 @@ def test_no_attribution_line_opens_on_a_numeral_a_date_or_a_dash(browser, width)
             first = line[0]
             assert not re.fullmatch(r"[IVXLC]+[,.;:]?", first), (width, line)
             assert not re.match(r"\(\d", first) and first not in ("Essay", "on", "Man", "—"), (width, line)
+
+
+@pytest.mark.parametrize("width", [360, 412])
+def test_real_time_stays_on_one_line_on_the_bci4als_row(browser, width):
+    """Chromium set the BCI4ALS row as "...the real- / time system." at 36 of 225 widths from 320 to 1440, 360
+    and 412 (the commonest Android widths) among them, because a hyphen is a break opportunity and the
+    site's nobreak list did not yet hold "real-time" (review of WP-S10). It does now, and the span it makes
+    sits on one line: one client rect. (WebKit never split it at 16px; this pins the engine that did.)"""
+    page, _, _ = _page(browser, width, slug="research/")
+    rects = page.evaluate("""() => { const s = [...document.querySelectorAll('span.nb')].find(s => s.textContent === 'real-time');
+                                   return s ? s.getClientRects().length : 0; }""")
+    assert rects == 1, (width, rects)

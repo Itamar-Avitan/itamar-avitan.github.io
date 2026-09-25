@@ -129,6 +129,9 @@ nobreak:
 - five-person
 - add-on
 - brain–computer
+# Chromium broke the BCI4ALS row's "real-time" at its hyphen ("...the real- / time system.") at 36 of 225 widths
+# from 320 to 1440, 360 and 412 among them; WebKit did not (review of WP-S10, 2026-09-26; same defect as CS-08).
+- real-time
 - 1733–34
 # "Negev, Israel" (the role line) is NOT here: the label ties it with a no-break space instead, because WebKit lets
 # a nowrap span that holds a space run past the column by up to a space width (see the note over `role`).
@@ -560,8 +563,8 @@ projects:
 # unlinked (ruling): its README prints teammates' personal email addresses.
 - title: Embodied Brain Technology Practicum
   period: 24 Jul–6 Aug 2026
-  # 63 words against the 64 of the wording it replaced, so the reframe cost the Research page nothing; the
-  # ruled clause of 2026-09-25 adds five (68). This row still sits below the peer-reviewed paper's own
+  # 65 words against the 64 of the wording it replaced, so the reframe cost the Research page one word; the
+  # ruled clause of 2026-09-25 adds five (70). This row still sits below the peer-reviewed paper's own
   # summary and still weighs less than it, which is right. The order is programme -> team -> product -> his
   # clause, and the clause stays last and stays one sentence. Line ends measured (2026-09-26, WP-S10; Chromium
   # and WebKit, every 10px from 320 to 1280): at 16px text neither this row nor BCI4ALS ever leaves one word
@@ -569,7 +572,12 @@ projects:
   # it. At 200% text "integration." (31 widths in Chromium, 13 in WebKit) and "system." (15 in both) do stand
   # alone, as "off." and "live." did before the clauses; a tie was measured and not taken: it clears the
   # BCI4ALS row and halves this row's widths, but 320-400 and 720-750 remain, where "system integration." at
-  # 32px (294px) is wider than the column (211-291px).
+  # 32px (294px) is wider than the column (211-291px). That sweep looked only for one-word last lines and so
+  # missed a hyphen split (review of WP-S10): Chromium at 16px set the BCI4ALS row as "...the real- / time
+  # system." at 36 of 225 widths from 320 to 1440 (330-370, 410-455, 490-500, 590-615, 700-715, 770-790), 360
+  # and 412 among them; WebKit did not. "real-time" is in `nobreak` for it; re-measured with the span, neither
+  # engine splits it at 16px or 32px, no one-word last line appears at 16px, and at 32px "system." alone gains
+  # only 320-340, inside the 200% band above. tests/test_browser.py holds the span to one client rect.
   blurb: 'Two weeks at Brown University in Providence, on a program run jointly with Ben-Gurion University: graduate students from the two universities, admitted by competitive selection, work in small teams, each building a piece of neurotechnology and pitching it. Our five-person team built and pitched EarBetter, an add-on that works with any headphones, reads biosignals and filters out the sounds that set a person’s anxiety off. I led the system integration.'
   url: https://sites.google.com/brown.edu/ebt/2026-practicum
   links:

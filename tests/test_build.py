@@ -855,6 +855,8 @@ def test_the_practicum_leads_with_the_programme_and_ends_on_his_one_clause():
         assert gone not in everywhere, gone
     # one clause on his own part, his words, at the end (rulings 4 and 7): not a list of what he did
     assert entry["blurb"].endswith(" I led the system integration.") and entry["blurb"].count("I ") == 1
+    # and the clause stays out of News and About (the rulings allow it on the project row alone)
+    assert "system integration" not in news["text"] and not any("system integration" in p for p in SITE["about"])
     assert "pitched" in entry["blurb"]              # the single word that survives of the pitch and the plan
     # BCI4ALS: the three areas he ticked (ruling 8), after the team sentence, and no leadership claimed
     assert bci["blurb"].endswith("the real-time system.") and "led" not in bci["blurb"]
@@ -1424,7 +1426,7 @@ def test_the_quotes_section_is_empty_when_there_are_no_quotes():
 def test_terms_of_art_do_not_break_and_stay_escaped():
     pages = every_page()
     assert all(f'<span class="nb">{term}</span>' in pages[""] for term in ("Ben-Gurion", "(NeurIPS) 2025"))
-    assert all(f'<span class="nb">{term}</span>' in pages["research/"] for term in ("Best-Fitting", "five-person"))
+    assert all(f'<span class="nb">{term}</span>' in pages["research/"] for term in ("Best-Fitting", "five-person", "real-time"))
     # a nobreak term that matches nothing is dead configuration: "go-to-market" went with the phrase itself
     assert "go-to-market" not in SITE["nobreak"]
     for term in SITE["nobreak"]:
