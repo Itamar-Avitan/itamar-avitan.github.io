@@ -848,7 +848,9 @@ def test_the_practicum_leads_with_the_programme_and_ends_on_his_one_clause():
     # EarBetter is named, in a clause, and briefly
     for phrase in ("EarBetter", "add-on", "any headphones", "biosignals", "anxiety"):
         assert phrase in entry["blurb"], phrase
-    assert "headphone add-on" in news["text"] and "designed, built and pitched" in news["text"]
+    assert "headphone add-on" in news["text"] and "our team of five built and pitched EarBetter" in news["text"]
+    # the verb list is the row's and the CVs'; "designed" belongs to the ruled clause alone (WP-S13 review fix)
+    assert news["text"].count("designed") == 1
     # and by its purpose, in the ruled wording (ruling 15): what it was designed to do, not that it does it
     assert "an add-on for any headphones, designed to read biosignals and filter out the sounds" in entry["blurb"]
     assert "a headphone add-on designed to filter the sounds" in news["text"]

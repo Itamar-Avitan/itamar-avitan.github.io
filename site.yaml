@@ -344,14 +344,16 @@ news:
 # twice in twenty words, once in the programme's name and once as the place -- and nothing else changed.
 # Since 2026-09-26 the add-on is named by its purpose, "designed to filter" (owner ruling 15 of 2026-09-25;
 # WP-S13): the line no longer says that it filters, and claims no result. Why, and the row's fuller form,
-# are under RULINGS in the note over `projects`. The wording here is the ruled one for News, word for word;
-# the "designed, built and pitched" before it is the test's pin, so the sentence keeps both "designed".
+# are under RULINGS in the note over `projects`. The clause is the ruled one for News, word for word; the
+# verb list before it, "built and pitched", is the practicum row's and the six CVs' (WP-S13 review fix,
+# 2026-09-26: the earlier "designed, built and pitched" put "designed" twice in one sentence, a line apart on
+# a laptop, and no ruling covers that list), so "designed" belongs to the ruled clause alone.
 # US spelling, here and everywhere the site speaks in its own words ("program", "behavior", "color"): the
 # paper's title is US and cannot change, so US is the one consistent choice (deep review 2026-09-25, RN-04).
 # Quoted text keeps its own spelling -- "skilful" in the commonplace evidence -- and comments and test names
 # that say "programme-first" keep the ruling's name.
 - date: Aug 2026
-  text: Completed the Embodied Brain Technology Practicum, a joint Brown University–Ben-Gurion University program held at Brown, where our team of five designed, built and pitched EarBetter, a headphone add-on designed to filter the sounds that set a person’s anxiety off.
+  text: Completed the Embodied Brain Technology Practicum, a joint Brown University–Ben-Gurion University program held at Brown, where our team of five built and pitched EarBetter, a headphone add-on designed to filter the sounds that set a person’s anxiety off.
 # The full paper title is not repeated here: it is printed on the card and in the Elsewhere label, and a
 # third copy on the home page said the same thing three times in two screens. The phrase links to the card.
 - date: Dec 2025
@@ -573,15 +575,14 @@ talks:
 # anxiety off" was purpose-phrased already and stands. The comma after "headphones" is the site's own (the
 # plan's site wording has none; the CVs' long form has it): without it, "headphones designed to read
 # biosignals" reads as the headphones' design, not the add-on's. (The wordings retired by these rulings are
-# not kept here, and
-# neither are the owner's own messages: a sentence retired from the page but kept word for word in a public
-# repository is not off the site. The history lives in FACTS PROJ-EBT-DESC and the private ledgers; deep
-# review 2026-09-25, external review 2 §16.)
+# not kept here, and neither are the owner's own messages: a sentence retired from the page but kept word for
+# word in a public repository is not off the site. The history lives in FACTS PROJ-EBT-DESC and the private
+# ledgers; deep review 2026-09-25, external review 2 §16.)
 #
 # FACTS THE ENTRY MAY STATE, all established: the practicum is the Embodied Brain Technology Practicum, run
 # jointly by Ben-Gurion University and Brown University; it ran at Brown, in Providence, USA, from 24 July to
 # 6 August 2026; entry was competitive; his team of five designed, built and pitched EarBetter, an add-on for
-# any headphones designed to read biosignals and filter out anxiety-triggering sounds (its purpose, not a
+# any headphones, designed to read biosignals and filter out anxiety-triggering sounds (its purpose, not a
 # result: ruling 15); he led the system integration (ruling 7). "Two weeks" is derived from the dates in
 # `period`, not asserted. NOT stated, because no source gives them: a course code, the size of the Brown
 # cohort, and any award. One number attached to this entry is private and is NOT printed either (owner
