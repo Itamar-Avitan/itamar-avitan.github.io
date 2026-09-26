@@ -1,3 +1,4 @@
+import bisect
 import copy
 import json
 import re
@@ -883,27 +884,43 @@ def test_the_public_source_records_decisions_and_not_the_owners_messages():
     """This repository is public. The rulings behind the site are recorded in its comments and docstrings as
     the active decision, dated, with "record kept privately" pointing at where the reasoning lives; the
     owner's own messages, once pasted in word for word, are not (external review 2 §16; WP-S16, 2026-09-26).
-    What the scan looks for are the marks of a pasted message, none of them anything he wrote: two pieces of
-    chat shorthand, the phrase that used to introduce a pasted message, and a quoted string that opens with a
-    lower-case "i" and a space -- the site's own strings open with a capital. The scan covers every
-    hand-written source file, this one included; only the line that names the marks is skipped."""
+    What the scan looks for are the marks of a pasted message, none of them reproduces his message: two pieces
+    of chat shorthand, the phrase that used to introduce a pasted message, a quoted string that opens with a
+    lower-case "i" and a space -- the site's own strings open with a capital -- and a lower-case quotation
+    that follows the owner as its subject (he, his, the owner) and an attribution word (asked, chose, said,
+    wrote, answer, words) within a few words, which is the shape a pasted message takes in a note; the label
+    of an option he picked opens with a capital and passes. A comment or a docstring wraps, and a quotation
+    wraps with it, so each file is read with its lines joined, comment marks and indentation stripped, and a
+    hit is reported on the line it starts on (review of WP-S16: the per-line scan let three wrapped
+    quotations through). The scan covers every hand-written source file, this one included; only the two
+    lines that name the marks are skipped."""
     root = build.ROOT
     files = [root / "site.yaml", root / "README.md", root / "style.css", root / "build.py",
              *sorted((root / "templates").rglob("*.j2")), *sorted((root / "tools").glob("*.py")),
              *sorted((root / "tests").glob("*.py"))]
     marks = ("btw", "blah blah", "words verbatim")
     opener = re.compile(r"""["'“‘]i\s""")
+    attributed = re.compile(r"""\b(?:[Hh]e|[Hh]is|owner(?:'s)?)\b[^"“]{0,40}?\b(?:ask(?:ed)?|chose(?:n)?|said|wrote|answer|words)\b[^"“]{0,24}?["“][a-z]""")
     assert len(files) >= 14
     for path in files:
-        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-            if "marks = (" in line:
-                continue
-            low = line.lower()
-            assert not any(mark in low for mark in marks), (path.name, number, line.strip())
-            assert not opener.search(line), (path.name, number, line.strip())
-    # the phrase itself, where the four rulings this package restated live (a comment may wrap inside it)
+        lines = [(number, line.strip().lstrip("#").strip())
+                 for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1)
+                 if "marks = (" not in line and "attributed = re.compile(" not in line]
+        text = " ".join(line for _, line in lines)
+        starts = [0]
+        for _, line in lines:
+            starts.append(starts[-1] + len(line) + 1)
+        def at(offset):                                   # the (file, line number, line) a hit starts on
+            number, line = lines[bisect.bisect_right(starts, offset) - 1]
+            return path.name, number, line
+        for mark in marks:
+            assert text.lower().find(mark) < 0, at(text.lower().find(mark))
+        for pattern in (opener, attributed):
+            hit = pattern.search(text)
+            assert hit is None, at(hit.start())
+    # the phrase itself, where the six rulings this package restated live (a comment may wrap inside it)
     joined = re.sub(r"\n#\s*", " ", (root / "site.yaml").read_text(encoding="utf-8"))
-    assert joined.count("record kept privately") >= 4
+    assert joined.count("record kept privately") >= 6
 
 
 
@@ -1102,10 +1119,10 @@ def test_the_family_resemblance_line_is_the_verified_one():
 
 
 def test_the_commonplace_runs_in_the_owners_order_with_snape_first():
-    """It used to run oldest first, so that the years in the gutter only went forward. The owner asked on
-    2026-09-21 for "the snape quote needs to be first", so that rule is gone: a commonplace book is a person's
-    own order, not a chronology, and the gutter may now carry 2003 above 1887. Nothing else moved -- the three
-    A Study in Scarlet lines keep the order they were in."""
+    """It used to run oldest first, so that the years in the gutter only went forward. The owner ruled on
+    2026-09-21 that the Snape line comes first (record kept privately), so that rule is gone: a commonplace book
+    is a person's own order, not a chronology, and the gutter may now carry 2003 above 1887. Nothing else moved
+    -- the three A Study in Scarlet lines keep the order they were in."""
     years = [q["year"] for q in SITE["quotes"]]
     assert years == ["2003", "1887", "1887", "1887"] != sorted(years)
     assert SITE["quotes"][0]["copyright"].startswith("in-copyright")          # the Snape passage leads

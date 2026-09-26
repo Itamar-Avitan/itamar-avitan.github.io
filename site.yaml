@@ -169,12 +169,13 @@ role:
 - label: Ben-Gurion University of the Negev, Israel
 identity_line: I study how to tell which neural network models of human vision are right, not just which ones predict best.
 
-# DRAFT, awaiting the owner's own words. Written on 2026-09-21 in answer to his ask for "a proper about me in
-# your voice" and a "Now / what I'm up to" block. Every clause below is drawn from facts already on this site
-# or given by him -- the lab, the advisor, the fields he came from, the question the work asks, the result the
-# paper found, the teaching, the two students, the BCI4ALS build and the practicum product. Nothing about his
-# life outside that is invented, and nothing should be added here that he has not said. It replaces the old
-# three-paragraph "bio", whose second paragraph is kept verbatim as the Research page's intro above.
+# DRAFT, awaiting the owner's own words. Written on 2026-09-21 because the owner asked for an About section in
+# his own voice and a Now block (owner ruling, 2026-09-21; record kept privately). Every clause below is drawn
+# from facts already on this site or given by him -- the lab, the advisor, the fields he came from, the question
+# the work asks, the result the paper found, the teaching, the two students, the BCI4ALS build and the practicum
+# product. Nothing about his life outside that is invented, and nothing should be added here that he has not
+# said. It replaces the old three-paragraph "bio", whose second paragraph is kept verbatim as the Research page's
+# intro above.
 #
 # Cut back on 2026-09-21, second pass. The first paragraph was an education record written as prose -- direct
 # track, department, school, B.Sc., B.A., M.Sc., 2026 -- which is exactly the online-CV register he rejected
@@ -215,7 +216,7 @@ about:
 # DRAFT, as above. Short enough to keep true: rewrite it whenever it stops being what you are doing.
 # Two lines since 2026-09-25 (WP-S1). Line 1 repeats the lede's question on purpose: it is the interim until
 # the owner says what may be said about the current work (Q-H). The mentoring line went because MENT-YEARS is
-# 2025-2026 on his own words, so it is not "now"; the teaching-assistant line went because no source records
+# 2025-2026 by his own account, so it is not "now"; the teaching-assistant line went because no source records
 # a 2026/27 assistantship (Q-G). The writing course stays: it is the one forthcoming thing he has dated.
 now_as_of: Sep 2026
 now:
@@ -550,8 +551,8 @@ talks:
 # 6 August 2026; entry was competitive; his team of five designed, built and pitched EarBetter; he led the
 # system integration (ruling 7). "Two weeks" is derived from the dates in `period`, not asserted. NOT stated,
 # because no source gives them: a course code, the size of the Brown cohort, and any award. One number attached
-# to this entry is private and is NOT printed either (owner ruling; the CV register records it), and the entry
-# says the entry was competitive and stops.
+# to this entry is private and is NOT printed either (owner ruling, 2026-09-21; the CV register records it), and
+# the entry says the entry was competitive and stops.
 projects:
 # Titled by the programme, not by the product: under a heading a reader's eye reaches first, "EarBetter" would
 # have led and the practicum would have been the clause, which is the ruling upside down. The title links the
@@ -586,9 +587,9 @@ projects:
 # BCI4ALS. RULING (source O, 2026-09-25, rulings 4 and 8; FACTS PROJ-BCI-TECH has the tick list). The team
 # sentence stands as it was -- the team is the subject of "built" -- and one clause on his own part follows
 # it, naming the three areas he ticked: data collection, signal processing, the real-time system. He did NOT
-# tick team lead / coordination: never "led" or "coordinated" here. This supersedes his 2026-09-21 answer
-# "Leave it as team credit" (B4). The CVs print the same three areas with the tools named; the site keeps its
-# plainer register. The order is team -> person -> his clause. The person it was built for stays unnamed and
+# tick team lead / coordination: never "led" or "coordinated" here. This supersedes his 2026-09-21 ruling B4
+# (team credit only). The CVs print the same three areas with the tools named; the site keeps its plainer
+# register. The order is team -> person -> his clause. The person it was built for stays unnamed and
 # the row stays unlinked (the note over `projects` says why).
 - title: BCI4ALS
   period: 2022–2023
@@ -608,8 +609,8 @@ projects:
 # The quotation marks belong to the text here, not to a CSS rule, so that a reader who copies a line gets the
 # marks with it. The year is a plain date like every other label in the gutter: a date that needs a
 # parenthetical belongs in the attribution, where there is room to say it properly.
-# ORDER: the owner's, chosen on 2026-09-21 -- "the snape quote needs to be first". The list used to run
-# oldest first, so that the years in the gutter only went forward; that rule is dropped, because he cares
+# ORDER: the owner's -- the Snape line first (owner ruling, 2026-09-21; record kept privately). The list used to
+# run oldest first, so that the years in the gutter only went forward; that rule is dropped, because he cares
 # which line a reader meets first and the gutter can carry 2003 above 1887. A commonplace book is a person's
 # own order, not a chronology. Keep his order when you add to it: say where a new line goes, do not sort.
 # The intro says what a commonplace book is, for the reader who has not met the word, and what these four
@@ -781,7 +782,7 @@ teaching:
     what: 'In the lab: one on model–brain alignment, one on statistical modeling of neural spiking data.'
   # The post is the title and the subjects are the sentence, so the row reads as a post and not as a course
   # with an odd name. The subjects are TEACH-TUTOR's, from the advisor-edited CV the register sources: the
-  # site once printed a weaker list that dropped statistics and said "algebra" where the confirmed subject is
+  # site once printed a weaker list that dropped statistics and printed "algebra" where the confirmed subject is
   # linear algebra.
   - title: Academic tutoring, Dean of Students Office
     kind: Tutor
