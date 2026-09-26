@@ -120,6 +120,27 @@ def validate(site: dict) -> list[str]:
         elif slug in seen:
             problems.append(f"quotation slug {slug!r} is used twice")
         seen.add(slug)
+        # A quotation's source is its fields, not a string (the reading room, controller decision C2 under
+        # owner ruling 18, 2026-09-26): speaker, author, work and year are required; chapter, source_url
+        # and `quoting` (author, work, year and chapter of the work the line itself quotes) are optional.
+        # The old one-string `attribution` is refused, so a source is written in one place and cannot
+        # disagree with itself; a source_url is an https address, since a reader is sent to it.
+        head = f"quotation {quote.get('text', '')[:40]!r}"
+        if "attribution" in quote:
+            problems.append(f"{head} has an attribution string: the source line is composed from its fields")
+        cited = [("", quote, ("speaker", "author", "work", "year"))]
+        if quote.get("quoting") is not None:
+            cited.append(("quoting: ", quote["quoting"], ("author", "work", "year")))
+        for where, part, required in cited:
+            if not isinstance(part, dict):
+                problems.append(f"{head}: {where.rstrip(': ')} is not a mapping")
+                continue
+            for key in required:
+                if not isinstance(part.get(key), str) or not part[key].strip():
+                    problems.append(f"{head}: {where}{key} is missing")
+            url = part.get("source_url")
+            if url is not None and not (isinstance(url, str) and url.startswith("https://")):
+                problems.append(f"{head}: {where}source_url {url!r} is not an https address")
     # A paper card's `doi` feeds the structured data; its BibTeX block prints the same identifier for a reader.
     # Both come from one FACTS row (PUB-DOI), so they may not disagree.
     for card in site.get("research") or []:

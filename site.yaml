@@ -96,7 +96,7 @@ pages:
 - slug: commonplace/
   nav: Commonplace
   heading: Commonplace
-  description: 'A commonplace book: lines about minds, and about how to study one, that Itamar Avitan keeps coming back to.'
+  description: 'A commonplace book: lines Itamar Avitan keeps because they return to one question — what can we infer about a mind from what it does?'
 # The accessibility statement, added 2026-09-21 at the owner's request.
 # A PAGE OF ITS OWN, NOT A SECTION, and NOT IN THE NAVIGATION STRIP. Three decisions, each with its reason:
 #   * its own page, because it is about the site rather than about him. Folded into Home it would sit under
@@ -781,37 +781,50 @@ projects:
 - title: BCI4ALS
   period: 2022–2023
   blurb: In a team of five, we built a brain–computer interface (BCI) that let a person with amyotrophic lateral sclerosis (ALS) answer yes/no questions through the P300 brain response measured with electroencephalography (EEG). The person it was built for used it live. I worked on the data collection, the signal processing and the real-time system.
-# Lines about the mind, collected. text, attribution and note are printed; year is the gutter label; slug is
-# the entry's own address on the page (see PERMALINKS below); status, evidence and copyright are the
-# provenance record and are not rendered. Always name a quotation's source.
+# Lines about the mind, collected, and read as a reading room (external review 3 §24; controller decision C2
+# under owner ruling 18, 2026-09-26; record kept privately): the line first, then its source, then one note of
+# context. Printed keys: text; the source line, which the template composes from speaker, author, work, year
+# and chapter (and, for a line that itself quotes another work, `quoting`, with the same author/work/year/
+# chapter); note; and source_url, which makes the work's title a link to a free text of the work where one
+# exists. slug is the entry's own address on the page (see PERMALINKS below). status, evidence and copyright
+# are the provenance record and are not rendered. Always name a quotation's source: build.py refuses an entry
+# without speaker, author, work and year, and refuses the old one-string `attribution`, so the fields are the
+# only place a source is written and the design can tell the speaker from the work.
+# SOURCE LINKS: the three Doyle lines link A Study in Scarlet to Project Gutenberg ebook #244, the text their
+# evidence was checked against; the Rowling novel is in copyright and has no free text, so its title is not a
+# link. A source_url is always https, and tools/check_links.py asks for it with every other address.
 # PERMALINKS (deep review 2026-09-25, AS-52): every quotation carries a `slug` -- lower-case ASCII words
-# joined by hyphens -- which becomes the id of its row and the address of the small "§" link at the end of
-# its attribution, so that one line can be shared (commonplace/#holmes-brain-attic lands on that entry, with
-# the page's accent ring around it). A slug is NEVER CHANGED once published: a link someone kept would stop
+# joined by hyphens -- which becomes the id of its entry and the address of the small "§" link at the end of
+# its source line, so that one line can be shared (commonplace/#holmes-brain-attic lands on that entry, on a
+# panel of the page's accent tint). A slug is NEVER CHANGED once published: a link someone kept would stop
 # landing. build.py refuses a quotation without one, a malformed one, and two the same. The link is always
 # painted, never only on hover: a keyboard or a finger cannot hover.
 # House rule: keep a quotation from a work that is still in copyright to a single sentence. The Snape entry
 # below is a deliberate exception, ruled by the owner and recorded there; every future in-copyright entry
 # still starts from the single sentence.
 # The quotation marks belong to the text here, not to a CSS rule, so that a reader who copies a line gets the
-# marks with it. The year is a plain date like every other label in the gutter: a date that needs a
-# parenthetical belongs in the attribution, where there is room to say it properly.
+# marks with it. The year is printed once, in the source line after the work's title: the page has no date
+# gutter (controller decision C5 item 10, 2026-09-26, after external review 3 §24 -- the same "1887" beside
+# three of the four lines asked the reader to read a chronology the page is not using). A date that needs a
+# parenthetical (Pope's 1733–34) has room in the source line to say it properly.
 # ORDER: the owner's -- the Snape line first (owner ruling, 2026-09-21; record kept privately). The list used to
 # run oldest first, so that the years in the gutter only went forward; that rule is dropped, because he cares
-# which line a reader meets first and the gutter can carry 2003 above 1887. A commonplace book is a person's
-# own order, not a chronology. Keep his order when you add to it: say where a new line goes, do not sort.
-# The intro says what a commonplace book is, for the reader who has not met the word, and what these four
-# have in common -- "about minds, and about how to study one" covers Pope's line and the thousand-and-first
-# misdeed as well as the two the old intro fit (deep review 2026-09-25, CS-18 and DI-05). "how to study one"
-# is the agent's phrase for what the lines share, not his: Q-N item 18 asks whether he wants his own sentence
-# here instead. The space before the em dash is a no-break space (U+00A0), so the dash never opens a line.
-# The same tie holds a section numeral to its noun in every attribution below (Part I, Chapter II,
-# Chapter 24, Epistle II), holds each work's year to its title (Phoenix (2003), Scarlet (1887), Pope's
-# title to its span), and holds the Watson line's dash to the word before it: with the permalink at the
-# end, the Watson attribution ran to three lines on a laptop and opened its second on a lone "I", which
-# reads as the pronoun, and the Snape line opened one on "(2003)," on a 320px phone (review of WP-S4,
+# which line a reader meets first -- and with the years off the gutter, nothing on the page reads as a
+# chronology any more. A commonplace book is a person's own order, not a chronology. Keep his order when you
+# add to it: say where a new line goes, do not sort.
+# The intro is the one understated sentence external review 3 §24 proposed, taken as written under the
+# owner's delegation of this page (ruling 18, decision C2; record kept privately): it gives the selection a
+# reason without explaining each line, and answers the page's one question -- what does he choose to keep
+# thinking about. It replaces the 2026-09-25 intro that said what a commonplace book is (CS-18/DI-05); the
+# heading and the page description still name the genre for a reader who has not met the word. The sentence
+# is not in his own words: Q-N item 18 / Q-M item 1 still offer him to replace it with one that is.
+# The no-break ties (U+00A0) hold a section numeral to its noun in every chapter field below (Part I,
+# Chapter II, Chapter 24, Epistle II) and hold Pope's title together; the template ties each work's year to
+# its title (Phoenix (2003), Scarlet (1887)) and the Watson line's dash to the word before it: with the
+# permalink at the end, the Watson source ran to three lines on a laptop and opened its second on a lone "I",
+# which reads as the pronoun, and the Snape line opened one on "(2003)," on a 320px phone (review of WP-S4,
 # 2026-09-25). tests/test_browser.py measures the line starts.
-quotes_intro: A commonplace book is a notebook of lines worth keeping. These are mine — lines about minds, and about how to study one, that I keep coming back to.
+quotes_intro: 'I keep these lines because they return to a question I find difficult to leave alone: what can we infer about a mind from what it does?'
 quotes:
 # The owner was shown that this novel is in copyright and that the single sentence “The mind is not a book…”
 # was the safer extract, and chose the full four-sentence passage anyway on 2026-09-21. It is printed here at
@@ -819,8 +832,11 @@ quotes:
 # reading” as two words, and the last sentence carried through to “most minds are” instead of breaking off
 # after “Potter—”.
 - text: “Only Muggles talk of ‘mind reading.’ The mind is not a book, to be opened at will and examined at leisure. Thoughts are not etched on the inside of skulls, to be perused by any invader. The mind is a complex and many-layered thing, Potter—or at least, most minds are.”
-  attribution: Severus Snape, in J.K. Rowling, Harry Potter and the Order of the Phoenix (2003), Chapter 24, “Occlumency”
+  speaker: Severus Snape
+  author: J.K. Rowling
+  work: Harry Potter and the Order of the Phoenix
   year: '2003'
+  chapter: Chapter 24, “Occlumency”
   slug: snape-mind-not-a-book
   status: corrected
   evidence: >-
@@ -844,8 +860,12 @@ quotes:
   # longer extract now says itself, two lines above it. It points back at those words instead of repeating them.
   note: Snape’s retort in Harry’s first Occlumency lesson, after Harry gives Legilimency that name.
 - text: “I consider that a man’s brain originally is like a little empty attic, and you have to stock it with such furniture as you choose.”
-  attribution: Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter II, “The Science of Deduction”
+  speaker: Sherlock Holmes
+  author: Arthur Conan Doyle
+  work: A Study in Scarlet
   year: '1887'
+  chapter: Part I, Chapter II, “The Science of Deduction”
+  source_url: https://www.gutenberg.org/ebooks/244
   slug: holmes-brain-attic
   status: verified
   evidence: >-
@@ -860,10 +880,21 @@ quotes:
   copyright: public-domain
   note: Holmes says this immediately after learning the earth goes round the sun and replying, “Now that I do know it I shall do my best to forget it.”
 - text: “The proper study of mankind is man.”
-  # The poem's span sits after the poem's title, as the novel's year sits after the novel's: Epistle II alone
-  # is 1733, and "(1733–34)" is the whole Essay's (deep review 2026-09-25, AK-16).
-  attribution: Dr. John Watson, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter I, “Mr. Sherlock Holmes” — quoting Alexander Pope, An Essay on Man (1733–34), Epistle II
+  speaker: Dr. John Watson
+  author: Arthur Conan Doyle
+  work: A Study in Scarlet
   year: '1887'
+  chapter: Part I, Chapter I, “Mr. Sherlock Holmes”
+  source_url: https://www.gutenberg.org/ebooks/244
+  # The line is Pope's, in Watson's mouth: the source line says so after a dash ("— quoting ..."), with the
+  # poem's own author, title, span and epistle. The span sits after the poem's title, as the novel's year sits
+  # after the novel's: Epistle II alone is 1733, and "(1733–34)" is the whole Essay's (deep review 2026-09-25,
+  # AK-16). No source_url here: the ADDENDUM names the three Doyle lines only.
+  quoting:
+    author: Alexander Pope
+    work: An Essay on Man
+    year: '1733–34'
+    chapter: Epistle II
   slug: watson-proper-study
   status: verified
   evidence: >-
@@ -885,8 +916,12 @@ quotes:
   # reply would otherwise end the YAML scalar.
   note: 'Watson says it walking away from his first meeting with Holmes, still wondering how Holmes knew, unasked, that he had come from Afghanistan. Stamford, who introduced them, replies: “You must study him, then… You’ll find him a knotty problem, though.”'
 - text: “There is a strong family resemblance about misdeeds, and if you have all the details of a thousand at your finger ends, it is odd if you can’t unravel the thousand and first.”
-  attribution: Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet (1887), Part I, Chapter II, “The Science of Deduction”
+  speaker: Sherlock Holmes
+  author: Arthur Conan Doyle
+  work: A Study in Scarlet
   year: '1887'
+  chapter: Part I, Chapter II, “The Science of Deduction”
+  source_url: https://www.gutenberg.org/ebooks/244
   slug: holmes-thousand-and-first
   status: verified
   evidence: >-

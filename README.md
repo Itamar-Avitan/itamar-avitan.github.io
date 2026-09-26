@@ -41,7 +41,7 @@ CV (owner ruling, 2026-09-21; record kept privately). Nothing was dropped in the
 | Home | `/` | the masthead, `about`, the featured paper (drawn from the first `research` card), `now`, the news feed, and the two invitations (`elsewhere`) |
 | Research | `/research/` | Papers (the paper card, as an argument), Talks and presentations, Projects |
 | Teaching | `/teaching/` | Courses and Students |
-| Commonplace | `/commonplace/` | the quotations, in the owner's order |
+| Commonplace | `/commonplace/` | the quotations as a reading room, in the owner's order: each line, then its source on one line (composed from `speaker`, `author`, `work`, `year`, `chapter`, with the title linked where a `source_url` gives a free text), then one note; no date gutter |
 
 A fifth page, the **accessibility statement** at `/accessibility/`, is not in that strip. It is about the
 site rather than about him, so it is linked from a small row in the colophon of every page — the convention

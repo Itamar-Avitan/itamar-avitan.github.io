@@ -274,27 +274,41 @@
 {% endfor %}
 {% endmacro -%}
 
-{#- A commonplace book: lines he has copied out, on the same time axis as everything else, so the year sits in
-    the gutter and takes its tick like a talk. The attribution stands outside the blockquote, as the quoting
-    rules ask, and is a paragraph rather than a <cite>, because it opens with a person and <cite> marks the
-    title of a work; the note after it is the one sentence of context that tells you where the line falls.
-    Each row carries its slug as its id, and the attribution ends on a small "§" that links to it, so one
-    line can be shared (deep review 2026-09-25, AS-52). The link is inside the attribution's own paragraph,
-    at its end, and it is always painted: a keyboard or a finger cannot hover. build.validate() refuses a
-    quotation without a slug, so the key is read directly. The link's accessible name carries the speaker
-    (the attribution up to ", in") and the line's first clause (build.opening), so a screen reader's list of
-    links tells the four apart; two of the lines are Holmes's, so the speaker alone would not. -#}
-{%- macro quote_rows(items) %}
+{#- A commonplace book read as a reading room (external review 3 §24; controller decision C2 under owner
+    ruling 18, 2026-09-26; record kept privately): the line first, large; then its source, compact, on one
+    muted line; then one note of context, smaller and lighter. Nothing is dated in a gutter -- the year is part
+    of the source, printed after the work's title, and the page has no time axis to put it on (C5 item 10) --
+    so an entry is not a log row: no "when", no tick. The source line is composed here from the entry's
+    fields (speaker, author, work, year, chapter; `quoting` for a line that itself quotes another work, with
+    the same author/work/year/chapter), so the design can tell the speaker from the work and a year cannot
+    drift from the title it belongs to. The ties are the ones the one-string attribution carried before it
+    was split: a no-break space between a title and its year, and before the dash of "— quoting"
+    (tests/test_browser.py measures the line starts); the numerals' ties travel inside the chapter field. The
+    work's title is set in italic by nb() (`works`, DS-07), and is the link to a free text of the work where
+    the entry gives a source_url. The source stands outside the blockquote, as the quoting rules ask, and is a
+    paragraph rather than a <cite>, because it opens with a person and <cite> marks the title of a work. Each
+    entry carries its slug as its id, and the source ends on a small "§" that links to it, so one line can be
+    shared (deep review 2026-09-25, AS-52); the link is inside the source's own paragraph, at its end, and it
+    is always painted: a keyboard or a finger cannot hover. build.validate() refuses an entry without its
+    fields or its slug, so they are read directly. The link's accessible name carries the speaker and the
+    line's first clause (build.opening), so a screen reader's list of links tells the four apart; two of the
+    lines are Holmes's, so the speaker alone would not. -#}
+{%- macro cited(w) -%}
+  {{- nb(w.author) }}, {% if w.get("source_url") %}<a class="quote__source" href="{{ w.source_url }}">{{ nb(w.work) }}</a>{% else %}{{ nb(w.work) }}{% endif %}{{ "\u00a0" }}({{ nb(w.year) }}){% if w.get("chapter") %}, {{ nb(w.chapter) }}{% endif -%}
+{%- endmacro -%}
+
+{%- macro source(quote) -%}
+  {{- nb(quote.speaker) }}, in {{ cited(quote) }}{% if quote.get("quoting") %}{{ "\u00a0" }}— quoting {{ cited(quote.quoting) }}{% endif -%}
+{%- endmacro -%}
+
+{%- macro quote_entries(items) %}
 {% for quote in items %}
-        <li class="row" id="{{ quote.slug }}">
-          {{ dates(quote.year, "when") }}
-          <div class="what quote">
-            <blockquote><p>{{ nb(quote.text) }}</p></blockquote>
-            <p class="quote__by">{{ nb(quote.attribution) }}<a class="quote__link" href="#{{ quote.slug }}" aria-label="Link to this quotation ({{ quote.attribution.split(', in ')[0] }}: “{{ quote.text|opening }}”)">§</a></p>
+        <li class="entry quote" id="{{ quote.slug }}">
+          <blockquote><p>{{ nb(quote.text) }}</p></blockquote>
+          <p class="quote__by">{{ source(quote) }}<a class="quote__link" href="#{{ quote.slug }}" aria-label="Link to this quotation ({{ quote.speaker }}: “{{ quote.text|opening }}”)">§</a></p>
   {% if quote.get("note") %}
-            <p class="quote__note">{{ nb(quote.note) }}</p>
+          <p class="quote__note">{{ nb(quote.note) }}</p>
   {% endif %}
-          </div>
         </li>
 {% endfor %}
 {% endmacro -%}

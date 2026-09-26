@@ -941,13 +941,17 @@ li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
   border-radius: 3px;
 }
 
-/* ---------- Quotes: lines copied out, dated like everything else ----------
-   Body face, body size, body colour: a quotation is not a heading and must not read as one -- the paper's
-   title is the only large title on the page. The quotation marks are part of the text in site.yaml, so a
-   reader who copies a line gets them too; text-indent hangs the opening one into the margin, which keeps the
-   quoted words on the same left edge as every other column of prose on the page. */
+/* ---------- Reading: the commonplace, one line at a time ----------
+   The line first, then its source, then one note (a reading room: external review 3 §24; controller decision
+   C2 under owner ruling 18, 2026-09-26). The entries are not dated in a gutter -- the year is in the source
+   line -- so they are not log rows: on a laptop the list stands in the text column by its inset, with no date
+   beside it and no tick of its own; on a phone it draws no rule of its own, and the quotation takes the whole
+   measure. Body face, and on a phone body size: a quotation is not a heading and must not read as one -- the
+   paper's title is the only large title on the site. The quotation marks are part of the text in site.yaml,
+   so a reader who copies a line gets them too; text-indent hangs the opening one into the margin, which keeps
+   the quoted words on the same left edge as every other column of prose on the page. */
 .quote blockquote { margin: 0; font-size: 1.0625rem; line-height: 1.55; }
-.quote blockquote p { text-indent: -0.42em; }
+.quote blockquote p { text-indent: -0.42em; text-wrap: pretty; }   /* no one-word last line: the source and the note already ask for the same */
 
 /* Then the source, then the context. Each is a step down in size and a step lighter in colour, and the step
    away from the block above it is wider than the space its own lines leave between themselves, so the change
@@ -986,20 +990,25 @@ li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
   text-decoration: none;
 }
 .quote__link:hover, .quote__link:focus-visible { color: var(--accent); text-decoration: underline; }
-/* The entry a permalink lands on stands on a panel of the accent tint. The panel is the whole row, so the
-   date in the gutter, the quotation with its hanging mark, the source and the note all sit on it and nothing
-   has to keep clear of it. A ring around .what alone (the plan's CSS) could not: on a laptop its left stroke
-   ran through the opening mark that hangs 0.42em into the margin, and on a phone its top stroke crossed the
-   date that stacks above the entry (review of WP-S4, 2026-09-25). The box-shadow spread is the panel's
-   padding without a layout change, so the page does not jump when it lands: 0.625rem stays inside the row's
-   own air (rows are 1.75rem apart), clears the hanging mark on a phone (0.42em of 17px is 7.1px) and, at
-   320px, keeps 10px of the page's padding on the right and stops short of the rule on the left. The rule
-   and the ticks are positioned above the panel and run over it, as they run over the page. The colour is a
-   token, not a color-mix(), so the contrast test can read it back as an opaque rgb(); every text on the
-   panel keeps 4.5:1 in both themes. tests/test_browser.py measures all of this. */
-.row:target { background: var(--target-tint); box-shadow: 0 0 0 0.625rem var(--target-tint); border-radius: 2px; }
-/* and the step between two quotations is larger again than any step inside one */
-.log--quotes > .row + .row { margin-top: 1.75rem; }
+/* The entry a permalink lands on stands on a panel of the accent tint. The panel is the whole entry, so the
+   quotation with its hanging mark, the source and the note all sit on it and nothing has to keep clear of it.
+   A ring around the text alone (the plan's CSS) could not: its left stroke ran through the opening mark that
+   hangs 0.42em into the margin (review of WP-S4, 2026-09-25). The box-shadow spread is the panel's padding
+   without a layout change, so the page does not jump when it lands: 0.625rem stays inside the entry's own air
+   (entries are 1.75rem apart here), clears the hanging mark on a phone (0.42em of 17px is 7.1px) and, at
+   320px, keeps 10px of the page's padding on the right. On a laptop the entry's left edge is the text's and
+   the mark hangs 9.2px at 22px, so the spread steps up there (the laptop block below). The colour is a token,
+   not a color-mix(), so the contrast test can read it back as an opaque rgb(); every text on the panel keeps
+   4.5:1 in both themes. tests/test_browser.py measures all of this. */
+.entry:target { background: var(--target-tint); box-shadow: 0 0 0 0.625rem var(--target-tint); border-radius: 2px; }
+/* and the step between two entries is larger again than any step inside one */
+.reading > .entry + .entry { margin-top: 1.75rem; }
+/* The work's title is the link to a free text of the work where site.yaml gives one (the three Doyle lines,
+   Project Gutenberg): set like a title link elsewhere on the site -- the text's own colour with the accent
+   under it, the accent itself when pointed at or focused -- so the source line stays quieter than the
+   quotation above it and the three links do not become the loudest thing on the page. */
+.quote__source { color: inherit; text-decoration-color: color-mix(in srgb, var(--accent) 65%, transparent); }
+.quote__source:hover, .quote__source:focus-visible { color: var(--accent-strong); text-decoration-color: currentColor; }
 
 /* ---------- Footer ---------- */
 .colophon { padding-block: 3.25rem 3rem; }
@@ -1365,14 +1374,20 @@ li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
      longer the same size as its own footnote, which left the loudest thing on the page the word
      "Commonplace". The phone stays as it was: at 400px the measure cannot afford the step. */
   .quote blockquote { font-size: 1.25rem; line-height: 1.5; }
-  /* On this page the tick meets the rule and stops instead of crossing it. Every row opens with a quotation
-     mark hung 0.42em into the margin -- at 22px, 6.8px right of the rule -- and a tick that ran 4px past the
-     rule left 2.8px between the two, so "2003 --“" read as one glyph on every row (DS-06). Ten pixels ending
-     on the rule give the mark about 7px of air. And the list stands 2.25rem under the intro (it collapses
-     with the intro's own 1.5rem to 36px), wider than the step between two quotations, so the first quotation
-     opens the collection rather than hanging off the intro. */
-  .log--quotes > .row > .when::after { right: calc(var(--gap) / -2); width: 0.625rem; }
-  .log--quotes { margin-top: 2.25rem; }
+  /* The reading room on a laptop: the entries stand in the text column, with no date beside them and no tick
+     of their own, and the margin rule runs past them from the title's tick to "Last updated" as the page's
+     quiet spine (decided by render in both themes against a page with no rule at all: without it the title's
+     tick and the colophon's segment stood on nothing, and the column lost the left edge every other page
+     has). The opening mark, hung 0.42em into the margin, keeps about 7px of air from the rule at 22px. The
+     list stands 2.25rem under the intro (it collapses with the intro's own 1.5rem to 36px) and the entries
+     2.25rem apart, wider than any step inside one. The source and the note take a shorter measure than the
+     quotation -- 36rem against the column's 42rem -- so the apparatus reads as subordinate to the line it
+     places (external review 3 §24). The landing panel's spread steps up to 0.875rem: the entry's left edge
+     is the text's here, and 0.625rem left the mark 0.8px inside the panel's edge. */
+  .reading { margin-top: 2.25rem; }
+  .reading > .entry + .entry { margin-top: 2.25rem; }
+  .quote__by, .quote__note { max-width: 36rem; }
+  .entry:target { box-shadow: 0 0 0 0.875rem var(--target-tint); }
 
   /* the rule ends at the last tick: "Last updated" */
   .colophon { padding-block: 4.5rem 4rem; }

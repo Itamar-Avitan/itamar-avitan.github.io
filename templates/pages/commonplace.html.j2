@@ -1,7 +1,10 @@
 {#- The commonplace book, on a page of its own because the owner asked for one: the quotations get a place of
-    their own (owner ruling, 2026-09-21; record kept privately). The lines stand in his order -- Snape first --
-    so the years in the gutter no longer only go forward; a commonplace book is a person's own order, not a
-    chronology. -#}
+    their own (owner ruling, 2026-09-21; record kept privately). Since 2026-09-26 it reads as a reading room
+    (external review 3 §24; controller decision C2 under owner ruling 18; record kept privately): each line,
+    then its source on one compact line, then one note, in his order -- Snape first -- and with no date
+    gutter, because the page is deliberately not a chronology; the year is in the source line. The margin
+    rule stays as the page's quiet spine, from the title's tick to "Last updated", with no tick of its own
+    for an entry (decided by render in both themes; the reasons are in style.css, "Reading"). -#}
 {% extends "base.html.j2" %}
 
 {% block main %}
@@ -12,8 +15,8 @@
       <p class="page-intro inset">{{ m.nb(site.quotes_intro) }}</p>
 {% endif %}
 {% if site.get("quotes") %}
-      <ul class="log log--quotes" role="list">
-        {{ m.quote_rows(site.quotes)|trim }}
+      <ul class="reading inset" role="list">
+        {{ m.quote_entries(site.quotes)|trim }}
       </ul>
 {% endif %}
     </section>

@@ -955,13 +955,13 @@ def test_the_way_to_report_a_problem_is_on_the_first_screen(browser):
     ctx.close()
 
 
-# The entry a permalink landed on: the targeted row's box, its panel (the background plus the box-shadow's
-# spread, which is the panel's padding), the boxes the panel has to enclose (the date, and the first glyph of
-# the quotation, which hangs into the margin) and the ones it has to keep out of (the rows either side and
-# the viewport's edges), and the colours painted on it.
+# The entry a permalink landed on: the targeted entry's box, its panel (the background plus the box-shadow's
+# spread, which is the panel's padding), the boxes the panel has to enclose (the source line, and the first
+# glyph of the quotation, which hangs into the margin) and the ones it has to keep out of (the entries either
+# side and the viewport's edges), and the colours painted on it.
 TARGET_MARK_JS = r"""
 () => {
-  const rows = [...document.querySelectorAll('.row:target')];
+  const rows = [...document.querySelectorAll('.entry:target')];
   if (rows.length !== 1) return {count: rows.length};
   const row = rows[0], p = row.querySelector('blockquote p');
   const text = document.createTreeWalker(p, NodeFilter.SHOW_TEXT).nextNode();
@@ -970,24 +970,26 @@ TARGET_MARK_JS = r"""
   const style = getComputedStyle(row);
   const spread = parseFloat((style.boxShadow.match(/(-?[\d.]+)px\s*$/) || [0, 0])[1]);
   const color = sel => getComputedStyle(row.querySelector(sel)).color;
-  return {count: 1, row: box(row), when: box(row.querySelector('.when')), glyph: box(glyph), spread: spread,
+  return {count: 1, row: box(row), source: box(row.querySelector('.quote__by')), glyph: box(glyph), spread: spread,
           background: style.backgroundColor, page: getComputedStyle(document.body).backgroundColor,
           neighbours: [row.previousElementSibling, row.nextElementSibling].filter(Boolean).map(box),
           viewport: document.documentElement.clientWidth,
           inks: {quotation: color('blockquote p'), source: color('.quote__by'), note: color('.quote__note'),
-                 date: color('.when'), link: color('.quote__link')}};
+                 link: color('.quote__link')}};
 }
 """
 
 
 @pytest.mark.parametrize("width", WIDTHS)
 def test_every_quotation_permalink_is_a_24px_target_and_marks_its_entry(browser, width):
-    """The "§" at the end of each attribution is not a link inside a sentence, so the 24px rule applies to it
+    """The "§" at the end of each source line is not a link inside a sentence, so the 24px rule applies to it
     (WCAG 2.2 SC 2.5.8); and following one lands on the entry it names, which stands on a panel of the accent
-    tint. The panel is measured, not read off the stylesheet, because the plan's 2px ring around .what was
-    found running through the quotation's hanging opening mark on a laptop and across the date on a phone
-    (review of WP-S4): the mark has to enclose the date and the first glyph, stay inside the row's own air
-    and inside the viewport, be a colour of its own, and keep every text on it at 4.5:1, in both themes."""
+    tint. The panel is measured, not read off the stylesheet, because the plan's 2px ring around the text was
+    found running through the quotation's hanging opening mark on a laptop and across the date that then
+    stood above the entry on a phone (review of WP-S4): the panel has to enclose the source line and the
+    first glyph (there is no date since C5 item 10, 2026-09-26; on a laptop the entry's left edge is now the
+    text's, so the spread steps up there), stay inside the entry's own air and inside the viewport, be a
+    colour of its own, and keep every text on it at 4.5:1, in both themes."""
     page, _, _ = _page(browser, width, slug="commonplace/")
     links = page.evaluate(HIT_TEST_JS, ".quote__link")
     assert [l["label"] for l in links] == ["§"] * len(SITE["quotes"])
@@ -1000,14 +1002,14 @@ def test_every_quotation_permalink_is_a_24px_target_and_marks_its_entry(browser,
             m = page.evaluate(TARGET_MARK_JS)
             where = (width, scheme, q["slug"])
             assert m["count"] == 1, where
-            assert 8 <= m["spread"] <= 12, where                              # 0.625rem: a panel, not a hairline
+            assert 8 <= m["spread"] <= 14, where                              # 0.625rem, 0.875rem on a laptop: a panel, not a hairline
             panel = {"left": m["row"]["left"] - m["spread"], "top": m["row"]["top"] - m["spread"],
                      "right": m["row"]["right"] + m["spread"], "bottom": m["row"]["bottom"] + m["spread"]}
-            for name in ("when", "glyph"):                                  # enclosed, with 2px to spare
+            for name in ("source", "glyph"):                                # enclosed, with 2px to spare
                 inner = m[name]
                 assert (panel["left"] + 2 <= inner["left"] and inner["right"] <= panel["right"] - 2
                         and panel["top"] + 2 <= inner["top"] and inner["bottom"] <= panel["bottom"] - 2), (where, name, panel, inner)
-            for other in m["neighbours"]:                                    # in its own air: clear of the rows either side
+            for other in m["neighbours"]:                                    # in its own air: clear of the entries either side
                 assert other["bottom"] <= panel["top"] or panel["bottom"] <= other["top"], (where, panel, other)
             assert panel["left"] >= 4 and panel["right"] <= m["viewport"] - 4, (where, panel)
             assert m["background"] != m["page"] and _contrast(m["background"], m["page"]) >= 1.15, where   # seen
@@ -1015,7 +1017,38 @@ def test_every_quotation_permalink_is_a_24px_target_and_marks_its_entry(browser,
                 assert _contrast(ink, m["background"]) >= 4.5, (where, kind, ink, m["background"])
 
 
-# The first word of each line of every attribution, at the widths the layout and the type change at and the
+@pytest.mark.parametrize("width", [400, 1280, 1440])
+def test_the_reading_room_sets_the_source_under_the_line_at_a_shorter_measure(browser, width):
+    """The reading room (external review 3 §24; controller decision C2 under owner ruling 18, 2026-09-26): the
+    quotation takes the column every other page has, and on a laptop the source and the note take a shorter
+    measure under it, so the apparatus reads as subordinate to the line it places; nothing stands in the
+    gutter beside an entry, and the hanging opening mark keeps its air from the margin rule, which runs past
+    the entries as the page's quiet spine. On a phone the list draws no rule of its own and the source runs
+    as wide as the line."""
+    page, _, _ = _page(browser, width, slug="commonplace/")
+    m = page.evaluate("""() => {
+        const r = s => document.querySelector(s).getBoundingClientRect();
+        const p = document.querySelector('.quote blockquote p');
+        const text = document.createTreeWalker(p, NodeFilter.SHOW_TEXT).nextNode();
+        const glyph = document.createRange(); glyph.setStart(text, 0); glyph.setEnd(text, 1);
+        const main = document.querySelector('main'), rule = getComputedStyle(main, '::before');
+        return {intro: r('.page-intro').left, quote: r('.quote blockquote').left, quoteWidth: r('.quote blockquote').width,
+                by: r('.quote__by').width, note: r('.quote__note').width, glyph: glyph.getBoundingClientRect().left,
+                border: getComputedStyle(document.querySelector('.reading')).borderLeftWidth,
+                ruleLeft: main.getBoundingClientRect().left + parseFloat(rule.left),
+                ruleDrawn: rule.content !== 'none' && rule.content !== 'normal',
+                gutter: document.querySelectorAll('#quotes .when, #quotes time, #quotes .row').length};
+    }""")
+    assert m["gutter"] == 0 and m["border"] == "0px", m
+    assert m["quote"] == pytest.approx(m["intro"], abs=0.5), m                # the column every other page has
+    if width >= 1280:
+        assert m["by"] <= 576 < m["quoteWidth"] and m["note"] <= 576, m       # 36rem under a 42rem line
+        assert m["ruleDrawn"] and 4 <= m["glyph"] - m["ruleLeft"] <= 12, m    # the mark hangs clear of the rule
+    else:
+        assert m["by"] == pytest.approx(m["quoteWidth"], abs=0.5) and not m["ruleDrawn"], m
+
+
+# The first word of each line of every source line, at the widths the layout and the type change at and the
 # ones between them, where the wrap moves one word at a time.
 LINE_STARTS_JS = r"""
 () => [...document.querySelectorAll('.quote__by')].map(p => {
@@ -1039,10 +1072,10 @@ LINE_STARTS_JS = r"""
 
 @pytest.mark.parametrize("width", sorted(set(WIDTHS) | {360, 390, 430, 1024, 1440}))
 def test_no_attribution_line_opens_on_a_numeral_a_date_or_a_dash(browser, width):
-    """"Part I, Chapter I" split as "Chapter | I," on a laptop once the permalink made the Watson attribution
+    """"Part I, Chapter I" split as "Chapter | I," on a laptop once the permalink made the Watson source line
     three lines, and the lone "I" read as the pronoun (review of WP-S4). The numerals are tied to their nouns
     with U+00A0, each work's year to its title (the Snape line opened one on "(2003)," at 320 and 768), Pope's
-    title to its span, and the dash to the word before it, so no line of any attribution opens on a Roman
+    title to its span, and the dash to the word before it, so no line of any source line opens on a Roman
     numeral, on a year, on a piece of the Essay's title, or on an em dash."""
     page, _, _ = _page(browser, width, slug="commonplace/")
     for lines in page.evaluate(LINE_STARTS_JS):

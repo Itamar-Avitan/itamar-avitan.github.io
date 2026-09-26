@@ -1104,6 +1104,9 @@ def test_optional_keys_may_be_absent():
             if key == "text" and "date" in entry:
                 continue                                # a news item's sentence is required; its link is not
             entry.pop(key, None)
+    for entry in site["quotes"]:
+        for key in ("note", "chapter", "quoting", "source_url"):
+            entry.pop(key, None)                        # a source is speaker, author, work and year; the rest may be absent
     for entry in site["research"]:
         for key in ("venue", "how", "argument", "open", "cite", "published", "doi", "feature", "uses"):
             entry.pop(key, None)                    # the card's citation line, argument, strip, questions, record,
@@ -1127,7 +1130,7 @@ def test_optional_keys_may_be_absent():
                      'class="authors"', 'class="role"', 'class="nb"', 'rel="me"', 'id="email"',
                      'class="tag tag--venue"', 'class="btn', 'class="page-intro', 'class="recovery-diagram"',
                      'class="open"', 'class="cite"', 'class="work"', 'class="feature', 'class="runin"',
-                     'class="buttons'):
+                     'class="buttons', 'class="quote__note"', 'class="quote__source"'):
             assert gone not in html, (slug, gone)
     # the buttons back without their groups (a copy: the home checks below want them absent): one flat row,
     # the first link filled, no group and no label
@@ -1372,20 +1375,44 @@ def test_a_teaching_row_without_a_sentence_still_renders():
     assert "<h3>A course</h3>" in only and '<section id="students"' not in only
 
 
-def test_quotes_print_the_line_its_attribution_and_its_context_and_nothing_else():
+# The four source lines as the page prints them, character for character (the ties are U+00A0): the one-string
+# attribution each entry carried until 2026-09-26, composed since then by the template from the entry's fields
+# (speaker, author, work, year, chapter, quoting), so that splitting the string changed no fact.
+SOURCE_LINES = {
+    "snape-mind-not-a-book": "Severus Snape, in J.K. Rowling, Harry Potter and the Order of the Phoenix\u00a0(2003), Chapter\u00a024, “Occlumency”",
+    "holmes-brain-attic": "Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet\u00a0(1887), Part\u00a0I, Chapter\u00a0II, “The Science of Deduction”",
+    "watson-proper-study": ("Dr. John Watson, in Arthur Conan Doyle, A Study in Scarlet\u00a0(1887), Part\u00a0I, Chapter\u00a0I, “Mr. Sherlock Holmes”"
+                            "\u00a0— quoting Alexander Pope, An\u00a0Essay\u00a0on\u00a0Man\u00a0(1733–34), Epistle\u00a0II"),
+    "holmes-thousand-and-first": "Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet\u00a0(1887), Part\u00a0I, Chapter\u00a0II, “The Science of Deduction”",
+}
+
+
+def _source_line(section: str, slug: str) -> str:
+    """An entry's source line as printed -- tags off, ties kept -- without its permalink and its drawn dash."""
+    by = re.search(r'<p class="quote__by">(.*?)</p>', section[section.index(f'id="{slug}"'):], re.S).group(1)
+    return re.sub(r"<[^>]+>", "", re.sub(r'<a class="quote__link".*?</a>', "", by))
+
+
+def test_quotes_print_the_line_its_source_and_its_context_and_nothing_else():
+    """A reading room (external review 3 §24; controller decision C2 under owner ruling 18, 2026-09-26; record
+    kept privately): the line, then its source on one line, then the note -- and no date gutter, so nothing
+    on the page reads as a chronology (C5 item 10). The source line is composed from the entry's fields and
+    reads, character for character, as the one-string attribution did before the fields were split
+    (SOURCE_LINES): splitting it changed no fact."""
     html = html_of("commonplace/")
     section = html.partition('<section id="quotes"')[2].partition("</section>")[0]
     shown = _visible_text(section)
     assert section.count("<blockquote>") == len(SITE["quotes"]) == 4
     for quote in SITE["quotes"]:
         assert f'<blockquote><p>{quote["text"]}</p></blockquote>' in section         # printed exactly as verified
-        # rendered text, with the attribution's U+00A0 ties read as the spaces they print as
-        assert " ".join(quote["attribution"].split()) in shown and quote.get("note", "") in shown
+        assert _source_line(section, quote["slug"]) == SOURCE_LINES[quote["slug"]]
+        assert quote.get("note", "") in shown
         for private in ("evidence", "status", "copyright"):                          # provenance, not page text
             assert quote[private] not in shown
-    assert section.count('<time class="when" datetime="1887">1887</time>') == 3      # the year takes its tick
-    assert '<time class="when" datetime="2003">2003</time>' in section
-    # the borrowed line keeps its own date in the attribution, where it cannot break at the hyphen -- after the
+        assert "attribution" not in quote                                            # the fields are the source
+    for gone in ('class="when"', "<time", 'class="log', 'class="row"', 'class="what'):
+        assert gone not in section, gone                                            # no gutter, no tick, no log row
+    # the borrowed line keeps its own date in the source line, where it cannot break at the hyphen -- after the
     # poem's title, as the novel's year follows the novel's (AK-16); the permalink follows inside the same <p>.
     # The title, its span and the epistle's numeral are tied with U+00A0 (see the numeral test below); the
     # title is set in italic (`works`, DS-07), so the tie inside it is inside the <i> and the one after it is not.
@@ -1412,16 +1439,19 @@ def test_the_family_resemblance_line_is_the_verified_one():
                              "the details of a thousand at your finger ends, it is odd if you can’t "
                              "unravel the thousand and first.”")
     assert "can't" not in quote["text"]
-    assert quote["attribution"] == ("Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet\u00a0(1887), "
-                                    "Part\u00a0I, Chapter\u00a0II, “The Science of Deduction”")   # year and numerals tied
-    assert quote["year"] == "1887" and quote["status"] == "verified" and quote["copyright"] == "public-domain"
+    assert (quote["speaker"], quote["author"], quote["work"], quote["year"]) == (
+        "Sherlock Holmes", "Arthur Conan Doyle", "A Study in Scarlet", "1887")
+    assert quote["chapter"] == "Part\u00a0I, Chapter\u00a0II, “The Science of Deduction”"      # numerals tied
+    assert quote["source_url"] == "https://www.gutenberg.org/ebooks/244"                    # the text it was checked against
+    assert quote["status"] == "verified" and quote["copyright"] == "public-domain"
 
 
 def test_the_commonplace_runs_in_the_owners_order_with_snape_first():
     """It used to run oldest first, so that the years in the gutter only went forward. The owner ruled on
     2026-09-21 that the Snape line comes first (record kept privately), so that rule is gone: a commonplace book
-    is a person's own order, not a chronology, and the gutter may now carry 2003 above 1887. Nothing else moved
-    -- the three A Study in Scarlet lines keep the order they were in."""
+    is a person's own order, not a chronology -- and since the years left the gutter (C5 item 10, 2026-09-26)
+    nothing on the page reads as one. Nothing else moved: the three A Study in Scarlet lines keep the order
+    they were in, and the page prints them in it."""
     years = [q["year"] for q in SITE["quotes"]]
     assert years == ["2003", "1887", "1887", "1887"] != sorted(years)
     assert SITE["quotes"][0]["copyright"].startswith("in-copyright")          # the Snape passage leads
@@ -1431,7 +1461,6 @@ def test_the_commonplace_runs_in_the_owners_order_with_snape_first():
         "“The proper study of mankind is man.”"[:40],
         "“There is a strong family resemblance abo"[:40]]
     section = html_of("commonplace/").partition('<section id="quotes"')[2].partition("</section>")[0]
-    assert re.findall(r'<time class="when" datetime="(\d{4})">', section) == years
     order = [m.start() for q in SITE["quotes"] for m in [re.search(re.escape(q["text"][:40]), section)]]
     assert order == sorted(order)                        # printed in that order too, not merely stored in it
 
@@ -1448,8 +1477,9 @@ def test_the_in_copyright_quotation_is_the_long_extract_the_owner_ruled_for():
                      "Thoughts are not etched on the inside of skulls, to be perused by any invader.",
                      "The mind is a complex and many-layered thing, Potter—"):
         assert sentence in quote["text"]
-    assert quote["attribution"] == ("Severus Snape, in J.K. Rowling, Harry Potter and the Order of the "
-                                    "Phoenix\u00a0(2003), Chapter\u00a024, “Occlumency”")           # year and numeral tied
+    assert (quote["speaker"], quote["author"], quote["work"], quote["year"]) == (
+        "Severus Snape", "J.K. Rowling", "Harry Potter and the Order of the Phoenix", "2003")
+    assert quote["chapter"] == "Chapter\u00a024, “Occlumency”" and "source_url" not in quote   # in copyright: no free text to link
     assert "owner-ruled" in quote["copyright"] and "2026-09-21" in quote["evidence"]
     assert "do not silently shorten it back" in (build.ROOT / "site.yaml").read_text(encoding="utf-8")
 
@@ -1463,14 +1493,14 @@ def test_every_commonplace_line_stands_open_on_its_own_page():
     assert "<details" not in section and "quotes_visible" not in (build.ROOT / "site.yaml").read_text(encoding="utf-8")
     assert not hasattr(build, "split_quotes")
     assert "older--first" not in (build.ROOT / "style.css").read_text(encoding="utf-8")
-    text = _visible_text(section)          # compare rendered text: the template wraps "1733-34" in a
-    for q in SITE["quotes"]:               # no-break span, so the raw attribution string is not in the HTML
+    text = _visible_text(section)          # rendered text, the ties read as the spaces they print as
+    for q in SITE["quotes"]:
         assert " ".join(q["text"].split()) in text
-        assert " ".join(q["attribution"].split()) in text
+        assert " ".join(SOURCE_LINES[q["slug"]].split()) in text
 
 
-def test_the_attribution_is_a_paragraph_not_a_cite():
-    """<cite> is for the title of a work and must not mark up a person's name; every attribution here opens
+def test_the_source_line_is_a_paragraph_not_a_cite():
+    """<cite> is for the title of a work and must not mark up a person's name; every source line here opens
     with the speaker."""
     html = html_of("commonplace/")
     assert "<cite" not in html
@@ -1479,7 +1509,7 @@ def test_the_attribution_is_a_paragraph_not_a_cite():
 
 def test_every_quotation_has_a_permalink_of_its_own():
     """One line can be shared (deep review 2026-09-25, AS-52): each quotation's slug is the id of its row and
-    the address of the small "§" at the end of its attribution. The slug is ASCII, unique, and never changed
+    the address of the small "§" at the end of its source line. The slug is ASCII, unique, and never changed
     once published; the link is always painted, since a keyboard or a finger cannot hover; each link's
     accessible name names its own line, so a list of links does not hear four identical entries; and the
     entry a link lands on stands on a panel of the accent tint (measured in tests/test_browser.py, which is
@@ -1489,29 +1519,31 @@ def test_every_quotation_has_a_permalink_of_its_own():
     assert len(set(slugs)) == len(slugs) and all(build.SLUG.fullmatch(s) for s in slugs)
     html = html_of("commonplace/")
     section = html.partition('<section id="quotes"')[2].partition("</section>")[0]
-    rows = re.findall(r'<li class="row" id="([^"]+)">', section)
+    rows = re.findall(r'<li class="entry quote" id="([^"]+)">', section)
     assert rows == slugs
     names = []
     for q in SITE["quotes"]:
         assert section.count(f'id="{q["slug"]}"') == 1
-        speaker = q["attribution"].split(", in ")[0]
+        speaker = q["speaker"]
         name = f'Link to this quotation ({speaker}: “{build.opening(q["text"])}”)'
         assert f'<a class="quote__link" href="#{q["slug"]}" aria-label="{name}">§</a></p>' in section
         names.append(name)
     assert len(set(names)) == len(names) and section.count('class="quote__link"') == len(slugs)
-    # inside the attribution's own paragraph, at its end, after the source
+    # inside the source line's own paragraph, at its end, after the source
     for q in SITE["quotes"]:
         by = re.search(r'<p class="quote__by">(.*?)</p>', section[section.index(f'id="{q["slug"]}"'):], re.S).group(1)
-        assert by.endswith("§</a>") and _visible_text(by).startswith(q["attribution"][:20])
+        assert by.endswith("§</a>") and _visible_text(by).startswith(q["speaker"])
     css = _css()
     link = re.search(r"\.quote__link \{[^}]*\}", css).group(0)
     assert "padding: 0.5rem 0.5625rem" in link and "var(--mono)" in link and "text-decoration: none" in link
     for hidden in ("display: none", "opacity: 0", "visibility: hidden"):
         assert hidden not in link                                              # never hover-only
     assert ".quote__link:hover, .quote__link:focus-visible {" in css
-    mark = re.search(r"\.row:target \{[^}]*\}", css).group(0)
+    mark = re.search(r"\.entry:target \{[^}]*\}", css).group(0)
     assert "background: var(--target-tint)" in mark and "box-shadow: 0 0 0 0.625rem var(--target-tint)" in mark
-    assert ".row:target > .what" not in css                                # the ring that collided is gone
+    assert ".row:target" not in css                                        # the ring that collided is gone, and so is the row
+    laptop = css.partition("@media (min-width: 45rem) {")[2].partition("@media (min-width: 64rem)")[0]
+    assert ".entry:target { box-shadow: 0 0 0 0.875rem var(--target-tint); }" in laptop   # the mark hangs 9.2px there
     assert css.count("--target-tint: #") == 3                             # a token in the light and both dark blocks
 
 
@@ -1558,12 +1590,117 @@ def test_the_statement_reports_before_it_lists():
     assert "My address is at the foot of this page, and at the top of the home page." in SITE["accessibility"]["report"]
 
 
-def test_every_gutter_label_in_the_quotes_section_is_a_plain_date():
-    """The gutter is the page's time axis. A date that needs a parenthetical belongs in the attribution."""
+def test_the_commonplace_has_no_date_gutter():
+    """The years used to stand in the gutter, each with a tick, and "1887" three times over asked the reader to
+    read a chronology the page is deliberately not using (external review 3 §24; controller decision C5 item
+    10 under owner ruling 18, 2026-09-26; record kept privately). The year is printed once now, in the source
+    line after the work's title and tied to it; the list is not a log -- it draws no rule of its own on a
+    phone, and on a laptop stands in the text column by its inset, with no tick of its own, while the page's
+    margin rule runs past it (decided by render). `year` stays a field, so the source line is composed and
+    never retyped."""
+    html = html_of("commonplace/")
+    section = html.partition('<section id="quotes"')[2].partition("</section>")[0]
+    assert '<ul class="reading inset" role="list">' in section
+    assert section.count('<li class="entry quote" id="') == len(SITE["quotes"])
+    assert re.findall(r'<(?:time|span|p) class="when"', section) == [] and "<time" not in section
+    for q in SITE["quotes"]:
+        assert re.fullmatch(r"\d{4}", q["year"]), q["year"]
+        entry = section[section.index(f'id="{q["slug"]}"'):].partition("</li>")[0]
+        assert re.search("</i>(?:</a>)?\u00a0\\(" + q["year"] + "\\)", entry), q["slug"]   # after the title, tied
+        assert entry.count(f'({q["year"]})') == 1                                              # and nowhere else
+    assert '<main id="content" tabindex="-1" class="opens-with-h1">' in html          # the margin rule stays
+    css = _css()
+    assert ".log--quotes" not in css and ".reading > .entry + .entry { margin-top: 1.75rem; }" in css
+    laptop = css.partition("@media (min-width: 45rem) {")[2].partition("@media (min-width: 64rem)")[0]
+    assert ".reading { margin-top: 2.25rem; }" in laptop and ".reading > .entry + .entry { margin-top: 2.25rem; }" in laptop
+    assert ".quote__by, .quote__note { max-width: 36rem; }" in laptop                # a shorter measure than the line
+    phone = css.partition("@media (max-width: 44.99rem) {")[2].partition("\n}\n")[0]
+    assert ".reading" not in phone and ".entry" not in phone                          # no rule of its own on a phone
+
+
+def test_the_source_line_is_composed_from_the_entrys_fields():
+    """Speaker, author, work, year and chapter are fields (external review 3 §24: the design can tell the
+    person speaking from the work cited, and a year cannot drift from its title); `quoting` carries the same
+    fields for a line that itself quotes another work -- Watson's is Pope's. The template composes
+    "Speaker, in Author, Work (Year), Chapter[ — quoting Author, Work (Year), Chapter]" with a no-break space
+    before each year and before the dash, and every work named is in `works`, so nb() sets it in italic
+    (DS-07). build.validate() refuses an entry missing a field, a leftover attribution string, a `quoting`
+    that is not a mapping or misses a field, and a source_url that is not an https address."""
+    for q in SITE["quotes"]:
+        for key in ("speaker", "author", "work", "year"):
+            assert isinstance(q[key], str) and q[key].strip(), (q["slug"], key)
+        assert q["work"] in SITE["works"], q["work"]
+        assert q["chapter"] and "attribution" not in q
+    watson = next(q for q in SITE["quotes"] if q["slug"] == "watson-proper-study")
+    assert watson["quoting"] == {"author": "Alexander Pope", "work": "An\u00a0Essay\u00a0on\u00a0Man",
+                                 "year": "1733–34", "chapter": "Epistle\u00a0II"}
+    assert watson["quoting"]["work"] in SITE["works"]
+    assert [q["slug"] for q in SITE["quotes"] if q.get("quoting")] == ["watson-proper-study"]
     section = html_of("commonplace/").partition('<section id="quotes"')[2].partition("</section>")[0]
-    labels = re.findall(r'<(?:time|span) class="when"[^>]*>([^<]*)</(?:time|span)>', section)
-    assert len(labels) == len(SITE["quotes"])
-    assert all(re.fullmatch(r"\d{4}", label) for label in labels), labels
+    for q in SITE["quotes"]:
+        line = _source_line(section, q["slug"])
+        assert line.startswith(f'{q["speaker"]}, in {q["author"]}, {q["work"]}\u00a0({q["year"]}), {q["chapter"]}'), line
+        assert line == SOURCE_LINES[q["slug"]]
+    assert _source_line(section, "watson-proper-study").endswith(
+        "“Mr. Sherlock Holmes”\u00a0— quoting Alexander Pope, An\u00a0Essay\u00a0on\u00a0Man\u00a0(1733–34), Epistle\u00a0II")
+    site = copy.deepcopy(SITE)
+    del site["quotes"][1]["author"]
+    assert any("author is missing" in p and "I consider that a man" in p for p in build.validate(site))
+    site = copy.deepcopy(SITE)
+    site["quotes"][1]["year"] = " "
+    assert any("year is missing" in p for p in build.validate(site))
+    site = copy.deepcopy(SITE)
+    site["quotes"][0]["attribution"] = "Severus Snape, in J.K. Rowling"
+    assert any("has an attribution string" in p for p in build.validate(site))
+    site = copy.deepcopy(SITE)
+    del site["quotes"][2]["quoting"]["year"]
+    assert any("quoting: year is missing" in p for p in build.validate(site))
+    site = copy.deepcopy(SITE)
+    site["quotes"][2]["quoting"] = "Alexander Pope"
+    assert any("quoting is not a mapping" in p for p in build.validate(site))
+    site = copy.deepcopy(SITE)
+    site["quotes"][1]["source_url"] = "http://www.gutenberg.org/ebooks/244"
+    assert any("is not an https address" in p for p in build.validate(site))
+    assert build.validate(SITE) == []
+
+
+def test_the_works_title_is_the_link_to_a_free_text_of_the_work_where_one_exists():
+    """The three Doyle lines link A Study in Scarlet to Project Gutenberg ebook #244 -- the text each line's
+    evidence was checked against -- through `source_url`; the Rowling novel is in copyright and has no free
+    text, so its title is not a link. The link is the title itself, set in the text's own colour with the
+    accent under it like a title link elsewhere on the site, so the source line stays quieter than the
+    quotation above it. tools/check_links.py asks for the address with every other one."""
+    section = html_of("commonplace/").partition('<section id="quotes"')[2].partition("</section>")[0]
+    url = "https://www.gutenberg.org/ebooks/244"
+    for q in SITE["quotes"]:
+        entry = section[section.index(f'id="{q["slug"]}"'):].partition("</li>")[0]
+        if q["author"] == "Arthur Conan Doyle":
+            assert q["source_url"] == url and "Project Gutenberg ebook #244" in q["evidence"], q["slug"]
+            assert f'<a class="quote__source" href="{url}"><i class="work">A Study in Scarlet</i></a>\u00a0(1887)' in entry
+        else:
+            assert "source_url" not in q and 'class="quote__source"' not in entry
+            assert '<i class="work">Harry Potter and the Order of the Phoenix</i>\u00a0(2003)' in entry
+        assert entry.count("<a ") == 1 + ("source_url" in q)      # the permalink, and the source link where there is one
+    assert section.count('class="quote__source"') == 3
+    css = _css()
+    assert ".quote__source { color: inherit; text-decoration-color: color-mix(in srgb, var(--accent) 65%, transparent); }" in css
+    assert ".quote__source:hover, .quote__source:focus-visible { color: var(--accent-strong); text-decoration-color: currentColor; }" in css
+
+
+def test_the_commonplace_intro_is_the_reading_rooms_one_sentence():
+    """One understated sentence gives the selection a reason without explaining each line (external review 3
+    §24, taken as written under the owner's delegation of this page: ruling 18, decision C2, 2026-09-26;
+    record kept privately). It answers the page's one question -- what does he choose to keep thinking
+    about -- and nothing else on the page does; the description names the genre for a reader who has not
+    met the word and follows the intro's question. The sentence is not in his own words, and Q-N item 18
+    still offers him one that is."""
+    assert SITE["quotes_intro"] == ("I keep these lines because they return to a question I find difficult to "
+                                    "leave alone: what can we infer about a mind from what it does?")
+    html = html_of("commonplace/")
+    assert f'<p class="page-intro inset">{SITE["quotes_intro"]}</p>' in html
+    description = page("commonplace/")["description"]
+    assert description.startswith("A commonplace book: ") and description.endswith("what can we infer about a mind from what it does?")
+    assert "how to study one" not in html and "notebook of lines worth keeping" not in html
 
 
 def test_the_talk_video_opens_where_his_own_talk_starts():
