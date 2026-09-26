@@ -24,10 +24,10 @@ news_visible: 8
 # alt="" and the accessibility statement says so; there is no `alt` key here to fall out of step with them.
 portrait: {webp: img/portrait-400.webp, jpg: img/portrait-800.jpg}
 
-# The site is four pages, not one long scroll. The owner asked for that on 2026-09-21: "the phone one column
-# is not fun", "might want to go more tabs", "not make it an online cv but more hey this is me website and
-# some things about me and updates and stuff". Nothing was dropped in the split -- every section of the old
-# page is still here, on the page where a reader would look for it.
+# The site is four pages, not one long scroll: separate pages rather than one column the phone scrolls through,
+# and a personal site with news on it rather than an online CV (owner ruling, 2026-09-21; record kept privately).
+# Nothing was dropped in the split -- every section of the old page is still here, on the page where a reader
+# would look for it.
 #   slug        the address under site_url, and the folder the page is written into. '' is the home page.
 #               It also names the template: templates/pages/<slug or "home">.html.j2.
 #   nav         the label in the navigation strip, on every page. A page without it is not in the strip.
@@ -178,8 +178,9 @@ identity_line: I study how to tell which neural network models of human vision a
 #
 # Cut back on 2026-09-21, second pass. The first paragraph was an education record written as prose -- direct
 # track, department, school, B.Sc., B.A., M.Sc., 2026 -- which is exactly the online-CV register he rejected
-# ("not make it an online cv but more hey this is me website"), and cv.pdf already carries every one of those
-# facts. Do not put the degree list back, and do not let any paragraph restate identity_line.
+# (a personal site, not an online CV: owner ruling, 2026-09-21; record kept privately), and cv.pdf already
+# carries every one of those facts. Do not put the degree list back, and do not let any paragraph restate
+# identity_line.
 #
 # The practicum clause in the third paragraph -- "a headphone add-on for the noises that set anxiety off" --
 # was re-read on 2026-09-21 against the owner's programme-first ruling (see the note over `projects`) and
@@ -524,34 +525,33 @@ talks:
 # THE PRACTICUM ENTRY. The owner ruled on this twice on 2026-09-21 (the second ruling, programme-first, is the
 # one the entry is built on) and once more on 2026-09-25 (one clause on his own part, see RULINGS below).
 #
-# PROGRAMME-FIRST (source O, 2026-09-21), his words verbatim: "i think its need to be more of a description of
-# an neurotechnology internship practicum for grad students collaborate with brown university at providence
-# blah blah, like more about the environment less on what i did, if they want to know they can ask. (also on
-# the website btw i think)". Shown the options, he chose "Joint BGU-Brown neurotech practicum for grad
-# students" and "One entry, programme-first": keep the entry where it is, on the site and on the CVs, but let
-# the PROGRAMME lead, name EarBetter in a clause, and -- until rulings 4 and 7 below -- say nothing about who
-# did what.
+# PROGRAMME-FIRST: the entry describes the practicum -- a neurotechnology programme for graduate students,
+# run with Brown University in Providence -- rather than what he did in it (owner ruling, 2026-09-21; record
+# kept privately). Shown the options, he chose "Joint BGU-Brown neurotech practicum for grad students" and
+# "One entry, programme-first": keep the entry where it is, on the site and on the CVs, but let the PROGRAMME
+# lead, name EarBetter in a clause, and -- until rulings 4 and 7 below -- say nothing about who did what.
 # So the entry is titled by the programme and the blurb describes it; EarBetter is the second sentence and
 # his one clause closes it. The same shape is in the CV repository, shared/projects.tex, with the same rulings
 # recorded beside it.
 #
-# RULINGS (source O; FACTS PROJ-EBT-DESC has the quotations). 2026-09-21, programme-first: the programme
-# leads, EarBetter is a clause; the sensor inventory (Muse headband, heart-rate variability, skin conductance)
-# and the go-to-market / business-plan detail were deleted at his request and stay deleted -- 'pitched' is all
-# that survives of the pitch. 2026-09-25, rulings 4 and 7: one short clause on his own part is allowed again,
-# in his words -- 'I led the system integration' (his account of 21 Sep: 'I kind of led the integration'). Do
-# not grow it into a list of what he did; do not restore the sensors or the business plan; do not put it in
-# News or About. (The wordings retired by these rulings are not kept here: a sentence retired from the page
-# but kept verbatim in a public repository is not off the site. The history lives in FACTS PROJ-EBT-DESC and
-# the private ledgers; deep review 2026-09-25, external review 2 §16.)
+# RULINGS (source O; FACTS PROJ-EBT-DESC, in the CV repository, has the record). 2026-09-21, programme-first:
+# the programme leads, EarBetter is a clause; the sensor inventory (Muse headband, heart-rate variability, skin
+# conductance) and the go-to-market / business-plan detail were deleted at his request and stay deleted --
+# 'pitched' is all that survives of the pitch. 2026-09-25, rulings 4 and 7: one short clause on his own part is
+# allowed again, in the ruled wording, 'I led the system integration' (owner ruling 7, 2026-09-25; record kept
+# privately). Do not grow it into a list of what he did; do not restore the sensors or the business plan; do
+# not put it in News or About. (The wordings retired by these rulings are not kept here, and neither are the
+# owner's own messages: a sentence retired from the page but kept word for word in a public repository is not
+# off the site. The history lives in FACTS PROJ-EBT-DESC and the private ledgers; deep review 2026-09-25,
+# external review 2 §16.)
 #
 # FACTS THE ENTRY MAY STATE, all established: the practicum is the Embodied Brain Technology Practicum, run
 # jointly by Ben-Gurion University and Brown University; it ran at Brown, in Providence, USA, from 24 July to
 # 6 August 2026; entry was competitive; his team of five designed, built and pitched EarBetter; he led the
 # system integration (ruling 7). "Two weeks" is derived from the dates in `period`, not asserted. NOT stated,
-# because no source gives them: a course code, the size of the Brown cohort, and any award. The number of BGU
-# participants he was one of is NOT printed either -- it is on his own list of private numbers (the CV
-# register records that ruling), and the entry says the entry was competitive and stops.
+# because no source gives them: a course code, the size of the Brown cohort, and any award. One number attached
+# to this entry is private and is NOT printed either (owner ruling; the CV register records it), and the entry
+# says the entry was competitive and stops.
 projects:
 # Titled by the programme, not by the product: under a heading a reader's eye reaches first, "EarBetter" would
 # have led and the practicum would have been the clause, which is the ruling upside down. The title links the

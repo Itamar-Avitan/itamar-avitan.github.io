@@ -820,14 +820,12 @@ def test_project_titles_link_only_when_a_url_is_given():
 
 
 def test_the_practicum_leads_with_the_programme_and_ends_on_his_one_clause():
-    """The owner's ruling of 2026-09-21, which supersedes every earlier framing of this entry -- his own
-    product-story correction of the same day included. His words: "i think its need to be more of a
-    description of an neurotechnology internship practicum for grad students collaborate with brown
-    university at providence blah blah, like more about the environment less on what i did, if they want to
-    know they can ask. (also on the website btw i think)". He chose "One entry, programme-first": the
-    PROGRAMME leads and EarBetter is named in a clause. On 2026-09-25 (rulings 4 and 7, OWNER-RULINGS) he
-    allowed one clause on his own part back, in his words -- "I led the system integration" -- and ruling 8
-    gave BCI4ALS its clause (the three areas he ticked, not leadership); this test used to be named
+    """The owner's ruling of 2026-09-21 supersedes every earlier framing of this entry, his own product-story
+    correction of the same day included: the entry describes the programme rather than his part in it, and he
+    chose "One entry, programme-first" (owner ruling, 2026-09-21; record kept privately) -- the PROGRAMME leads
+    and EarBetter is named in a clause. On 2026-09-25 (rulings 4 and 7, OWNER-RULINGS) he allowed one clause on
+    his own part back, in the ruled wording "I led the system integration", and ruling 8 gave BCI4ALS its
+    clause (the three areas he ticked, not leadership); this test used to be named
     "...says_nothing_about_who_did_what" and forbade the first person in the blurb, which those rulings
     supersede. The sensor inventory and the business-plan detail stay deleted. See the note over `projects`
     in site.yaml, and shared/projects.tex in the CV repository, which carries the same shape."""
@@ -853,7 +851,7 @@ def test_the_practicum_leads_with_the_programme_and_ends_on_his_one_clause():
                  "Muse", "heart-rate variability", "skin conductance",
                  "go-to-market", "business plan"):
         assert gone not in everywhere, gone
-    # one clause on his own part, his words, at the end (rulings 4 and 7): not a list of what he did
+    # one clause on his own part, in the ruled wording, at the end (rulings 4 and 7): not a list of what he did
     assert entry["blurb"].endswith(" I led the system integration.") and entry["blurb"].count("I ") == 1
     # and the clause stays out of News and About (the rulings allow it on the project row alone)
     assert "system integration" not in news["text"] and not any("system integration" in p for p in SITE["about"])
@@ -870,14 +868,42 @@ def test_the_practicum_leads_with_the_programme_and_ends_on_his_one_clause():
     # the facts it may state, and the two it may not
     assert entry["period"] == "24 Jul–6 Aug 2026" and "Two weeks" in entry["blurb"]   # derived, not asserted
     assert "competitive" in entry["blurb"] and "five-person" in entry["blurb"]
-    assert "12" not in _visible_text(html)          # "1 of 12" is on his list of private numbers
+    assert "12" not in _visible_text(html)          # a private number attached to this entry stays off the page
     assert "award" not in everywhere.lower()
 
-    # the rulings are recorded where the next editor will see them, and the retired wording is not kept in
-    # this public file (external review 2 §16: the history lives in FACTS PROJ-EBT-DESC and the private ledgers)
+    # the rulings are recorded where the next editor will see them, as the active decision and not as the
+    # owner's own messages, and the retired wording is not kept in this public file (external review 2 §16:
+    # the history lives in FACTS PROJ-EBT-DESC and the private ledgers)
     yaml_text = (build.ROOT / "site.yaml").read_text(encoding="utf-8")
-    assert "more about the environment less on what i did" in yaml_text
+    assert "PROGRAMME-FIRST" in yaml_text and "record kept privately" in yaml_text
     assert "programme-first" in yaml_text and "I led the system integration" in yaml_text and "control software" not in yaml_text
+
+
+def test_the_public_source_records_decisions_and_not_the_owners_messages():
+    """This repository is public. The rulings behind the site are recorded in its comments and docstrings as
+    the active decision, dated, with "record kept privately" pointing at where the reasoning lives; the
+    owner's own messages, once pasted in word for word, are not (external review 2 §16; WP-S16, 2026-09-26).
+    What the scan looks for are the marks of a pasted message, none of them anything he wrote: two pieces of
+    chat shorthand, the phrase that used to introduce a pasted message, and a quoted string that opens with a
+    lower-case "i" and a space -- the site's own strings open with a capital. The scan covers every
+    hand-written source file, this one included; only the line that names the marks is skipped."""
+    root = build.ROOT
+    files = [root / "site.yaml", root / "README.md", root / "style.css", root / "build.py",
+             *sorted((root / "templates").rglob("*.j2")), *sorted((root / "tools").glob("*.py")),
+             *sorted((root / "tests").glob("*.py"))]
+    marks = ("btw", "blah blah", "words verbatim")
+    opener = re.compile(r"""["'“‘]i\s""")
+    assert len(files) >= 14
+    for path in files:
+        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if "marks = (" in line:
+                continue
+            low = line.lower()
+            assert not any(mark in low for mark in marks), (path.name, number, line.strip())
+            assert not opener.search(line), (path.name, number, line.strip())
+    # the phrase itself, where the four rulings this package restated live (a comment may wrap inside it)
+    joined = re.sub(r"\n#\s*", " ", (root / "site.yaml").read_text(encoding="utf-8"))
+    assert joined.count("record kept privately") >= 4
 
 
 

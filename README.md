@@ -32,9 +32,9 @@ browser that can use it). The mark's arrangement stays the owner's row.
 
 ## Four pages, one site.yaml
 
-The site was one long page until 2026-09-21, when the owner asked for separate pages: "the phone one column
-is not fun", "might want to go more tabs", "not make it an online cv but more hey this is me website and some
-things about me and updates and stuff". Nothing was dropped in the split.
+The site was one long page until 2026-09-21, when the owner asked for separate pages: one column on the phone
+had not been good to read, and the site was to be a personal page with some news on it rather than an online
+CV (owner ruling, 2026-09-21; record kept privately). Nothing was dropped in the split.
 
 | Page | Address | What is on it |
 | --- | --- | --- |
