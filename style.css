@@ -17,8 +17,8 @@
 
    One visual language for three jobs:
      outlined box   = venue badge, never clickable: on the paper card, and
-                      the paper's first badge again under the home page's
-                      Research hand-off (DS-09). A kind or a page name in a
+                      the paper's first badge again beside the home page's
+                      featured Research block (DS-09). A kind or a page name in a
                       log's gutter is not a box: it is a small uppercase mono
                       label in the muted colour of the dates (DS-03: twelve
                       of fourteen boxes were not venues)
@@ -340,9 +340,13 @@ main:focus { outline: none; }
   border-radius: 4px;
   background: var(--surface);
 }
+/* The name's cell: the mark above the name, then the name (WP-S17, to the WP-S14 spec; the owner said yes
+   to the mark above the name, Q-L, 2026-09-25). The wrapper is the grid item; min-width: 0 so a long name can
+   still break inside it rather than push the column. The mark is the colophon's drawing at 50 by 12 -- a
+   signature, not a heading -- set 2px in so its first circle's edge lines up with the name's first stroke. */
+.masthead__name { grid-column: 2; grid-row: 1; min-width: 0; }
+.mark--mast { display: block; margin: 0 0 0.875rem 2px; }
 .masthead h1 {
-  grid-column: 2;
-  grid-row: 1;
   /* A cap, never a grow: min() takes the smaller of the two, so the name is 2rem everywhere it fits and only
      gives way on a narrow screen at a large text size, where 2rem would otherwise be wider than its column
      and push the page sideways. 15vw is the measured ceiling that still holds two lines with no overflow at
@@ -411,6 +415,17 @@ main:focus { outline: none; }
   font-size: 1.25rem;
   line-height: 1.45;
   text-wrap: balance;
+}
+/* The identity line's second sentence (owner ruling 17: two sentences, the object of study and then the
+   question): one step under the lede, at the size the other pages' intros take, so the front door opens on a
+   six-word statement and the question stands under it rather than the two running together as a paragraph.
+   `pretty`, not `balance`: balanced, the dash before "and when it does not" opened a line at 320px. */
+.lede__more {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  text-wrap: pretty;
 }
 
 /* how to reach him: quiet rows of text links in the body face, the address first and the profiles under it;
@@ -524,8 +539,8 @@ a:focus-visible > .ico { color: var(--accent-strong); }
 
 /* ---------- Tags: outlined, mono, never clickable ----------
    The box belongs to the paper card's venue badges (and its "Ongoing"), and to the paper's venue badge set
-   once more under the home page's Research hand-off (DS-09). A kind under a talk's date or a page name in
-   the hand-off rows takes the same class and is unboxed by the log rule further down. */
+   once more beside the home page's featured Research block (DS-09). A kind under a talk's date or a page
+   name in the invitation rows takes the same class and is unboxed by the log rule further down. */
 .tag {
   display: inline-block;
   max-width: 100%;
@@ -663,22 +678,32 @@ main.opens-with-h1 { margin-top: 2.25rem; }
 .note { color: var(--ink-2); font-size: 1rem; margin-top: 0.375rem; }
 .what > h3 + p:not([class]) { margin-top: 0.375rem; }
 
-/* ---------- Elsewhere on this site: the home page's hand-off ----------
+/* ---------- The invitations at the foot of the home page ----------
    The one list whose gutter carries an address instead of a date, so it carries the page's name as the quiet
    mono label the kind tags use -- never clickable, and no longer boxed, because a boxed page name read as a
    button that does nothing (DS-03) -- and no tick. The margin rule stays a time axis; a page name is not a
    point on it. The link is set like a title (ink, accent underline: the h3 a rule above), and bold. The
-   selector is a descendant on purpose, so a title that gains a wrapping element keeps the rule -- which means
-   a link under a row that is not its title (the paper and code links the Research row is to carry) lives
-   outside .what, or it would be set as a second bold ink title. */
+   selector is a descendant on purpose, so a title that gains a wrapping element keeps the rule. The section
+   has no heading (WP-S17: two small invitations, not a directory), so it takes no section tick; the tags in
+   the gutter and the section's own air above it are what set it apart from the news over it. */
 .log--go .kind { margin-bottom: 0.375rem; }
 .log--go .what a { font-weight: 600; }
-/* The Research row's two extras (DS-09, AS-02): the paper's venue badge under the label -- the one outlined
-   box outside the card, in the card's own register -- and, under the line, "Paper · Code" in the mono of the
-   card's link labels. On a phone they stack in reading order: label, badge, line, links. From 45rem up the
-   badge takes the gutter under the label and the links the text column under the line (the desktop block). */
-.go-venue { line-height: 1; margin-bottom: 0.375rem; }
-.go-links { margin-top: 0.25rem; font: 500 0.8125rem/1.6 var(--mono); }
+
+/* ---------- The featured paper on the home page (WP-S17) ----------
+   The first research card, in the front door's register: the venue badge in the gutter -- the one outlined box
+   outside the card (DS-09) -- and in the text column the paper's short title as a linked h3, one paragraph
+   that opens on the question in bold ink and runs question, test, result, scope, the four marks of the card's
+   diagram at three-quarters of their size with one-word captions, and the links in the mono of the card's
+   labels. On a phone the badge stands above the title, as the card's badges do. The links row is the quiet
+   "Paper · Code" line the Research hand-off used to carry, one link longer; each link's box is padded to the
+   24px a target needs (WCAG 2.2 SC 2.5.8) without moving the line -- padding on an inline box widens what
+   can be pointed at and leaves the line's height alone. */
+.feature__venue { line-height: 1; margin-bottom: 0.75rem; }
+.feature h3 { font-size: 1.25rem; line-height: 1.3; letter-spacing: -0.008em; text-wrap: balance; }
+.feature__text { margin-top: 0.75rem; }
+.feature .lead { font-weight: 600; color: var(--ink); }
+.feature__links { margin-top: 1rem; font: 500 0.8125rem/1.6 var(--mono); }
+.feature__links a { position: relative; display: inline-block; padding-block: 0.3125rem; }
 
 /* ---------- The expander: the older end of the news list ----------
    The commonplace had one of these too, while it shared a page with everything else. It has a page of its own
@@ -800,6 +825,16 @@ main.opens-with-h1 { margin-top: 2.25rem; }
 @media (min-width: 45rem) and (max-width: 63.99rem) {
   .recovery-diagram { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+/* The same four marks on the home page's featured paper (WP-S17), smaller and captioned by one word each: two
+   rows of two on a phone, one row of four from 45rem up (the desktop block). The marks are capped at 7rem (the
+   card's are 8.5rem) so the strip reads as a figure under the paragraph rather than a second card, and their
+   strokes, 1.5 units of 120, still print at over a pixel. The captions are labels, not sentences: the
+   gutter's mono at the dates' size, the counter in the accent before each, no full stop after it. These rules
+   follow the card's so that, at equal specificity, they win. */
+.recovery-diagram--small { margin-top: 1rem; gap: 0.75rem 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.recovery-diagram--small svg { max-width: 7rem; }
+.recovery-diagram--small p { font: 400 0.8125rem/1.5 var(--mono); color: var(--muted); }
+.recovery-diagram--small p::before { content: counter(step) " "; font-weight: 500; color: var(--accent); }
 /* the questions keep their markers: they are a list a reader counts, not a row of links */
 .open { margin: 0.25rem 0 0; padding-left: 1.1rem; list-style: disc; }
 .open li { margin-top: 0.25rem; }
@@ -1087,6 +1122,7 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   .role, .lede, .links-nav { grid-column: 2; }
   .role { margin-top: 0.375rem; }
   .lede { font-size: 1.375rem; margin-top: 1rem; }
+  .lede__more { font-size: 1.1875rem; }   /* the page-intro's size at this width: the question, one step under the lede */
 
   main { position: relative; margin-top: 4.5rem; --spine-top: 0.9375rem; }
   section + section { margin-top: 4.5rem; }
@@ -1169,15 +1205,20 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   }
   .log--kind > .row > .what { grid-row: 1 / span 2; clear: none; }
 
-  /* the hand-off rows have no date above the tag, so the tag takes the first row of the grid itself */
+  /* the invitation rows have no date above the tag, so the tag takes the first row of the grid itself */
   .log--go > .row > .kind { grid-row: 1; margin-top: 0.125rem; }
-  /* The Research row: the venue badge under the label in the gutter, the line spanning both gutter rows, and
-     "Paper · Code" in the text column under the line (a third row of the grid, so it never drops into the
-     gutter, where auto-placement would have put the first free cell). */
-  .log--go > .row { grid-template-rows: auto 1fr; }
-  .log--go > .row > .what { grid-row: 1 / span 2; }
-  .log--go > .row > .go-venue { grid-column: 1; grid-row: 2; justify-self: end; margin: 0.375rem 0 0; }
-  .log--go > .row > .go-links { grid-column: 2; grid-row: 3; }
+
+  /* The featured paper on the grid: the badge in the gutter against the rule, on the title's first line, the
+     rest in the text column; the strip one row of four. */
+  .feature {
+    display: grid;
+    grid-template-columns: var(--gutter) minmax(0, 1fr);
+    column-gap: var(--gap);
+    align-items: start;
+  }
+  .feature__venue { grid-column: 1; justify-self: end; margin: 0.1875rem 0 0; }
+  .feature__body { grid-column: 2; }
+  .recovery-diagram--small { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
   /* expander sits on the rule */
   .older > summary {
@@ -1281,7 +1322,7 @@ main.opens-with-h1 { margin-top: 2.25rem; }
 
   .masthead h1 { font-size: 3.25rem; }
   .lede { font-size: 1.5rem; }
-  .page-intro { font-size: 1.25rem; }     /* the step under the lede's 1.5rem; the commonplace intro is exempt */
+  .lede__more, .page-intro { font-size: 1.25rem; }     /* the step under the lede's 1.5rem; the commonplace intro is exempt */
   main > section > h1 { font-size: 2.25rem; }
   h2.inset { font-size: 1.625rem; }
   h3 { font-size: 1.25rem; }
@@ -1300,9 +1341,10 @@ main.opens-with-h1 { margin-top: 2.25rem; }
      above the dates. */
   .sitenav a:not(.btn) { font-size: 0.875rem; }
   .toggle { font-size: 0.8125rem; }
-  /* the Research row's "Paper · Code" and the mark's caption are mono labels too, and take the same step: at
-     13px under an 18px line, and under the 14px "Last updated" row, each would be the one label left behind */
-  .when, .colophon .row, .colophon-nav, .go-links, .mark-note { font-size: 0.875rem; }
+  /* the featured paper's links, the captions under its four marks and the mark's caption are mono labels too,
+     and take the same step: at 13px under an 18px line, and under the 14px "Last updated" row, each would be
+     the one label left behind */
+  .when, .colophon .row, .colophon-nav, .feature__links, .recovery-diagram--small p, .mark-note { font-size: 0.875rem; }
   .buttons .btn, .older > summary { font-size: 0.875rem; }
   .tag { font-size: 0.8125rem; }
   .log .kind .tag { font-size: 0.75rem; }
@@ -1351,12 +1393,12 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   /* The filled button prints as a plain link: its white-on-fill text is what the dialog greys out. */
   .btn--primary { color: var(--accent); background: none; border: 0; padding-inline: 0; text-decoration: underline; }
   /* On paper a link is only as good as its address: the card's and the rows' buttons, a venue, a title that
-     is a link, and the home page's Paper and Code under the Research row. Not the links inside sentences --
+     is a link, and the home page's Paper, Code and Video under the featured paper. Not the links inside sentences --
      an address in the middle of a line of prose is noise, and the ones that matter are also on the card. An
      address breaks only when it must (overflow-wrap, not word-break: break-all, which split short ones
      after "ht" or mid-word); the short ones then sit whole on a line of their own. */
   .buttons a[href^="http"]::after, .venue a[href^="http"]::after, h3 a[href^="http"]::after,
-  .go-links a[href^="http"]::after {
+  .feature__links a[href^="http"]::after {
     content: " <" attr(href) ">"; font: 400 0.6875rem/1.4 var(--mono); color: #444;
     word-break: normal; overflow-wrap: anywhere;
   }

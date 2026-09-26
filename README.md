@@ -38,7 +38,7 @@ CV (owner ruling, 2026-09-21; record kept privately). Nothing was dropped in the
 
 | Page | Address | What is on it |
 | --- | --- | --- |
-| Home | `/` | the masthead, `about`, `elsewhere`, `now`, and the news feed |
+| Home | `/` | the masthead, `about`, the featured paper (drawn from the first `research` card), `now`, the news feed, and the two invitations (`elsewhere`) |
 | Research | `/research/` | Papers, Talks and presentations, Projects |
 | Teaching | `/teaching/` | Courses and Students |
 | Commonplace | `/commonplace/` | the quotations, in the owner's order |
@@ -66,14 +66,21 @@ the site prints; a test checks each one. The home page's `<title>` and descripti
 ("NeuroAI PhD candidate, Ben-Gurion University") for the same reason: a result that says only his name
 cannot be told from the other Itamar Avitan's.
 
-**Every page names its sections**, and every section takes a 2px ink tick on the margin rule. `elsewhere`
-on the home page is the hand-off: one row per other page, each carrying a real line from it. Its gutter
-holds the page's name as a tag rather than a date, because these rows are addresses and not points in time —
-the margin rule stays a time axis, and a tag takes no tick. A tag in a log's gutter (a page name here, a role
-or a talk's kind elsewhere) is a small uppercase mono label; the outlined box is a venue badge: the paper
-card's, and the paper's first badge again under the Research row of `elsewhere`, which also carries the
-card's Paper and Code addresses under its line, so the work is one click from the front door. Both are drawn
-from the first research card and are written nowhere else.
+**Every page names its sections**, and every section takes a 2px ink tick on the margin rule. The home page
+runs masthead (the mark above the name, the two-sentence identity line, the address with GitHub and Google
+Scholar beside it), `about` (two short paragraphs: who he is, and the rest of the person), the featured
+paper, `now` (one dated line), the news feed (three items open, the rest behind "Older news"), and the two
+invitations under `elsewhere` — Teaching and Commonplace, the pages about the person — with no heading of
+their own (astra's wireframe, taken under the owner's delegation of 2026-09-25; record kept privately). The
+featured paper is the first `research` card read from the front door: its venue badge in the gutter, the
+title's second half linked to the card, one paragraph of four sentences kept on the card as `feature`
+(question, test, result with its chance baseline, scope), the four marks of the card's diagram with one-word
+captions, and the card's Paper, Code and video addresses with a link to the page. Nothing about the paper is
+written twice. The invitations' gutter holds the page's name as a tag rather than a date, because these rows
+are addresses and not points in time — the margin rule stays a time axis, and a tag takes no tick. A tag in a
+log's gutter (a page name here, a role or a talk's kind elsewhere) is a small uppercase mono label; the
+outlined box is a venue badge: the paper card's, and the paper's first badge again beside the featured
+paper.
 
 The list under `pages` in `site.yaml` **is** the site. Each entry's `slug` is three things at once: the
 address under `site_url`, the folder the file is written into, and the name of its template in
@@ -103,9 +110,11 @@ the script opens the expander on `beforeprint` and closes it again after. Measur
 margins: home takes two A4 sheets, `/research/` three (its card is taller than a sheet, so the card's parts
 keep whole rather than the card), `/teaching/` one, `/commonplace/` two and `/accessibility/` three.
 
-**The `about` and `now` blocks are drafts** written on 2026-09-21 and marked as such in `site.yaml`. They
-stand in for the owner's own words until he replaces them. Every clause in them comes from a fact already on
-the site; do not add anything to them that he has not said. The one-sentence descriptions under the courses
+**The `about` and `now` blocks are drafts** written on 2026-09-21, rewritten on 2026-09-26, and marked as
+such in `site.yaml`. They stand in for the owner's own words until he replaces them. Every clause in them
+comes from a fact already on the site, on the CVs or ruled by him; the one sentence on his broader interests
+names questions at the level a researcher states on a homepage and nothing of what he plans to do about
+them. Do not add anything to them that he has not said. The one-sentence descriptions under the courses
 in `teaching` are drafts of the same kind: they say what each course is about, drawn from its own name, and
 say nothing about what he does inside it beyond the role in its `kind` tag, because nothing on record does.
 The Academic Writing row carries no sentence at all: its title and his role are the owner's (owner ruling,

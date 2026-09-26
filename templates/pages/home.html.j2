@@ -1,4 +1,11 @@
-{#- Home: who he is, what he is doing now, and the news feed. The front door, not a CV. -#}
+{#- Home: the front door, not a CV. It answers one question -- who is he, and what question animates his
+    work -- on the wireframe of the site's external review (astra) as the controller took it under the
+    owner's delegation (owner ruling 18 and controller decision C1, 2026-09-25/26; record kept privately):
+    the masthead with the mark above the name; a short personal About; the featured paper, drawn from the
+    first research card so that nothing is written twice; one dated Now line; the three latest news items
+    with the rest behind an expander; and two invitations, to Teaching and to the Commonplace. The Research
+    hand-off row that used to stand under "Elsewhere on this site" is the featured block now, and the heading
+    is gone. Every word still comes from site.yaml; this file holds markup only. -#}
 {% extends "base.html.j2" %}
 
 {% block identity %}
@@ -6,9 +13,17 @@
 {# alt="" on purpose: the portrait stands beside the name, and a description would make a screen reader say
    "Itamar Avitan" twice (deep review 2026-09-25, PA-05). The accessibility statement says so; change both. #}
       <picture><source srcset="{{ site.portrait.webp|local(base) }}" type="image/webp"><img src="{{ site.portrait.jpg|local(base) }}" width="120" height="120" alt=""></picture>
-      <h1>{{ site.name }}</h1>
+{# The mark above the name (owner: yes, Q-L masthead question, 2026-09-25; the WP-S14 spec, built here): the
+   same row of three shapes the favicon and the colophon are made from, small, on the name's own column, so
+   the front door opens and closes on the site's signature. aria-hidden: the colophon's copy carries the
+   caption that says what it is, and the name is the next word. #}
+      <div class="masthead__name"><svg class="mark mark--mast" aria-hidden="true" viewBox="0 0 42 10" width="50" height="12"><circle cx="5" cy="5" r="5"/><circle cx="21" cy="5" r="5"/><rect x="32" width="10" height="10"/></svg><h1>{{ site.name }}</h1></div>
       {{ m.role_line()|trim }}
-      <p class="lede">{{ site.identity_line }}</p>
+{# The identity line (owner ruling 17, 2026-09-25): one string in site.yaml, so the meta description, the og
+   text and the JSON-LD carry it whole. Here its first sentence is the lede and the second, the question,
+   stands under it one step smaller: split at the first sentence end, and printed whole when there is none. #}
+{% set said = site.identity_line.partition(". ") %}
+      <p class="lede">{{ said[0] }}{{ said[1]|trim }}{% if said[2] %} <span class="lede__more">{{ said[2] }}</span>{% endif %}</p>
 {# The address, and beside it the two profiles a recruiter and a peer open first. The full row of six stands
    in the colophon of every page, this one included: see the note over `contact` in macros.html.j2. The two
    labels are the exact ones in site.yaml's `links`; a label that is not there is silently not drawn. #}
@@ -27,32 +42,66 @@
       </div>
     </section>
 
-{# The hand-off. Home named the commonplace, the teaching and the paper without a way to reach any of them,
-   so the navigation strip was the only route into the site. Each row carries a real line from the page it
-   leads to, and the gutter carries the page's name as a tag rather than a date -- see the note over
-   `elsewhere` in site.yaml for why it takes no tick. #}
-{% if site.get("elsewhere") %}
-    <section id="elsewhere" aria-labelledby="elsewhere-h">
-      <h2 id="elsewhere-h" class="inset">Elsewhere on this site</h2>
-      <ul class="log log--tight log--go" role="list">
-        {{ m.elsewhere_rows(site.elsewhere)|trim }}
-      </ul>
+{# The featured paper: the first research card's own badge, short title, four sentences (`feature` in
+   site.yaml: question, test, result with its chance baseline, scope), the four marks of its diagram with
+   one-word captions, and its Paper, Code and video buttons -- every piece read off the card, so the front
+   door cannot drift from the research page. The title leads to the card on that page; the last link to the
+   page itself. A card without `feature` draws no block; one without badges or buttons draws no badge or no
+   links (build renders with StrictUndefined, so every key is tested first). The venue badge is the first
+   badge without " · ", the card's own condition, so a presentation badge never takes the box here.
+   What a screen reader hears: the title link names its page in a hidden span, as the invitations do; the
+   Paper, Code and Video links carry the card's own `context` the same way (deep review 2026-09-25, PA-05). #}
+{% if research and research[0].get("feature") %}
+{% set card = research[0] %}
+{% set feature = card.feature %}
+{% set venue = namespace(badge=none) %}
+{% for badge in card.get("badges") or [] %}{% if venue.badge is none and " · " not in badge %}{% set venue.badge = badge %}{% endif %}{% endfor %}
+    <section id="research" aria-labelledby="research-h">
+      <h2 id="research-h" class="inset">Research</h2>
+      <div class="feature">
+{% if venue.badge %}
+        <p class="feature__venue"><span class="tag tag--venue">{{ venue.badge }}</span></p>
+{% endif %}
+        <div class="feature__body">
+          <h3><a href="{{ 'research/#papers'|local(base) }}">{{ m.nb(card.title.split(": ", 1)[-1]) }}<span class="vh"> (Research page)</span></a></h3>
+          <p class="feature__text"><strong class="lead">{{ m.nb(feature.question) }}</strong> {{ m.nb(feature.test) }} {{ m.nb(feature.result) }} {{ m.nb(feature.scope) }}</p>
+{% if feature.get("stages") %}
+          <ol class="recovery-diagram recovery-diagram--small" role="list" aria-label="The model-recovery test in four stages">
+{% for stage in feature.stages %}
+            <li>{{ m.recovery_mark(loop.index) }}<p>{{ m.nb(stage) }}</p></li>
+{% endfor %}
+          </ol>
+{% endif %}
+          <p class="feature__links">
+{% for label, shown in [("Paper", "Paper"), ("Code", "Code"), ("NeurIPS 2025 video", "Video")] %}
+{% for button in card.get("buttons") or [] if button.label == label %}
+            <a href="{{ button.url }}">{{ shown }}{% if button.get("context") %}<span class="vh"> {{ button.context }}</span>{% endif %}</a> ·
+{% endfor %}
+{% endfor %}
+            <a href="{{ 'research/'|local(base) }}">More on the research page</a>
+          </p>
+        </div>
+      </div>
     </section>
 {% endif %}
 
 {# What he is doing at the moment, dated, so it is read as a snapshot and not as a standing claim. The date
-   takes the gutter and its tick like every other date on the site; the lines themselves are one list in the
-   text column, because none of them is an event with a date of its own. #}
+   takes the gutter and its tick like every other date on the site. One line is a paragraph in the text
+   column; two or more are one dotted list there, because none of them is an event with a date of its own. #}
     <section id="now" aria-labelledby="now-h">
       <h2 id="now-h" class="inset">Now</h2>
       <ul class="log" role="list">
         <li class="row">
           {{ m.dates(site.now_as_of, "when") }}
+{% if site.now|length == 1 %}
+          <p class="what">{{ m.nb(site.now[0]) }}</p>
+{% else %}
           <ul class="what now" role="list">
 {% for line in site.now %}
             <li>{{ m.nb(line) }}</li>
 {% endfor %}
           </ul>
+{% endif %}
         </li>
       </ul>
     </section>
@@ -71,5 +120,17 @@
       </details>
 {% endif %}
     </section>
+
+{# The two invitations, to the pages that are about the person rather than the work: two rows on the grid,
+   the page's name in the gutter as a tag rather than a date, a real thing from the page as the link and one
+   clause on what else is there -- see the note over `elsewhere` in site.yaml for why the rows take no tick
+   and no heading. aria-label, because the section has no heading of its own to be labelled by. #}
+{% if site.get("elsewhere") %}
+    <section id="elsewhere" class="invitations" aria-label="Elsewhere on this site">
+      <ul class="log log--tight log--go" role="list">
+        {{ m.elsewhere_rows(site.elsewhere)|trim }}
+      </ul>
+    </section>
+{% endif %}
 
 {% endblock %}

@@ -1,7 +1,7 @@
 """Draw the two link-preview cards (1200x630) from site.yaml, in the site's own faces and colours.
 
-  img/og.png           the name card: the mark, the name, the role line and the identity line. Every page
-                       shares it unless it sets `og_image`.
+  img/og.png           the name card: the mark, the name, the role line and the identity line in up to three
+                       balanced lines. Every page shares it unless it sets `og_image`.
   img/og-research.png  the paper card, for /research/: the mark, the first badge of the first research card,
                        the paper's short title (the part after the colon), the authors, and the figure the
                        card shows -- Figure 1D drawn from its own SVG (the matrix's cells and its grid, not
@@ -81,6 +81,22 @@ def wrap(text: str, font, draw: ImageDraw.ImageDraw, room: float) -> list[str]:
     return lines + [line] if line else lines
 
 
+def wrap_balanced(text: str, font, draw: ImageDraw.ImageDraw, room: float, max_lines: int) -> list[str]:
+    """The greedy wrap at the narrowest width that still needs no more than `max_lines` lines, so the lines
+    come out about as long as one another rather than full ones over a runt (the two-line case is wrap_in_two;
+    this is its answer for three). Found by bisection on the width; the result is never wider than `room`."""
+    if len(wrap(text, font, draw, room)) > max_lines:
+        return wrap(text, font, draw, room)          # does not fit: the greedy lines, for the caller to size down
+    low, high = 0.0, room
+    while high - low > 1:
+        middle = (low + high) / 2
+        if len(wrap(text, font, draw, middle)) <= max_lines:
+            high = middle
+        else:
+            low = middle
+    return wrap(text, font, draw, high)
+
+
 def fit(text: str, draw: ImageDraw.ImageDraw, sizes, room: float, max_lines: int, style: str = "Regular",
         family: str = "Sans"):
     """The largest size in `sizes` at which `text` wraps into at most `max_lines` lines within `room`
@@ -103,7 +119,9 @@ def draw_mark(draw: ImageDraw.ImageDraw, x: int, y: int, s: int) -> None:
 
 def draw_card(name: str, line: str, role: str = "") -> Image.Image:
     """The name card: the mark, the name, the role line under it (one line, sized to fit the measure, in the
-    page's own role-line face) and the identity line in two lines."""
+    page's own role-line face) and the identity line in at most three balanced lines -- two while two hold it
+    at 36px or more, three below that: the line of 2026-09-26 (owner ruling 17) is two sentences, which two
+    lines carried only at 24px, smaller than the role line under the name."""
     s = SCALE
     img = Image.new("RGB", (W * s, H * s), BG)
     draw = ImageDraw.Draw(img)
@@ -113,6 +131,12 @@ def draw_card(name: str, line: str, role: str = "") -> Image.Image:
         lines, width = wrap_in_two(line, line_font, draw)
         if width <= (W - 2 * MARGIN) * s:
             break
+    if size < 36:                           # two lines only by shrinking the line under the role: three instead
+        for size in range(40, 23, -2):
+            line_font = load_font("Regular", size * s)
+            lines = wrap_balanced(line, line_font, draw, (W - 2 * MARGIN) * s, 3)
+            if len(lines) <= 3:
+                break
     leading = round(size * 1.4)
     for rsize in range(32, 23, -1):         # the largest size at which the role line fits on one line
         role_font = load_font("Regular", rsize * s)
@@ -122,6 +146,7 @@ def draw_card(name: str, line: str, role: str = "") -> Image.Image:
 
     u = MARK_UNIT
     block = 10 * u + 64 + 104 + role_h + 44 + leading * len(lines)      # mark, gap, name, role, gap, lines
+    assert all(draw.textlength(text, font=line_font) <= (W - 2 * MARGIN) * s for text in lines), "identity line wider than the card"
     x, y = MARGIN, (H - block) // 2
     draw_mark(draw, x, y, s)
     baseline = y + 10 * u + 64 + 84          # the name's baseline: about a cap height below the gap

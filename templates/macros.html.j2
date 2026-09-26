@@ -212,48 +212,26 @@
   {%- endif -%}
 {%- endmacro -%}
 
-{#- Where to go next, on the home page. The gutter carries the page's name as a tag rather than a date,
-    because these rows are addresses and not points in time: a tag is the site's label that is never
+{#- The invitations at the foot of the home page. The gutter carries the page's name as a tag rather than a
+    date, because these rows are addresses and not points in time: a tag is the site's label that is never
     clickable, it takes no tick, and so nothing false is put on the margin rule, which stays a time axis.
     The stylesheet sets a tag in a log's gutter as a small uppercase mono label, not an outlined box -- a
     boxed page name read as a button that does nothing (deep review 2026-09-25, DS-03); the box is the
-    paper card's venue badge alone. The link is set like a title, in ink with the accent underline. The
-    link is a real thing on the page it leads to -- a paper's title, a course, a speaker -- and the clause
-    after the em dash says what else is there. The dash is tied to the label's last word by a no-break
-    space, so it never opens a line: with the Teaching label at the course's full name it stood at the
-    start of a line on 390-400px phones, and the Research row's did at 430 (deep review 2026-09-25).
-    The Research row carries two things more, both drawn from the first paper card (`research[0]`) so
-    that nothing is written twice: the paper's first venue badge under the gutter label -- the one
-    outlined box outside the card, set in the gutter exactly as the card sets its badges; a venue is a
-    badge without " · ", the card's own condition, so a presentation badge ("CCN 2025 · Talk") never
-    takes the box here whatever the order of the list -- and, under the line, a small mono row with the
-    card's first button (Paper) and its Code link (deep review 2026-09-25, DS-09 and AS-02). The links
-    row stands outside .what on purpose: inside it, the title rule (.log--go .what a) would set them as
-    two more bold ink titles. Every key is tested before use;
-    a card without badges or buttons draws neither.
+    venue badge alone. The link is set like a title, in ink with the accent underline. The link is a real
+    thing on the page it leads to -- a course, a speaker -- and the clause after the em dash says what else
+    is there. The dash is tied to the label's last word by a no-break space, so it never opens a line: with
+    the Teaching label at the course's full name it stood at the start of a line on 390-400px phones (deep
+    review 2026-09-25). Until 2026-09-26 the same rows carried a Research row as well, with the paper's
+    venue badge and its Paper and Code links; that row is the featured Research block under About now
+    (templates/pages/home.html.j2), and this macro draws only the two invitations.
     What a screen reader hears (deep review 2026-09-25, PA-05): the link's name is the label and then, in a
-    hidden span, the page it leads to -- "When the Best-Fitting Model Isn't the Right One (Research page)"
-    -- because a list of links that read as three bare titles said nothing about where they go; and the
-    Paper and Code links carry the card's own `context` the same way, as they do on the card. -#}
+    hidden span, the page it leads to -- "Introduction to Computation and Cognition (Teaching page)" --
+    because a list of links that read as bare titles said nothing about where they go. -#}
 {%- macro elsewhere_rows(items) %}
 {% for item in items %}
         <li class="row">
           <p class="kind"><span class="tag">{{ item.page }}</span></p>
-  {% set venue = namespace(badge=none) %}
-  {% if item.url == "research/" and research %}
-    {% for badge in research[0].get("badges") or [] %}{% if venue.badge is none and " · " not in badge %}{% set venue.badge = badge %}{% endif %}{% endfor %}
-  {% endif %}
-  {% if venue.badge %}
-          <p class="go-venue"><span class="tag tag--venue">{{ venue.badge }}</span></p>
-  {% endif %}
           <p class="what"><a href="{{ item.url|local(base) }}">{{ nb(item.label) }}<span class="vh"> ({{ item.page }} page)</span></a>&nbsp;— {{ nb(item.text) }}</p>
-  {% if item.url == "research/" and research and research[0].get("badges") %}
-    {% set buttons = research[0].get("buttons") or [] %}
-    {% set code = buttons|selectattr("label", "equalto", "Code")|list %}
-    {% if buttons %}
-          <p class="go-links"><a href="{{ buttons[0].url }}">{{ buttons[0].label }}{% if buttons[0].get("context") %}<span class="vh"> {{ buttons[0].context }}</span>{% endif %}</a>{% if code %} · <a href="{{ code[0].url }}">Code{% if code[0].get("context") %}<span class="vh"> {{ code[0].context }}</span>{% endif %}</a>{% endif %}</p>
-    {% endif %}
-  {% endif %}
         </li>
 {% endfor %}
 {% endmacro -%}

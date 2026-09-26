@@ -362,7 +362,7 @@ def test_the_cv_is_one_click_from_every_page():
 
 def test_every_page_says_whose_site_it_is_without_repeating_the_bio():
     """A visitor landing on a deep page sees the name, the role line and the portrait at the top and the
-    address at the foot. The three paragraphs of "about" are said once, at home."""
+    address at the foot. The two paragraphs of "about" are said once, at home."""
     for slug, html in every_page().items():
         assert SITE["name"] in build._visible_text(html) if False else True
         assert html.count('class="role"') == 1, slug
@@ -383,47 +383,84 @@ def test_every_page_says_whose_site_it_is_without_repeating_the_bio():
     assert sum(1 for h in every_page().values() if first[0] in _visible_text(h)) == 1
 
 
-def test_home_hands_the_visitor_on_to_every_other_page():
-    """The front door named the commonplace, the teaching and the paper and linked to none of them, so the
-    navigation strip was the only way in. One row per other page, each carrying a real thing from it."""
+def test_home_hands_the_visitor_on_to_the_two_pages_about_the_person():
+    """The front door used to close on "Elsewhere on this site": three rows under a heading, one per other page.
+    Since 2026-09-26 (WP-S17; astra's wireframe, taken by the controller under owner ruling 18, decision C1;
+    record kept privately) the Research row is the featured block under About, and what is left is two small
+    invitations without a heading -- Teaching and Commonplace, the pages about the person -- each carrying a
+    real thing from its page as the link and one clause on what else is there, with no count in it (a number
+    in a teaser goes stale: external review 2 §4)."""
     html = html_of("")
     section = html.partition('<section id="elsewhere"')[2].partition("</section>")[0]
-    assert [row["page"] for row in SITE["elsewhere"]] == [page(s)["nav"] for s in NAV_SLUGS[1:]]
-    assert section.count('<li class="row">') == 3
+    assert [row["page"] for row in SITE["elsewhere"]] == [page(s)["nav"] for s in NAV_SLUGS[2:]] == ["Teaching", "Commonplace"]
+    assert section.count('<li class="row">') == 2 and "<h2" not in section
+    assert '<section id="elsewhere" class="invitations" aria-label="Elsewhere on this site">' in html
     for row in SITE["elsewhere"]:
         assert f'<span class="tag">{row["page"]}</span>' in section, row["page"]   # a label, never a link
         assert f'<a href="{row["url"]}">' in section, row["url"]                   # relative to the root page
         assert row["label"] in _visible_text(section) and row["text"] in _visible_text(section)
         assert "read more" not in row["label"].lower() and row["label"] != row["page"]
+        assert not re.search(r"\b(?:one|two|three|four|five|six|\d+)\b", row["text"]), row["text"]   # no count
     assert '<p class="when">' not in section          # the gutter carries an address here, so it takes no tick
-    # one way out of each row, plus the paper and its code under the Research row (2026-09: the two objects a
-    # visitor came for). The extras are the first paper card's own: its first venue badge in the gutter under
-    # the label -- the one outlined box outside the card -- and its Paper and Code addresses, so nothing here
-    # can drift from the card (deep review 2026-09-25, DS-09 and AS-02).
-    assert section.count("<a ") == 5
-    card = SITE["research"][0]
-    research_row = section.partition('<span class="tag">Research</span>')[2].partition("</li>")[0]
-    venue = next(b for b in card["badges"] if " · " not in b)       # the card's own condition: a " · " is a presentation
-    assert f'<p class="go-venue"><span class="tag tag--venue">{venue}</span></p>' in research_row
-    assert section.count('class="tag tag--venue"') == 1
-    paper = card["buttons"][0]
-    code = next(b for b in card["buttons"] if b["label"] == "Code")
-    assert paper["label"] == "Paper"
-    assert (f'<p class="go-links"><a href="{paper["url"]}">Paper<span class="vh"> {paper["context"]}</span></a> · '
-            f'<a href="{code["url"]}">Code<span class="vh"> {code["context"]}</span></a></p>') in unescape(research_row)
-    assert re.findall(r'<a href="([^"]+)">', unescape(research_row))[1:] == [paper["url"], code["url"]]
-    assert research_row.index('class="go-venue"') < research_row.index('class="what"') < research_row.index('class="go-links"')
-    assert "go-links" not in research_row.partition('class="what"')[2].partition("</p>")[0]   # outside .what: not a title
-    # the box goes to the first venue, not to the first badge: with the card's list turned round, the talk
-    # ("CCN 2025 · Talk", a neutral tag on the card) stays off the row and the venue still takes the box
-    talk = next(b for b in card["badges"] if " · " in b)
-    turned = copy.deepcopy(SITE)
-    turned["research"][0]["badges"] = list(reversed(card["badges"]))
-    turned_section = html_of("", turned).partition('<section id="elsewhere"')[2].partition("</section>")[0]
-    assert f'<p class="go-venue"><span class="tag tag--venue">{venue}</span></p>' in turned_section
-    assert talk not in turned_section and turned_section.count('class="tag tag--venue"') == 1
+    assert section.count("<a ") == 2                  # one way out of each row, and nothing else
+    assert "tag--venue" not in section and "feature" not in section
     for slug in SLUGS[1:]:                            # and only the home page hands off; no page does it twice
         assert 'id="elsewhere"' not in html_of(slug), slug
+
+
+def test_the_front_door_features_the_paper():
+    """Between About and Now the home page carries the paper (WP-S17, controller decision C1 under owner
+    ruling 18; record kept privately): the first research card's own venue badge -- the one outlined box
+    outside the card -- its short title linked to the card, one paragraph that opens on the question in bold
+    and runs question, test, result with its chance baseline, scope (`feature` in site.yaml), the four marks
+    of the card's diagram captioned by one word each, and the card's Paper, Code and video addresses with a
+    link to the page. Everything is read off the card, so nothing here can drift from the research page;
+    a card without the keys draws no block, no badge or no links, as the optional-keys test shows."""
+    html = html_of("")
+    card = SITE["research"][0]
+    section = html.partition('<section id="research"')[2].partition("</section>")[0]
+    assert '<h2 id="research-h" class="inset">Research</h2>' in section
+    assert section.index('class="feature__venue"') < section.index("<h3>") < section.index('class="feature__text"') \
+        < section.index('class="recovery-diagram recovery-diagram--small"') < section.index('class="feature__links"')
+    venue = next(b for b in card["badges"] if " · " not in b)
+    assert f'<p class="feature__venue"><span class="tag tag--venue">{venue}</span></p>' in section
+    assert section.count('class="tag tag--venue"') == 1
+    short = card["title"].split(": ", 1)[-1]
+    assert f'<h3><a href="research/#papers">{short}'.replace("Best-Fitting", '<span class="nb">Best-Fitting</span>') in section
+    assert '<span class="vh"> (Research page)</span></a></h3>' in section
+    # the four sentences, in order, the question in bold; the result is the wording verified for the site
+    feature = card["feature"]
+    text = _visible_text(section)
+    assert f'<strong class="lead">{feature["question"]}</strong>' in section
+    for key in ("question", "test", "result", "scope"):
+        assert " ".join(feature[key].split()) in text, key
+    assert text.index(feature["question"]) < text.index(feature["test"]) < text.index(feature["result"][:30]) < text.index(feature["scope"])
+    assert "picked the right one less than 80% of the time: far above the one in twenty of guessing" in feature["result"]
+    assert 40 <= sum(len(feature[k].split()) for k in ("question", "test", "result", "scope")) <= 95
+    assert "12" not in text                                                # the private number stays off the page
+    # the strip: the card's four marks, one word under each, no numeral in a caption
+    strip = section.partition('<ol class="recovery-diagram recovery-diagram--small"')[2].partition("</ol>")[0]
+    assert strip.count("<li>") == strip.count("<svg") == len(feature["stages"]) == 4
+    assert [re.search(r"<p>(.*?)</p>", li).group(1) for li in strip.split("<li>")[1:]] == feature["stages"]
+    assert all(len(stage.split()) == 1 and not re.search(r"\d", stage) for stage in feature["stages"])
+    assert 'role="list" aria-label="The model-recovery test in four stages"' in section
+    # the links: the card's own addresses, its contexts in hidden spans, and the page last
+    by = {b["label"]: b for b in card["buttons"]}
+    links = re.findall(r'<a href="([^"]+)">([^<]+)(?:<span class="vh"> ([^<]+)</span>)?</a>', unescape(section.partition('class="feature__links"')[2]))
+    assert links == [(by["Paper"]["url"], "Paper", by["Paper"]["context"]),
+                     (by["Code"]["url"], "Code", by["Code"]["context"]),
+                     (by["NeurIPS 2025 video"]["url"], "Video", by["NeurIPS 2025 video"]["context"]),
+                     ("research/", "More on the research page", "")]
+    assert "CCN" not in section                       # the preliminary version is never the paper's link
+    # the block is the home page's alone, under About and above Now
+    assert html.index('id="about"') < html.index('id="research"') < html.index('id="now"') < html.index('id="news"') < html.index('id="elsewhere"')
+    for slug in SLUGS[1:]:
+        assert 'class="feature"' not in html_of(slug), slug
+    # a card whose first badge is the talk still puts the venue in the box
+    turned = copy.deepcopy(SITE)
+    turned["research"][0]["badges"] = list(reversed(card["badges"]))
+    turned_section = html_of("", turned).partition('<section id="research"')[2].partition("</section>")[0]
+    assert f'<span class="tag tag--venue">{venue}</span>' in turned_section and turned_section.count("tag--venue") == 1
 
 
 def test_the_address_is_said_at_the_top_and_the_profiles_at_the_foot():
@@ -556,7 +593,7 @@ def test_open_graph_points_at_the_site_and_its_card():
 
 
 def test_section_ids_and_script_hooks():
-    where = {"": ["about", "elsewhere", "now", "news"],
+    where = {"": ["about", "research", "now", "news", "elsewhere"],
              "research/": ["research", "papers", "talks", "projects"],
              "teaching/": ["teaching", "courses", "students"], "commonplace/": ["quotes"],
              "accessibility/": ["accessibility", "aim", "done", "limits", "report"]}
@@ -733,13 +770,15 @@ def _news_rows(html: str) -> list[str]:
 
 
 def test_a_news_item_links_the_thing_it_names_and_nothing_else():
-    """Four items name an artefact a reader can open -- the NEAT page, the paper's card, the code and data,
-    the arXiv preprint -- and each links that one phrase; the other items carry no link at all. The phrase
+    """Five items name an artefact a reader can open -- the NEAT page, the practicum's row, the paper's card,
+    the code and data, the arXiv preprint -- and each links that one phrase; the other items carry no link at
+    all. Every item the front door shows open links something (WP-S17: `news_visible` is 3). The phrase
     is the first occurrence of `link` in the sentence, and the address is `url` made relative to the page.
     The sentence has to survive the split: the pieces around the link go through nb() one by one."""
     rows = _news_rows(html_of(""))
     assert len(rows) == len(SITE["news"])
-    assert {n["date"] for n in SITE["news"] if n.get("link")} == {"Sep 2026", "Dec 2025", "Nov 2025", "Oct 2025"}
+    assert {n["date"] for n in SITE["news"] if n.get("link")} == {"Sep 2026", "Aug 2026", "Dec 2025", "Nov 2025", "Oct 2025"}
+    assert all(n.get("link") for n in SITE["news"][:SITE["news_visible"]]) and SITE["news_visible"] == 3
     for item, row in zip(SITE["news"], rows):
         anchors = re.findall(r'<a href="([^"]*)">(.*?)</a>', row, re.S)
         if item.get("link"):
@@ -855,7 +894,7 @@ def test_the_practicum_leads_with_the_programme_and_ends_on_his_one_clause():
     assert "an add-on for any headphones, designed to read biosignals and filter out the sounds" in entry["blurb"]
     assert "a headphone add-on designed to filter the sounds" in news["text"]
     about_clause = next(p for p in SITE["about"] if "add-on" in p)
-    assert "a headphone add-on for the noises that set anxiety off" in about_clause
+    assert "a headphone add-on designed to filter the sounds that set anxiety off" in about_clause
     for text in (entry["blurb"], news["text"], about_clause):
         for claim in ("filters", "reads biosignals", "works with"):
             assert claim not in text, (claim, text)
@@ -947,8 +986,8 @@ def test_optional_keys_may_be_absent():
                 continue                                # a news item's sentence is required; its link is not
             entry.pop(key, None)
     for entry in site["research"]:
-        for key in ("venue", "how", "found", "open", "cite", "published", "doi"):    # the card's citation line,
-            entry.pop(key, None)                                # depth blocks and record are optional; a talk's venue is not
+        for key in ("venue", "how", "found", "open", "cite", "published", "doi", "feature"):    # the card's citation
+            entry.pop(key, None)                    # line, depth blocks, record and home block are optional; a talk's venue is not
     for entry in site["links"]:
         entry.pop("format", None)
     for entry in site["pages"]:
@@ -967,8 +1006,13 @@ def test_optional_keys_may_be_absent():
         for gone in ('<p class="venue"><a', 'class="venue paper__venue"', 'class="note"', "<figure",
                      'class="authors"', 'class="role"', 'class="nb"', 'rel="me"', 'id="email"',
                      'class="tag tag--venue"', 'class="btn', 'class="page-intro', 'class="recovery-diagram"',
-                     'class="open"', 'class="cite"', 'class="work"', 'class="go-venue"', 'class="go-links"'):
+                     'class="open"', 'class="cite"', 'class="work"', 'class="feature'):
             assert gone not in html, (slug, gone)
+    assert 'id="research"' not in pages[""]                     # no `feature`, no featured block on the front door
+    site["research"][0]["feature"] = SITE["research"][0]["feature"]     # the block back, without its badge or its buttons
+    home = html_of("", site)
+    assert 'class="feature"' in home and 'class="feature__venue"' not in home
+    assert re.search(r'<p class="feature__links">\s*<a href="research/">More on the research page</a>\s*</p>', home)
     assert "<h3>Embodied Brain Technology Practicum</h3>" in pages["research/"]
     assert "Cognitive Computational Neuroscience (CCN) 2025" in pages["research/"]
 
@@ -1000,14 +1044,20 @@ def test_dates_that_cannot_be_read_stay_plain_text():
 
 
 def test_the_now_block_is_dated_once_and_its_lines_are_not_events():
-    """It says what he is doing, so it carries one date and takes one tick. The lines under it are not events
-    and get no dates of their own -- they are a list in the text column, beside that single tick."""
+    """It says what he is doing, so it carries one date and takes one tick. Since 2026-09-26 (WP-S17) it is one
+    line, printed as a paragraph in the text column beside that single tick -- not a list, and not the paper's
+    question again. Two or more lines would be one dotted list there, with no dates of their own, because
+    none of them is an event: the template keeps that branch, exercised here on a fixture."""
     section = html_of("").partition('<section id="now"')[2].partition("</section>")[0]
     assert section.count('class="when"') == 1 and '<time class="when" datetime="2026-09">' in section
-    assert section.count("<li>") == len(SITE["now"]) == 2
-    assert '<ul class="what now" role="list">' in section
+    assert len(SITE["now"]) == 1 and "<li>" not in section and '<ul class="what now"' not in section
+    assert re.search(r'<p class="what">.*?</p>', section, re.S)
     text = _visible_text(section)
-    assert all(" ".join(line.split()) in text for line in SITE["now"])
+    assert " ".join(SITE["now"][0].split()) in text
+    site = copy.deepcopy(SITE)
+    site["now"] = ["A first line.", "A second line."]
+    two = html_of("", site).partition('<section id="now"')[2].partition("</section>")[0]
+    assert '<ul class="what now" role="list">' in two and two.count("<li>") == 2 and '<p class="what">' not in two
 
 
 def test_now_says_nothing_about_what_he_is_looking_for_or_the_neat_work():
@@ -1049,8 +1099,9 @@ def test_the_about_and_now_drafts_are_marked_as_drafts_in_site_yaml():
     that whoever edits next knows they are standing in for his own words, not recording them."""
     yaml_text = (build.ROOT / "site.yaml").read_text(encoding="utf-8")
     assert yaml_text.count("DRAFT, awaiting the owner") == 1 and "DRAFT, as above" in yaml_text
-    assert 150 <= sum(len(p.split()) for p in SITE["about"]) <= 200
-    assert 2 <= len(SITE["now"]) <= 5
+    # two short paragraphs since WP-S17 (astra's 90-140 words as the starting range, 80-150 here)
+    assert len(SITE["about"]) == 2 and 80 <= sum(len(p.split()) for p in SITE["about"]) <= 150
+    assert 1 <= len(SITE["now"]) <= 3
 
 
 def test_teaching_is_two_sections_and_every_row_is_dated_and_titled():
@@ -1167,7 +1218,6 @@ def test_quotes_print_the_line_its_attribution_and_its_context_and_nothing_else(
     section = html.partition('<section id="quotes"')[2].partition("</section>")[0]
     shown = _visible_text(section)
     assert section.count("<blockquote>") == len(SITE["quotes"]) == 4
-    assert "four" in SITE["elsewhere"][2]["text"] and len(SITE["quotes"]) == 4      # the home page's teaser counts them
     for quote in SITE["quotes"]:
         assert f'<blockquote><p>{quote["text"]}</p></blockquote>' in section         # printed exactly as verified
         # rendered text, with the attribution's U+00A0 ties read as the spaces they print as
@@ -1436,7 +1486,13 @@ def test_a_link_says_where_it_leads_to_a_reader_who_cannot_see_the_card():
         # the page's name closes the link, inside it, before the dash that opens the clause
         assert section.count(f'<span class="vh"> ({row["page"]} page)</span></a>&nbsp;—') == 1, row["page"]
         assert re.search(rf'<a href="{row["url"]}">(?:(?!</a>).)*{re.escape(row["label"][-12:])}<span class="vh"> \({row["page"]} page\)</span></a>', section), row["page"]
-    assert section.count('class="vh"') == len(SITE["elsewhere"]) + 2          # the three pages, then Paper and Code
+    assert section.count('class="vh"') == len(SITE["elsewhere"])              # the two pages, nothing else
+    # the featured paper: its title names the page, and Paper, Code and Video carry the card's own contexts
+    feature = home.partition('<section id="research"')[2].partition("</section>")[0]
+    assert feature.count('<span class="vh"> (Research page)</span>') == 1
+    for shown, label in (("Paper", "Paper"), ("Code", "Code"), ("Video", "NeurIPS 2025 video")):
+        assert f'>{shown}<span class="vh"> {contexts[label]}</span></a>' in feature, shown
+    assert feature.count('class="vh"') == 4
     css = _css()
     assert re.search(r'\.role li::before \{[^}]*content: "\\00B7" / "";', css)
     assert '.quote__by::before { content: "\\2014\\00A0" / ""; }' in css
@@ -1488,7 +1544,7 @@ def test_paper_gets_the_light_palette_and_the_addresses_whatever_the_screen_show
     assert ".btn--primary { color: var(--accent); background: none; border: 0; padding-inline: 0; text-decoration: underline; }" in block
     addresses = re.search(r"(\.buttons a\[href\^=\"http\"\]::after[^{]*)\{([^}]*)\}", block)
     assert addresses and 'content: " <" attr(href) ">";' in addresses.group(2)
-    for where in ('.venue a[href^="http"]::after', 'h3 a[href^="http"]::after', '.go-links a[href^="http"]::after'):
+    for where in ('.venue a[href^="http"]::after', 'h3 a[href^="http"]::after', '.feature__links a[href^="http"]::after'):
         assert where in addresses.group(1), where
     # the card is taller than a sheet, so its pieces keep whole rather than the card (which only emptied sheet 1)
     assert ".paper__aside, .paper .tldr, .recovery-diagram li, .paper .open, .log > .row, .quote { break-inside: avoid; }" in block

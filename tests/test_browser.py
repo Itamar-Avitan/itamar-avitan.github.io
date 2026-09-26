@@ -406,6 +406,42 @@ def test_the_laptop_gets_a_composition_of_its_own(browser):
     assert abs(narrow.evaluate(tick_foot)) <= 0.5 and abs(wide.evaluate(tick_foot)) <= 0.5
 
 
+@pytest.mark.parametrize("width", WIDTHS)
+def test_the_featured_papers_links_are_24px_targets_and_its_strip_keeps_its_order(browser, width):
+    """The front door's "Paper · Code · Video · More on the research page" is set like the card's mono labels
+    in a line of prose, and each link's box is padded to the 24px a target needs (WCAG 2.2 SC 2.5.8) without
+    moving the line (WP-S17). The four marks under the paragraph read in order: one row of four from 45rem
+    up, two rows of two below it -- never three and a stranded fourth."""
+    page, _, _ = _page(browser, width)
+    links = page.evaluate(HIT_TEST_JS, ".feature__links a")
+    assert [l["label"].split(" ")[0] for l in links] == ["Paper", "Code", "Video", "More"]
+    assert [l for l in links if l["height"] < 24 or not l["covered"]] == []
+    tops = page.evaluate("[...document.querySelectorAll('.recovery-diagram--small li')].map(l => Math.round(l.getBoundingClientRect().top))")
+    rows = sorted(set(tops))
+    assert [tops.count(r) for r in rows] == ([4] if width >= 720 else [2, 2]), (width, tops)
+
+
+@pytest.mark.parametrize("scheme", ["light", "dark"])
+def test_the_first_screen_says_who_he_is_and_what_question_animates_his_work(browser, scheme):
+    """At 1280 by 800, the commonest laptop screen, the front door shows the name under the mark, the role
+    line, both sentences of the identity line -- the second set one step under the first, at the size the
+    other pages' intros take -- the address, and the About heading with its whole first paragraph, which
+    closes on the broader question (WP-S17: the page's one promise, external review 3 §21 and §28)."""
+    ctx = browser.new_context(viewport={"width": 1280, "height": 800}, color_scheme=scheme)
+    page = ctx.new_page()
+    page.goto((ROOT / "index.html").as_uri())
+    page.wait_for_timeout(300)
+    box = page.evaluate("""() => { const r = s => document.querySelector(s).getBoundingClientRect().toJSON();
+      return {mark: r('.mark--mast'), name: r('.masthead h1'), more: r('.lede__more'), email: r('#email'),
+              about: r('#about-h'), first: r('#about .prose p')}; }""")
+    assert box["first"]["bottom"] <= 800 and box["about"]["top"] < box["first"]["top"] < box["first"]["bottom"]
+    assert box["more"]["bottom"] < box["email"]["top"] < box["about"]["top"]
+    assert box["mark"]["bottom"] <= box["name"]["top"] and abs(box["mark"]["x"] - box["name"]["x"]) <= 3
+    sizes = page.evaluate("""['.lede', '.lede__more'].map(s => parseFloat(getComputedStyle(document.querySelector(s)).fontSize))""")
+    assert sizes == [24, 20]
+    ctx.close()
+
+
 @pytest.mark.parametrize("width", [320, 400])
 @pytest.mark.parametrize("scheme", ["light", "dark"])
 def test_a_phone_meets_the_name_before_the_preferences(browser, width, scheme):

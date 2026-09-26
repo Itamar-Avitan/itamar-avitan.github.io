@@ -10,15 +10,19 @@ affiliation: Ben-Gurion University of the Negev
 # intro's term, the identity line's nouns -- because structured data describes the visible page and must not
 # add to it (deep review 2026-09-25, MR-06 with EM-14's rule; tests/test_build.py checks each term is visible).
 affiliation_url: https://www.bgu.ac.il/
-knows_about: [NeuroAI, Computational cognitive neuroscience, Representational alignment, Human vision, Neural network models]
+# "Machine learning" replaced "Neural network models" on 2026-09-26 (WP-S17): the phrase left the identity line
+# with owner ruling 17, and the field word is what About prints (FACTS ID-FIELD, owner ruling 9).
+knows_about: [NeuroAI, Computational cognitive neuroscience, Representational alignment, Human vision, Machine learning]
 show_cv: true
 # Hiding a card does not make it private: nothing unpublished may be stored in this repository at all, hidden
 # or not (README, public-only policy). This switch only decides whether a card marked `ongoing: true` is drawn
 # (build.py, visible_research).
 show_ongoing: false
-# Show every item until the list outgrows this; the expander returns by itself when it does. It hid the CCN
-# 2025 talk and the PhD start to save 125px, which is the start of the story the rest of the page tells.
-news_visible: 8
+# Three items stand open and the rest go behind "Older news" (astra's wireframe, controller decision C1 under
+# owner ruling 18, 2026-09-26; record kept privately). The front door answers "what changed recently" with the
+# three latest events, each linking the thing it names; the whole story, back to the PhD start, is one click
+# away in the expander. It stood at 8 (every item open) from 2026-09-25 until the home page was rebuilt.
+news_visible: 3
 # The portrait has no alt text on purpose (deep review 2026-09-25, PA-05): it stands beside the name on every
 # page, so a description would only make a screen reader say "Itamar Avitan" twice. The templates write
 # alt="" and the accessibility statement says so; there is no `alt` key here to fall out of step with them.
@@ -50,9 +54,10 @@ pages:
   # Every word of the title and the description is printed on the site already: the field words are in About
   # (FACTS ID-FIELD), the status in the role line, the university in the affiliation. The name leads, exactly
   # as the <h1> prints it (spec 4.5 is a name-form rule: never "Itamar Amram Avitan" here). The description
-  # ends on the identity line and follows it when that line changes (owner ruling 17, built by WP-S17).
+  # ends on the identity line and follows it when that line changes (owner ruling 17, built by WP-S17): the
+  # two sentences below are that line word for word, tie included.
   title: Itamar Avitan · NeuroAI PhD candidate, Ben-Gurion University
-  description: NeuroAI PhD candidate at Ben-Gurion University. I study how to tell which neural network models of human vision are right, not just which ones predict best.
+  description: NeuroAI PhD candidate at Ben-Gurion University. I study human vision with computational models. I’m interested in when a model’s success at predicting behavior tells us something about the representation behind it — and when it does not.
 - slug: research/
   nav: Research
   heading: Research
@@ -167,123 +172,112 @@ role:
 # the interior pages and 2.7px at 340px on home; the no-break space wraps correctly in all three engines.
 # `affiliation:` at the top stays without the country: it feeds the JSON-LD.
 - label: Ben-Gurion University of the Negev, Israel
-identity_line: I study how to tell which neural network models of human vision are right, not just which ones predict best.
+# The site's first sentence, the owner's own choice among the wordings put to him (owner ruling 17,
+# 2026-09-25; record kept privately -- the review's rulings file): two sentences, the object of study and
+# then the question, in place of the one-line "right, not just which ones predict best" thesis, which now
+# lives in the paper's own title and on the research page. It is printed once, as the masthead lede -- the
+# template sets the first sentence a step larger than the second -- and reused as it stands by the meta
+# description, the og text, the JSON-LD description and the name card (tools/make_og.py: rerun it when this
+# changes). Typographic apostrophe and em dash, as the ruling asks; the space before the dash is a no-break
+# space (U+00A0), the site's convention for its own dashes (About, the accessibility statement): untied, the
+# lede opened a line on "— and when it does not." at 200% text at twelve widths (460-490, 890-920 and
+# 1060-1090px; Chromium, measured 2026-09-26) and at none at 100%. The description above carries the same tie, so the two stay one string.
+identity_line: I study human vision with computational models. I’m interested in when a model’s success at predicting behavior tells us something about the representation behind it — and when it does not.
 
 # DRAFT, awaiting the owner's own words. Written on 2026-09-21 because the owner asked for an About section in
 # his own voice and a Now block (owner ruling, 2026-09-21; record kept privately). Every clause below is drawn
-# from facts already on this site or given by him -- the lab, the advisor, the fields he came from, the question
-# the work asks, the result the paper found, the teaching, the two students, the BCI4ALS build and the practicum
-# product. Nothing about his life outside that is invented, and nothing should be added here that he has not
-# said. It replaces the old three-paragraph "bio", whose second paragraph is kept verbatim as the Research page's
-# intro above.
+# from facts already on this site, on the CVs (FACTS.md in the cv repository) or ruled by him. Nothing about
+# his life outside that is invented, and nothing should be added here that he has not said.
 #
-# Cut back on 2026-09-21, second pass. The first paragraph was an education record written as prose -- direct
-# track, department, school, B.Sc., B.A., M.Sc., 2026 -- which is exactly the online-CV register he rejected
-# (a personal site, not an online CV: owner ruling, 2026-09-21; record kept privately), and cv.pdf already
-# carries every one of those facts. Do not put the degree list back, and do not let any paragraph restate
-# identity_line.
+# Two paragraphs since 2026-09-26 (WP-S17), on astra's wireframe for the front door (controller decision C1
+# under owner ruling 18; record kept privately): the home page answers "who is he and what question animates
+# his work", and About is the person, not the paper. The first paragraph is who he is and how he got here --
+# the field words every CV prints (FACTS ID-FIELD, "NeuroAI and computational cognitive neuroscience"), the
+# lab and the advisor, the two undergraduate fields (FACTS EDU-UG-DEGREES; the degree line's "(computational
+# track)" is left to the CV: two words the word budget could not carry), and the three things the work combines, which are the paper's
+# (human judgments, models, model-recovery simulations) -- and closes on ONE sentence about the broader
+# question, at the level a researcher states on a homepage: how to compare models with minds so that competing
+# ideas can be told apart, which experiments separate them, and how people differ in how they see. That
+# sentence names interests and not studies (owner request, 2026-09-25, that his broader interests be stated
+# without revealing future work; the same two interests close the academic CVs' Research-interests line,
+# FACTS INT-BROADER); it carries no verb of future work, no dataset, no method beyond "model recovery", and
+# nothing about the NEAT 2026 work (owner ruling 16). Do not grow it into a programme. The second paragraph is
+# the rest of the person: the teaching by subject (the titles and the years are the teaching page's and the
+# Now line's -- said there, not here as well), the mentoring in the past tense (MENT-YEARS is 2025-2026), the
+# two things built with other people, and the commonplace. "And I collect lines about the mind." stays as
+# written (external review 3 kept it by name).
 #
-# The practicum clause in the third paragraph -- "a headphone add-on for the noises that set anxiety off" --
-# was re-read on 2026-09-21 against the owner's programme-first ruling (see the note over `projects`) and
-# KEPT unchanged. It survives that ruling on its own terms: it is a passing mention in a list of two things
-# he built with other people, it names no personal contribution, no sensor and no business step, and it is in
-# his voice, which he asked for. Naming the programme here instead would make the third paragraph of an
-# "about me" carry a programme's name for no reader's benefit -- the Research page says all that, once.
-# The rule the ruling sets for this paragraph is narrow and should be kept: do not add to this clause.
+# Gone since 2026-09-26: the paragraph that argued the paper (the mapping, the twenty networks, the 80%) --
+# that argument is the featured Research block directly under About, drawn from the paper card, and the
+# CV-shaped sentence on the PhD's start and expected end (the CV chip in the strip carries the record; do not
+# put "degrees are in the CV" back either).
 #
-# Fourth pass, 2026-09-25 (deep review, WP-S1); the third pass of 2026-09-23 had only stopped the opening from
-# repeating the role line. The order is now: the argument, in plain words, closing on the paper at NeurIPS
-# 2025; then who -- the field, the advisor, the start and the expected end; then what else. The first
-# paragraph used to open on the advisor and a pointer to the CV, and the first "NeurIPS" a reader met stood
-# 1352px down the page at 1280x800; the argument leads now, its number carries its chance baseline (one in
-# twenty), and the paragraph ends on the venue, expanded, so it is the first use on the page. The old
-# "a mapping flexible enough to fit anything" overstated the paper: the mechanism is that the fitted mapping
-# reshapes the network's features, which is what is said. The CV pointer went because the CV chip is in the
-# strip on every page. The field words every CV prints -- "NeuroAI and computational cognitive neuroscience",
-# FACTS ID-FIELD -- enter the site here, in the second paragraph: do not turn this back into "I am a PhD
-# candidate in ...", which is the role line printed directly above it. The third paragraph puts the teaching
-# and the mentoring in the past tense, as he dated them (MENT-YEARS is 2025-2026, his own words), and no
-# longer announces the writing course: `now` and the teaching page do that, and two places are enough.
-# The space before the em dash in the first paragraph (after "predicts") and in the third (after "people")
-# is a no-break space (U+00A0): the dash otherwise opened a line at 360px (first) and 1440px (third). The
-# word count is unchanged by it, since str.split() breaks on it. The three paragraphs sit at 199 of the 200
-# words the test allows, so nothing may be added without a cut; if the count ever trips, cut "of guessing"
-# first.
+# The practicum clause -- "a headphone add-on designed to filter the sounds that set anxiety off" -- names the
+# add-on by what it was designed to do, never as a working filter (owner ruling 15, 2026-09-25; the note
+# over `projects` has the rule), and says nothing about who did what: the ruled role clause belongs to the
+# project row alone. The ALS expansion is this page's first use of the acronym. Do not add to this clause.
+#
+# Ties: the space before the em dash in the first paragraph is a no-break space (U+00A0), so the dash never
+# opens a line. Word count 81 + 67 = 148 of the 80-150 the test allows (str.split() counts the dash and the
+# colon-less "with"); nothing may be added without a cut, and if the count ever trips, cut "on courses" first.
 about:
-- 'To ask whether a network sees the way people do, you fit a flexible linear mapping from its features to people’s judgments and check how well it predicts — but the mapping reshapes the network’s features, and that can let the wrong network win. When we let each of twenty networks generate judgments, the comparison picked the right one less than 80% of the time: far above the one in twenty of guessing, but wrong more than one time in five, even with millions of simulated trials. That is our paper at the Conference on Neural Information Processing Systems (NeurIPS) 2025.'
-- I work in NeuroAI and computational cognitive neuroscience. I started my PhD with Dr. Tal Golan in 2024, coming from cognitive and brain sciences and psychology, and expect to finish in 2029.
-- I have been a teaching assistant on courses in computation and cognition, neuroimaging and deep learning, and have mentored two undergraduates in the lab. I like building things with other people — a brain–computer interface that let a person with amyotrophic lateral sclerosis (ALS) answer yes or no, and a headphone add-on for the noises that set anxiety off. And I collect lines about the mind.
+- 'I work in NeuroAI and computational cognitive neuroscience, with Dr. Tal Golan in the Brains and Machines Lab at Ben-Gurion University of the Negev. I came to it from psychology and cognitive and brain sciences, and my work combines human behavioral data, machine learning and model-recovery simulations. Behind it is a broader question: how to compare models with minds so that competing ideas can be told apart — which experiments separate them, and how people differ in the way they see.'
+- 'I have been a teaching assistant on courses in computation and cognition, neuroimaging and deep learning, and have mentored two undergraduates in the lab. I like building things with other people: a brain–computer interface that let a person with amyotrophic lateral sclerosis (ALS) answer yes or no, and a headphone add-on designed to filter the sounds that set anxiety off. And I collect lines about the mind.'
 # DRAFT, as above. Short enough to keep true: rewrite it whenever it stops being what you are doing.
-# Two lines since 2026-09-25 (WP-S1). Line 1 is the paper's own question, a public fact, and it stays the
-# research line under the owner's ruling of 2026-09-25 on what comes next (ruling 16, WP-S11; record kept
-# privately -- the review's rulings file): the NEAT 2026 flash talk stands on this site as title, co-authors,
-# place and date only, and this line does not describe that work. Before that ruling the line was an interim
-# that repeated the lede on purpose. The mentoring line went because MENT-YEARS is 2025-2026 by his own
-# account, so it is not "now". Line 2 is his teaching in 2026/27, said once: he is the teaching assistant for
-# Introduction to Computation and Cognition again that year (owner ruling 11, 2026-09-25; the fourth year on
-# the course row under `teaching`) and, from the same year, for Academic Writing (owner ruling 13, 2026-09-25:
-# the course's title and his role; record kept privately -- the CV register, FACTS TEACH-TA-MAIN and
-# TEACH-WRITING). Until those rulings the line said only "helping teach an academic writing course", because
-# no source recorded the 2026/27 assistantship or the course's title (WP-S12). One line for both facts, not
-# two: the site says nothing twice, and the teaching page carries each course as a row of its own. The course
-# title is printed in its official order (ruling 19). Two no-break spaces: one ties "from" to its year,
-# because at 320px the line opened on "2026/27" (review of WP-S12), and one keeps the title's two words
-# together, because tied at "from" alone the line ended on "Writing." by itself -- the last pair is kept
-# whole, as "wrong winner" is in the figure's caption.
+# One dated line since 2026-09-26 (WP-S17; astra's wireframe, controller decision C1 under owner ruling 18):
+# the current activity, not a list, and not the paper's question again -- that lives in the featured Research
+# block above. The line is his teaching in 2026/27, said once: he is the teaching assistant for Introduction
+# to Computation and Cognition again that year (owner ruling 11, 2026-09-25; the fourth year on the course row
+# under `teaching`) and, from the same year, for Academic Writing (owner ruling 13, 2026-09-25: the course's
+# title and his role; record kept privately -- the CV register, FACTS TEACH-TA-MAIN and TEACH-WRITING). The
+# course title is printed in its official order (ruling 19). Two no-break spaces: one ties "from" to its
+# year, because at 320px the line opened on "2026/27" (review of WP-S12), and one keeps the title's two words
+# together, because tied at "from" alone the line ended on "Writing." by itself -- the last pair is kept whole,
+# as "wrong winner" is in the figure's caption. The template prints one line as a paragraph and two or more as
+# the dotted list, so the block can grow back into a list without a template change.
+# The research line that stood here from 2026-09-25 ("Carrying the NeurIPS 2025 work forward: ...") went with
+# the wireframe: it repeated the paper's question under a heading meant for what he is doing this term. What
+# it kept out still holds -- the NEAT 2026 flash talk stands on this site as title, co-authors, place and date
+# only, and no line here describes that work (owner ruling 16, WP-S11; record kept privately).
 # Owner ruling 2026-09-25: the site says nothing about what he is looking for; the résumés carry the
 # availability line. Do not add one. (Ruling 14, WP-S11; record kept privately. The block's test refuses the
 # words.)
 now_as_of: Sep 2026
 now:
-- 'Carrying the NeurIPS 2025 work forward: can an alignment measure identify the right model of human vision, or only the best-fitting one?'
 - Teaching assistant again for Introduction to Computation and Cognition, and from 2026/27 for Academic Writing.
 
-# The front door has to hand a visitor on. Added 2026-09-21: the home page named the commonplace, the teaching
-# and the NeurIPS paper without a way to reach any of them, so the only route into the site was the navigation
-# strip, and at laptop width the whole left gutter of the home page sat empty. These three rows use the grid
-# the rest of the site is built on -- a label in the gutter, the line in the text column -- and each one says
-# something real about where it goes rather than "read more".
+# The two invitations at the foot of the front door (astra's wireframe: "small invitations: Teaching ·
+# Commonplace"; controller decision C1 under owner ruling 18, 2026-09-26; record kept privately). Until then this
+# was "Elsewhere on this site", three rows under a heading, one per other page; the Research row is now the
+# featured block under About, drawn from the paper card, and the heading is gone -- two rows on the grid, the
+# page's name in the gutter, say where they lead without announcing themselves. Each row says something real
+# about where it goes rather than "read more".
 #   page   the gutter label. It is a tag, not a date: this list is the one place on the site where the
 #          gutter carries an address instead of a point in time, so it takes a tag (a label that is never
 #          clickable) and no tick, exactly as the "kind" tag under a talk's date does. The margin rule stays a
 #          time axis; nothing false is put on it. The tag is set as a small uppercase mono label, not an
 #          outlined box: boxed, a page name read as a button that does nothing (deep review 2026-09-25,
-#          DS-03); the box now belongs to the paper card's venue badges alone.
-#   label  the link itself, and it must be a real thing on that page -- the paper's short title, the course,
-#          the line -- never "read more" or the page's own name a second time.
-#   text   what else is there, in one clause. The template sets the em dash between the two, tied to the
-#          label by a no-break space so that it never opens a line.
+#          DS-03); the box belongs to the venue badges alone.
+#   label  the link itself, and it must be a real thing on that page -- the course, the line -- never "read
+#          more" or the page's own name a second time.
+#   text   what else is there, in one clause, and no count in it: a number in a teaser is a maintenance
+#          trap (external review 2 §4) -- the course list has changed twice with his answers, and "four lines"
+#          used to be pinned to the length of the quotes list. The template sets the em dash between the two,
+#          tied to the label by a no-break space so that it never opens a line.
 # The commonplace row deliberately does not quote the Snape passage again: the novel is in copyright, the
 # house rule keeps such an extract to the page that argued for it, and the full passage is printed there at
 # the owner's ruling. Naming the speaker and the subject gets a reader there without a second reproduction.
-# The Research row is the one row that says more than its label and its line (deep review 2026-09-25, DS-09
-# and AS-02). Under its gutter label it carries the paper's first venue badge -- "NeurIPS 2025", the one
-# outlined box outside the paper card, drawn from `research[0].badges` as the first badge without " · " (a
-# presentation badge such as "CCN 2025 · Talk" is a neutral tag on the card and stays off this row, whatever
-# the order of the list) -- and under its line a small mono row with the paper's first button (Paper) and its
-# Code link, drawn from `research[0].buttons`. Nothing is written here for it: the badge and the addresses are
-# the card's own, so they cannot drift from it. That gives the row three ways out (the page, the paper, the
-# code) where the other two keep one; the work is what a visitor came to the front door for, and until this it
-# was two clicks away. tests/test_build.py pins the count and the two addresses.
+# The Teaching label is the course he has helped teach longest (four academic years with 2026/27: owner
+# ruling 11), printed in its official order (ruling 19).
 elsewhere:
-- page: Research
-  label: When the Best-Fitting Model Isn’t the Right One
-  url: research/
-  text: the paper with its code and data, the talks and posters around it, and two things I built with other people.
-# The label is the course he has helped teach longest (three academic years, and 2026/27 the fourth: owner
-# ruling 11, 2026-09-25). The Teaching row names no count on purpose: the course list has changed with his
-# answers (the writing course's title and the 2026/27 assistantship, rulings 11 and 13) and may again, and a
-# stale number in a teaser is worse than none (external review 2). The Commonplace row's "four"
-# is a count the tests already pin to len(quotes): tests/test_build.py asserts the word and the length side
-# by side, so the two move together.
 - page: Teaching
   label: Introduction to Computation and Cognition
   url: teaching/
-  text: the course I have helped teach longest, the others beside it, and the students I have mentored and tutored.
+  text: the course I have helped teach longest, and the others beside it.
 - page: Commonplace
   label: Severus Snape on what a mind is not
   url: commonplace/
-  text: the first of four lines I keep coming back to, each with where it comes from.
+  text: the first of the lines I keep coming back to, each with where it comes from.
 
 # icon: which mark the template draws before the label. The template now holds three, and only three:
 # mail, github, bluesky. The owner ruled on 2026-09-21 that LinkedIn, ORCID, Google Scholar and X carry no
@@ -354,8 +348,13 @@ news:
 # that say "programme-first" keep the ruling's name.
 - date: Aug 2026
   text: Completed the Embodied Brain Technology Practicum, a joint Brown University–Ben-Gurion University program held at Brown, where our team of five built and pitched EarBetter, a headphone add-on designed to filter the sounds that set a person’s anxiety off.
-# The full paper title is not repeated here: it is printed on the card and in the Elsewhere label, and a
-# third copy on the home page said the same thing three times in two screens. The phrase links to the card.
+  # The link (since 2026-09-26, WP-S17: every visible news item links the thing it names) leads to the
+  # practicum's own row under Projects on the research page, not to the programme's page or the repository.
+  link: Embodied Brain Technology Practicum
+  url: 'research/#projects'
+# The full paper title is not repeated here: it is printed on the card, and its second half heads the home
+# page's featured Research block; a third copy said the same thing three times in two screens. The phrase
+# links to the card.
 - date: Dec 2025
   text: Presented our paper with Tal Golan as a poster at the Conference on Neural Information Processing Systems (NeurIPS) 2025 in San Diego.
   link: our paper
@@ -466,6 +465,32 @@ research:
       year      = {2025},
       doi       = {10.52202/085713-0404}
     }
+  # The front door's version of this card (WP-S17, 2026-09-26: astra's wireframe, controller decision C1
+  # under owner ruling 18; record kept privately). The home page draws the block from here -- the first venue
+  # badge, the title's second half, these four sentences, the four marks of the diagram with these captions,
+  # and the Paper, Code and video buttons -- so nothing about the paper is written twice.
+  #   question  the paper's question in one sentence, in the words of its own title.
+  #   test      what was done, in one sentence: the abstract's 20 models, 4.5 million judgments, each model
+  #             generating judgments in turn, and the comparison asked to pick it out.
+  #   result    the number with its chance baseline, in the wording verified for the site on 2026-09-25
+  #             (WP-S1): one in twenty is the paper's 1/|M| with |M| = 20 models; "simulated" keeps the
+  #             millions of trials apart from the human judgments named a sentence earlier.
+  #   scope     the result's reach, as the research page states it (controller decision C4): the evaluated
+  #             task, model set, calibration and transformation family, and not a claim about every flexible
+  #             evaluation -- the paper's own term for the mapping.
+  #   stages    one-word captions for the four marks (`how` above has the full sentences for the card): the
+  #             generator, its judgments, the candidates all fitted to them, the winner -- which the fourth
+  #             mark draws as the wrong one. The marks are aria-hidden, so these four words are all a screen
+  #             reader hears of the strip; the sentences above it say the rest.
+  # 90 words in the four sentences (the block's budget is 40-90). No numeral in the captions; "12" nowhere
+  # (a private number, see the note over `projects`). The tie in "one in twenty" is not needed: the
+  # paragraph is a <p>, so `text-wrap: pretty` looks after its last line.
+  feature:
+    question: Is the network that predicts human judgments best also the right one?
+    test: We fitted 20 networks to 4.5 million human odd-one-out judgments, let each generate its own judgments, and asked whether the comparison would pick it out.
+    result: 'It picked the right one less than 80% of the time: far above the one in twenty of guessing, but wrong more than one time in five, even with millions of simulated trials.'
+    scope: That is a result for the task, models, calibration and mappings we tested, not a claim that every flexible evaluation fails.
+    stages: [generator, judgments, candidates, winner]
   # The citation's venue line, under the authors, as academic cards carry it: FACTS PUB-CITATION's compact
   # wording. The badge above stays "NeurIPS 2025", a venue tag; the track belongs here, not in the badge, where
   # a " · " would turn it into a neutral presentation tag (PR-08). No rank and no acceptance rate (ruling).
@@ -479,7 +504,8 @@ research:
   # card around the word (deep review 2026-09-25, PA-05). Per button, and never a suffix the template adds to
   # all of them: one wording for every link would have called the CCN recording, when it stood here, part of
   # the NeurIPS paper, and the ruling keeps CCN a preliminary version. The home page's Paper and Code links
-  # under the Research row carry the same two contexts (templates/macros.html.j2, elsewhere_rows).
+  # of the featured Research block carry the same contexts (templates/pages/home.html.j2), "Video" for the
+  # poster video among them.
   buttons:
   - label: Paper
     url: https://proceedings.neurips.cc/paper_files/paper/2025/hash/11e1900e680f5fe1893a8e27362dbe2c-Abstract-Conference.html
@@ -571,8 +597,8 @@ talks:
 # headphone add-on designed to filter the sounds that set a person’s anxiety off" -- superseding, for this
 # clause alone, the ruling of 2026-09-21 that the entry say the system worked. The README the Code link
 # opens calls the selective path experimental and says anxiety inference was not evaluated or claimed, so
-# the printed claim and the evidence it links agree. About's "a headphone add-on for the noises that set
-# anxiety off" was purpose-phrased already and stands. The comma after "headphones" is the site's own (the
+# the printed claim and the evidence it links agree. About names the add-on the same way -- "a headphone
+# add-on designed to filter the sounds that set anxiety off" (WP-S17). The comma after "headphones" is the site's own (the
 # plan's site wording has none; the CVs' long form has it): without it, "headphones designed to read
 # biosignals" reads as the headphones' design, not the add-on's. (The wordings retired by these rulings are
 # not kept here, and neither are the owner's own messages: a sentence retired from the page but kept word for
@@ -803,7 +829,7 @@ teaching:
   # The title is the course's official English title in the BGU course catalogue, "Introduction to
   # Computation and Cognition" (owner ruling 19, 2026-09-26, superseding the word order ruled on 2026-09-21;
   # record kept privately -- the CV register, FACTS TEACH-TA-MAIN, holds the catalogue URL and the history).
-  # It is printed in this order everywhere: here, as the Elsewhere Teaching label on the home page, in the
+  # It is printed in this order everywhere: here, as the Teaching invitation's label on the home page, in the
   # Now line on his 2026/27 teaching, and in lower case in the About paragraph on his teaching.
   # tests/test_build.py pins the four and refuses the old order in the visible text of every page.
   # The fourth year, 2026/27, is the owner's (owner ruling 11, 2026-09-25; record kept privately -- FACTS
