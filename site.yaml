@@ -125,11 +125,17 @@ pages:
 # The page for an address with nothing at it (GitHub Pages serves /404.html with status 404, at any depth).
 # NOT under `pages`: it belongs in neither the strip, the colophon nor the sitemap, and search engines are told
 # not to index it. build.py writes it with root-absolute links. The CV sentence is added by the template.
-# The intro's second sentence is a claim about the site, and it is true by construction: build.py refuses a
-# page that is in neither the strip nor the colophon (see the note over `pages`).
+# The intro's second sentence is a claim about the site, and it must hold at every width. The home page is
+# reached through the name in the byline, which is the link home on this page as on the four interior ones,
+# and on a phone it is the only way there, because the strip leaves "Home" out below 45rem (WP-S21, controller
+# decision C5 item 16 under owner ruling 18, 2026-09-25); an earlier wording sent a lost phone visitor to the
+# strip and the colophon, where Home is absent. Every other page is in the strip or the colophon by
+# construction: build.py refuses a page that is in neither (see the note over `pages`). The browser test of
+# the 404 page checks the sentence against the paint: the name is a visible link to the root at 320, 390 and
+# 1280, and the strip's "Home" is visible only from 45rem.
 not_found:
   heading: Nothing here
-  intro: There is no page at this address. Every page of the site is linked from the strip above or the foot of this one.
+  intro: There is no page at this address. My name above is the way home, and every other page is linked from the strip or the foot of this one.
 
 # Proper nouns and terms of art that must never break across two lines, wherever they occur in the text.
 # A term here must actually occur in the content: a rule that matches nothing is dead configuration, and the

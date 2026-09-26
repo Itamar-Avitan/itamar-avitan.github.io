@@ -226,6 +226,12 @@ def test_a_wrong_address_gets_the_sites_own_404_page(browser, served, width, sch
     assert failed == [] and all(u.startswith(served + "/") for u in requests), requests
     assert page.inner_text("h1").strip() == SITE["not_found"]["heading"]
     assert SITE["not_found"]["intro"] in page.inner_text("main")
+    # the intro says the name above is the way home: it is a visible link to the root at every width, and on
+    # a phone it is the only one, since the strip leaves "Home" out below 45rem (WP-S21) -- the sentence used
+    # to send a lost phone visitor to the strip and the foot, where Home is absent
+    home = page.locator(".byline__home")
+    assert home.count() == 1 and home.is_visible() and home.get_attribute("href") == "/"
+    assert page.locator(".sitenav__home a").is_visible() == (width >= 720), width
     loaded = page.evaluate("[...document.fonts].filter(f => f.status === 'loaded').map(f => f.family.replace(/\"/g, ''))")
     assert "Fira Sans" in loaded and "Fira Mono" in loaded, loaded
     assert "Fira Sans" in page.evaluate("getComputedStyle(document.querySelector('h1')).fontFamily")
