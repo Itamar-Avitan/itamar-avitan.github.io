@@ -317,7 +317,7 @@ elsewhere:
 - page: Teaching
   label: Introduction to Computation and Cognition
   url: teaching/
-  text: and the other courses beside it.
+  text: and the other courses I help teach.
 - page: Commonplace
   label: Severus Snape on what a mind is not
   url: commonplace/
@@ -1117,7 +1117,7 @@ accessibility:
   # because cv.pdf, linked from every page, prints both addresses as plain links. Every em dash in this
   # block follows a no-break space (U+00A0), so none of them opens a line on a phone (review of WP-S4).
   aim: 'This site aims at WCAG 2.1 Level AA — the middle of the three levels of the Web Content Accessibility Guidelines — and that is the standard I hold it to. It is not a certificate: nobody but me has audited this site, and the list below is what was actually done, not a claim that the whole of AA has been met.'
-  done_intro: 'What that has meant in practice. Each of these is checked by an automated test that I run before I publish a change, so the list stays true:'
+  done_intro: 'What aiming at AA has meant in practice. Each of these is checked by an automated test that I run before I publish a change, so the list stays true:'
   done:
   - 'Nothing loads from anyone else. The fonts are served from this site, and no page asks any other host for anything — no analytics, no trackers, no embedded players, no hosted fonts — so the pages work on a slow or filtered connection, and reading them tells no one but the host, GitHub Pages, that you were here.'
   - 'Contrast is measured, not judged by eye. Every piece of text painted on every page is sampled in a real browser and checked against the WCAG contrast formula — 4.5 to 1 for ordinary text, 3 to 1 for large text — in both themes, whether the theme comes from your system setting or from the theme button.'
@@ -1135,7 +1135,7 @@ accessibility:
   # script the older news prints closed, because a closed expander hides its content in the browser itself
   # (the print note over `@media print` in style.css). Handed here by the reviews of WP-S8 and WP-S9.
   - 'The site works with JavaScript switched off: the pages are plain HTML joined by ordinary links. Three things need it, and all three fail quietly — the theme button, which stays hidden until the script has run rather than sitting there doing nothing; the older news on the home page, which prints closed without it; and my email address, which is written as text and made into a link in your browser.'
-  - 'Body text is set at 16 pixels or larger, the layout reflows into one column on a phone, and no page scrolls sideways at any width down to 320 pixels.'
+  - 'Body text is set at 16 pixels or larger: the layout reflows into one column on a phone, and no page scrolls sideways at any width down to 320 pixels.'
   limits_intro: 'The gaps I know about, so that the list above is not read for more than it says:'
   limits:
   - This site has not been audited by anyone else, and it has not been tested with a screen reader, with voice control or with a magnifier. The checks above are automated ones and my own reading, and neither can tell you how a page actually sounds.
@@ -1158,5 +1158,5 @@ footer:
   # a label beside a mark, not running text, and the rule that each page expands the acronym at its first
   # use is a rule for the text (on the research page the card's badge precedes the venue line's expansion in
   # the same way). The mark itself is drawn in templates/base.html.j2; the favicon and the arrangement of the
-  # three shapes are the owner's (Q-L) and this line does not touch them.
+  # three shapes are unchanged (controller decision C5 under the owner's delegation, 2026-09-25) and this line does not touch them.
   mark_note: 'Two alike and one odd one out: the task behind our NeurIPS 2025 paper.'

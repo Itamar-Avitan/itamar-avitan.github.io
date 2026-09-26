@@ -344,8 +344,8 @@ main:focus { outline: none; }
   border-radius: 4px;
   background: var(--surface);
 }
-/* The name's cell: the mark above the name, then the name (WP-S17, to the WP-S14 spec; the owner said yes
-   to the mark above the name, Q-L, 2026-09-25). The wrapper is the grid item; min-width: 0 so a long name can
+/* The name's cell: the mark above the name, then the name (WP-S17, to the WP-S14 spec; controller decision
+   C5 under the owner's delegation of 2026-09-25). The wrapper is the grid item; min-width: 0 so a long name can
    still break inside it rather than push the column. The mark is the colophon's drawing at 50 by 12 -- a
    signature, not a heading -- set 2px in so its first circle's edge lines up with the name's first stroke. */
 .masthead__name { grid-column: 2; grid-row: 1; min-width: 0; }

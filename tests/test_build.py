@@ -2210,7 +2210,7 @@ def test_favicon_is_the_mark():
     # The icon files at the root, written by tools/make_favicon.py from that mark (deep review 2026-09-25,
     # MR-07): the row, centred on a square, in an SVG that keeps the theme style, a 96px PNG (Google takes only
     # a square raster it can crawl, larger than 48px), an ICO for clients that ask for one blindly, and a
-    # home-screen tile. The arrangement of the mark is the owner's (Q-L A) and does not change here.
+    # home-screen tile. The arrangement of the mark is unchanged (controller decision C5, 2026-09-25).
     square = (build.ROOT / "favicon.svg").read_text(encoding="utf-8").strip()
     assert square == mark.replace('viewBox="0 0 42 10"', 'viewBox="0 -16 42 42"')
     with Image.open(build.ROOT / "favicon-96.png") as im:

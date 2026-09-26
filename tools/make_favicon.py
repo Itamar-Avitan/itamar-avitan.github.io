@@ -10,7 +10,7 @@
   favicon.ico           16, 32 and 48, for clients that ask for /favicon.ico blindly.
   apple-touch-icon.png  180 by 180, the row set on the paper colour, for a phone's home screen.
 
-The mark's arrangement does not change here (the owner's odd-one-out row, Q-L A): a 42-unit row centred on a
+The mark's arrangement does not change here (the odd-one-out row, kept by controller decision C5, 2026-09-25): a 42-unit row centred on a
 42-unit square is small in a 16px tab, and that is the owner's choice to revisit, not this script's.
 """
 from __future__ import annotations
