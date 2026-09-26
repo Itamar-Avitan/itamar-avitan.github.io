@@ -2287,7 +2287,7 @@ def test_the_statement_does_not_overclaim_the_tap_target_rule():
     held to 24 by 24 (tests/test_browser.py measures all three), so that is exactly what the page may say."""
     done = " ".join(SITE["accessibility"]["done"])
     assert "navigation strip" in done and "row of profiles" in done and "footer" in done
-    assert "my name at the top of a page" in done                  # the byline's link home, measured too (WP-S21)
+    assert "My name at the top of every page but the home page is the link home, and is held to the same size." in done   # measured too (WP-S21)
     assert "A link set inside a sentence is left at the size of the words around it." in done
     assert "Links and buttons are at least 24" not in done          # the sentence this replaced, which was false
 

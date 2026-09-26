@@ -103,8 +103,8 @@ the theme button stands in the colophon there, labelled, beside the accessibilit
 in the markup, written hidden; the script unhides them and the stylesheet shows one at a time), and
 "Home" is left out, the name being the way home — the markup keeps all five links on every page, and a
 laptop shows them all. So the strip is one line at every width from 320px up (at 200% text, two lines
-from 350px and one item a line below that): the four items spread across it below 480px, and are set at
-the laptop's 18px gap from there.
+from 350px, three at 346–348 and one item a line below that): the four items spread across it below 480px,
+and are set at the laptop's 18px gap from there.
 Should it ever wrap, the tick becomes a plain underline under its own link; the row gap is wider than the
 tick is long, so it never lands on the line below. The CV is the strip's one filled element, by the rule
 the site has kept throughout: a filled box is the single primary action in its group. Before the strip,
