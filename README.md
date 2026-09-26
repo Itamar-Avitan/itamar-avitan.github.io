@@ -95,15 +95,20 @@ one folder down), so the built site can be opened straight off the disk.
 
 **The navigation strip** is ordinary links, and works with JavaScript switched off. The page you are on is
 the one set in ink rather than accent; it carries `aria-current="page"` and a 2px ink tick on the strip's
-hairline — the same tick the margin rule uses to mark a section, one floor up. On a phone the strip carries
-only the five items: the theme button stands in the colophon there, labelled, beside the accessibility link
-(both buttons are in the markup, written hidden; the script unhides them and the stylesheet shows one at a
-time), so the strip is one line from 356px up — the five items spread across it below 480px, and set at the
-laptop's 18px gap from there. Below 356px the CV chip alone drops to a second line and the
-tick becomes a plain underline under its own link; the row gap is wider than the tick is long, so it never
-lands on the line below. The CV is the strip's one filled element, by the rule the site has kept throughout:
-a filled box is the single primary action in its group. Before the strip, the first Tab stop on every page
-is a "Skip to content" link, painted only while it holds focus.
+hairline — the same tick the margin rule uses to mark a section, one floor up. On every page but the home
+page the name at the top, beside the portrait, is a link home at every width — set in ink with no
+underline, underlined in ink when pointed at or focused, and the portrait is part of its target (one link,
+not two; controller decision under owner ruling 18, 2026-09-25). On a phone the strip carries four items:
+the theme button stands in the colophon there, labelled, beside the accessibility link (both buttons are
+in the markup, written hidden; the script unhides them and the stylesheet shows one at a time), and
+"Home" is left out, the name being the way home — the markup keeps all five links on every page, and a
+laptop shows them all. So the strip is one line at every width from 320px up (at 200% text, two lines
+from 350px and one item a line below that): the four items spread across it below 480px, and are set at
+the laptop's 18px gap from there.
+Should it ever wrap, the tick becomes a plain underline under its own link; the row gap is wider than the
+tick is long, so it never lands on the line below. The CV is the strip's one filled element, by the rule
+the site has kept throughout: a filled box is the single primary action in its group. Before the strip,
+the first Tab stop on every page is a "Skip to content" link, painted only while it holds focus.
 
 **Print** gets the light palette on white whatever the screen was showing (the dark theme, chosen by the
 toggle or by the system, used to print its name and lede in a 2.91:1 grey), one scale step down, with the

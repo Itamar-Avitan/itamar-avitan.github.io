@@ -347,6 +347,38 @@ def test_every_link_between_pages_climbs_back_to_the_root_first():
             assert f'"{base}{asset}"' in html, (slug, asset)
 
 
+def test_the_name_is_the_link_home_on_every_page_but_home_and_the_strip_drops_home_on_a_phone():
+    """On every page but the home page the byline's name is a link home, and on a phone the strip leaves
+    "Home" out (controller decision C5 item 16 under owner ruling 18, 2026-09-25, on the site's external
+    review; WP-S21). The markup is the same on every page at every width: the strip's first item carries
+    the class the phone block hides, so a laptop still shows all five, and the byline link stands in the
+    markup with its climb to the root and the hidden span that says where it leads (PA-05). The 404 page,
+    served at every depth, links home root-absolute. The stylesheet hides the item in the phone block only,
+    sets the link in ink with no underline, underlines it when pointed at or focused, and gives it the
+    overlay that makes the portrait part of its target; and the template no longer records that the name
+    is not a link. tests/test_browser.py measures the link and follows it."""
+    for slug, html in every_page().items():
+        base = "../" if slug else ""
+        strip = html.partition('<nav class="sitenav"')[2].partition("</nav>")[0]
+        assert strip.count("sitenav__home") == 1, slug
+        assert strip.partition("<li")[2].startswith(f' class="sitenav__home"><a href="{base or "./"}"'), slug   # the first item
+        link = f'<a class="byline__home" href="{base}">{SITE["name"]}<span class="vh"> (home page)</span></a>'
+        assert html.count(link) == (0 if slug == "" else 1), slug
+        assert ("byline__home" in html) == (slug != ""), slug
+    lost = build.render(SITE, build.not_found_page(SITE))
+    assert '<li class="sitenav__home"><a href="/">Home</a></li>' in lost
+    assert f'<a class="byline__home" href="/">{SITE["name"]}<span class="vh"> (home page)</span></a>' in lost
+    css = _css()
+    base_css, _, rest = css.partition("Phone: the rule moves")
+    phone = rest.partition("Desktop: the gutter")[0]
+    assert ".sitenav__home { display: none; }" in phone and css.count(".sitenav__home") == 1
+    assert re.search(r"\n\.byline__home \{[^}]*color: var\(--ink\);\s*text-decoration: none;", base_css)
+    assert re.search(r"\.byline__home:hover, \.byline__home:focus-visible \{[^}]*text-decoration: underline;", base_css)
+    assert re.search(r"\.byline__home::before \{[^}]*position: absolute;\s*inset: 0;", base_css)
+    template = (build.ROOT / "templates" / "base.html.j2").read_text(encoding="utf-8")
+    assert "The name is not a link" not in template and "The name is the link home" in template
+
+
 def _cv_pages() -> int:
     out = subprocess.run(["pdfinfo", str(build.ROOT / "cv.pdf")], capture_output=True, text=True)
     assert out.returncode == 0, "pdfinfo is needed to check the CV chip's label; install poppler"
@@ -1851,7 +1883,7 @@ def test_the_theme_toggle_is_not_painted_when_the_script_has_not_run():
     phone = rest.partition("Desktop: the gutter")[0]
     assert ".colophon-nav__theme { display: none; }" in base
     assert ".topstrip > .toggle { display: none; }" in phone and ".colophon-nav__theme { display: list-item; }" in phone
-    # the five items spread across the line only where it is tight (a phone, below 30rem); from 480px the
+    # the items spread across the line only where it is tight (a phone, below 30rem); from 480px the
     # laptop's 18px gap fits on one line, and a split-screen laptop window keeps the strip's own rhythm
     spread = ".sitenav ul { justify-content: space-between; column-gap: 0.5rem; }"
     assert spread in phone.partition("@media (max-width: 29.99rem) {")[2].partition("\n}")[0]
@@ -2255,6 +2287,7 @@ def test_the_statement_does_not_overclaim_the_tap_target_rule():
     held to 24 by 24 (tests/test_browser.py measures all three), so that is exactly what the page may say."""
     done = " ".join(SITE["accessibility"]["done"])
     assert "navigation strip" in done and "row of profiles" in done and "footer" in done
+    assert "my name at the top of a page" in done                  # the byline's link home, measured too (WP-S21)
     assert "A link set inside a sentence is left at the size of the words around it." in done
     assert "Links and buttons are at least 24" not in done          # the sentence this replaced, which was false
 

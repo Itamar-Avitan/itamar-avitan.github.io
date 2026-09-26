@@ -126,13 +126,19 @@
    cannot see the chip is told what opens before it opens, and `type` says the same to the browser (deep
    review 2026-09-25, PA-07).
    The theme button stands beside the strip from 45rem up and in the colophon below that (the second button
-   at the foot of this file): on a phone the five items need the whole line, and a preference control was
-   the first thing a visitor met (PA-04). Both buttons are written hidden and the script unhides them. #}
+   at the foot of this file): on a phone the items need the whole line, and a preference control was the
+   first thing a visitor met (PA-04). Both buttons are written hidden and the script unhides them.
+   "Home" is the strip's first item, and on a phone the stylesheet leaves it out (the `sitenav__home` class;
+   the phone block in style.css): with it the strip wrapped at the narrowest phones and ran to four lines at
+   200% text, and the name at the top of every other page is the link home there, as on a laptop (controller
+   decision C5 item 16 under owner ruling 18, 2026-09-25; the byline below). The markup is the same five
+   links on every page at every width; only the paint changes. The home page is the first entry of `pages`
+   (build.render), so the first item of the loop is the one. #}
     <div class="topstrip">
       <nav class="sitenav" aria-label="Pages">
         <ul role="list">
 {% for item in nav %}
-          <li><a href="{{ item.href }}"{% if item.current %} aria-current="page"{% endif %}>{{ item.label }}</a></li>
+          <li{% if loop.first %} class="sitenav__home"{% endif %}><a href="{{ item.href }}"{% if item.current %} aria-current="page"{% endif %}>{{ item.label }}</a></li>
 {% endfor %}
 {% for link in site.links if link.label == "CV" and site.show_cv and link.get("url") %}
           <li class="sitenav__cv"><a class="btn btn--primary" href="{{ link.url|local(base) }}" type="application/pdf">{{ link.label }}{% if link.get("format") %}<span class="vh"> ({{ link.format }})</span>{% endif %}</a></li>
@@ -148,14 +154,19 @@
 {% block identity %}
 {# Every page but the home page says whose site it is in two lines: the same portrait, small, the name, and
    the role line under it. The bio itself is said once, on the home page, and the address once in the
-   colophon below. The name is not a link -- "Home" is the first item of the strip directly above it, and a
-   second way home, in accent, would only make the identity read as a control. The portrait's alt is empty
-   on purpose: the name is the next word, and a screen reader would otherwise say it twice (deep review
-   2026-09-25, PA-05); the accessibility statement says so, so the two change together. #}
+   colophon below. The name is the link home, at every width (controller decision C5 item 16 under owner
+   ruling 18, 2026-09-25, on the site's external review; it replaces the earlier agent decision that the name
+   is not a link): set in ink with no underline, so the identity does not read as a control, and underlined
+   in ink when pointed at or focused. On a phone it is the only way home, since the strip drops "Home" there.
+   The portrait is part of the same target -- the link's overlay reaches over it (style.css, .byline__home) --
+   so a tap on the picture goes home too, and there is one link, not two: its accessible name is the name,
+   and the hidden span says where it leads, as the site's other page links do (PA-05). The portrait's alt
+   is empty on purpose: the name is the next word, and a screen reader would otherwise say it twice (deep
+   review 2026-09-25, PA-05); the accessibility statement says so, so the two change together. #}
     <div class="byline inset">
       <p class="byline__who">
         <picture><source srcset="{{ site.portrait.webp|local(base) }}" type="image/webp"><img src="{{ site.portrait.jpg|local(base) }}" width="36" height="36" alt=""></picture>
-        <span>{{ site.name }}</span>
+        <a class="byline__home" href="{{ base }}">{{ site.name }}<span class="vh"> (home page)</span></a>
       </p>
       {{ m.role_line()|trim }}
     </div>
@@ -206,7 +217,8 @@
    beside it the one line that says what it is -- two alike and the odd one out, the task behind the paper --
    because it had stood at the foot of every page unexplained (deep review 2026-09-25, DS-10 and DI-01). The
    words come from site.yaml like every other word; the three shapes and their row are the owner's and stay
-   as drawn (the favicon's arrangement is his question, Q-L). aria-hidden: the caption is the mark's text. #}
+   as drawn (he kept the row for the favicon too: Q-L, 2026-09-25). aria-hidden: the caption is the mark's
+   text. #}
     <p class="mark-row inset"><svg class="mark" aria-hidden="true" viewBox="0 0 42 10" width="63" height="15"><circle cx="5" cy="5" r="5"/><circle cx="21" cy="5" r="5"/><rect x="32" width="10" height="10"/></svg><span class="mark-note">{{ site.footer.mark_note }}</span></p>
   </footer>
 

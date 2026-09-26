@@ -251,13 +251,14 @@ main:focus { outline: none; }
   padding-block: 1rem var(--strip-pad);
   border-bottom: 1px solid var(--rule);
 }
-/* The row gap is wider than the tick is long. On a phone the five items have the whole line to themselves
-   now that the theme button stands in the colophon there (the phone block below; deep review 2026-09-25,
-   PA-04), and the strip is one line from 356px up. Below that -- 320 to 352px -- the CV chip alone drops
-   to a second line, and the tick under a link on the first line then hangs into the gap under it;
-   1.125rem of gap against 0.6875rem of overhang keeps it clear of the line below, so it still reads as an
-   underline and never lands on another link. From 45rem up the strip is one line and the tick lies on the
-   hairline, which is the point of it. */
+/* The row gap is wider than the tick is long. On a phone the strip has the whole line to itself now that
+   the theme button stands in the colophon there (the phone block below; deep review 2026-09-25, PA-04) and
+   "Home" is left out of it (the same block; the name at the top of every other page is the link home), so
+   the strip is one line at every width from 320px up, and the tick lies on the hairline, which is the point
+   of it. Should the strip ever wrap again -- a longer page name, or text enlarged past 200% on the
+   narrowest phone -- the tick under a link on the first line hangs into the gap under it, and 1.125rem of
+   gap against 0.6875rem of overhang keeps it clear of the line below, so it still reads as an underline
+   and never lands on another link. */
 .sitenav ul {
   display: flex;
   flex-wrap: wrap;
@@ -362,15 +363,45 @@ main:focus { outline: none; }
 
 /* ---------- The byline: whose site this is, on every page but the home page ----------
    The name and the role line, under the same portrait, small. The bio is said once, at home; this is only the
-   label on the folder. The name is not a link: "Home" is the first item of the strip directly above it. */
+   label on the folder. The name is the link home (controller decision C5 item 16 under owner ruling 18,
+   2026-09-25; it used to be plain text, with "Home" in the strip as the one way back), and on a phone,
+   where the strip drops "Home", it is the only one. It is set in ink with no underline, so the identity
+   does not read as a control, and takes an ink underline -- not the accent -- when pointed at or focused.
+   The portrait is part of the same target: the link's overlay (::before) reaches over the picture and the
+   gap between them, the way the profile links widen "X" without widening its box, so a tap on the portrait
+   goes home and there is still one link. On a phone the overlay is the byline row itself -- the <p> is the
+   positioned box, shrunk to its content so the target ends at the name -- and from 45rem, where that <p>
+   is display: contents and has no box, the overlay is placed on .byline over the portrait's own rectangle
+   (the block below). One pixel of padding above and below the name, taken back by the margin so nothing
+   moves, brings the link's own box to 24px, the rule every navigation link on this site is held to. */
 .byline { margin-top: 1.5rem; }
 .byline__who {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  width: fit-content;
+  max-width: 100%;
   font-size: 1rem;
   font-weight: 600;
   line-height: 1.4;
+}
+.byline__home {
+  padding-block: 0.0625rem;
+  margin-block: -0.0625rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+.byline__home:hover, .byline__home:focus-visible {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: currentColor;
+}
+.byline__home::before {
+  content: "";
+  position: absolute;
+  inset: 0;
 }
 .byline__who picture { display: block; flex: none; }
 .byline__who img {
@@ -1060,13 +1091,19 @@ li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
      two lines from 320 to 430px, five lines at 200% text, where the strip was 70% of the screen (deep
      review 2026-09-25, PA-04). On a phone it stands in the colophon instead, labelled in full, beside the
      link about the site (the rules further down), and the navigation has the line to itself: one line and
-     60px tall from 356px up (spread across it on a phone; the block after this one), two lines only at
-     320-352px, the CV chip alone on the second. The system setting is followed until a visitor chooses, so
-     the one control a phone visitor rarely needs is no longer the first thing on the page. "Home" stays in
-     the strip on a phone: dropping it, with the name above each page as the way home, is the owner's
-     question (Q-L). A basis of 0 on the nav lets it take the whole line and wrap inside itself, which is
-     where any wrapping belongs. */
+     60px tall (spread across it on a phone; the block after this one). The system setting is followed until
+     a visitor chooses, so the one control a phone visitor rarely needs is no longer the first thing on the
+     page. "Home" leaves the strip on a phone as well (controller decision C5 item 16 under owner ruling
+     18, 2026-09-25): with it the strip still wrapped at 320-352px, the CV chip alone on a second line, and
+     ran to four lines at 200% text on a 390px phone; without it the four items are one line from 320px up
+     and, at 200% text, two lines from 350px (one item a line at 320-344, where each is wider than half the
+     screen). The name at the top of every other page is the link home there (the
+     byline, above), as it is at every width; on the home page itself nothing needs to lead home. The
+     markup keeps all five links on every page -- this is paint, and a laptop still shows "Home". A basis
+     of 0 on the nav lets it take the whole line and wrap inside itself, which is where any wrapping
+     belongs. */
   .topstrip > .toggle { display: none; }
+  .sitenav__home { display: none; }
   .sitenav { flex: 1 1 0; min-width: 0; }
   /* The colophon's button: the row's own mono register at the row's own size, a button's box (28.8px tall,
      above the 24px a target needs) on the row's text line, and its label painted -- it is the one place
@@ -1154,7 +1191,7 @@ li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
   .paper .cite { order: 7; }
 }
 
-/* The five items spread across the line only where the line is tight -- a phone. From 30rem (480px) the
+/* The items spread across the line only where the line is tight -- a phone. From 30rem (480px) the
    laptop's 18px gap fits on one line, and a split-screen laptop window (640px is half of 1280) keeps the
    strip's own rhythm rather than a stretched tab bar the site uses nowhere else (WP-S9 review). */
 @media (max-width: 29.99rem) {
@@ -1176,8 +1213,16 @@ li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
      right edge on the gutter's edge like the masthead's plate, spanning the two rows beside it, and the name
      and the role line take the text column, the name's foot on the row seam. The <p> around portrait and
      name becomes display: contents so its two children are grid items of their own; a paragraph role is all
-     it gives up. 56px, from the 400px source, is sharp. Phones keep the chip. */
+     it gives up. 56px, from the 400px source, is sharp. Phones keep the chip.
+     The link home (the name) is one of those grid items. Its overlay, which lets a tap on the portrait go
+     home, cannot be placed from the <p> here -- display: contents leaves it no box -- so the byline is the
+     positioned box, and the overlay is set on the portrait's own rectangle: 3.5rem square, its right edge
+     on the gutter's edge, centred on the byline as the picture is (it spans both rows and the grid centres
+     it), plus the gap, so the target runs unbroken from the picture's left edge into the name. The link's
+     own box hugs the name (justify-self): stretched across the column, as a grid item is by default, its
+     focus ring ran to the column's right edge and a click on the empty paper beside the name went home. */
   .byline.inset {
+    position: relative;
     margin-left: 0;
     display: grid;
     grid-template-columns: var(--gutter) minmax(0, 1fr);
@@ -1187,7 +1232,15 @@ li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
   .byline__who { display: contents; }
   .byline__who picture { grid-column: 1; grid-row: 1 / span 2; justify-self: end; }
   .byline__who img { width: 3.5rem; height: 3.5rem; }
-  .byline__who span { grid-column: 2; grid-row: 1; align-self: end; font-size: 1.125rem; font-weight: 600; line-height: 1.3; }
+  .byline__home { grid-column: 2; grid-row: 1; align-self: end; justify-self: start; font-size: 1.125rem; font-weight: 600; line-height: 1.3; }
+  .byline__home::before {
+    inset: auto;
+    top: 50%;
+    left: calc(var(--gutter) - 3.5rem);
+    width: calc(3.5rem + var(--gap));
+    height: 3.5rem;
+    transform: translateY(-50%);
+  }
   .byline .role { grid-column: 2; grid-row: 2; align-self: start; }
 
   .masthead {

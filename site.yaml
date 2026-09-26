@@ -1118,9 +1118,11 @@ accessibility:
   # The skip link is the first Tab stop on every page (deep review 2026-09-25, PA-06; tests/test_browser.py
   # presses Tab and Enter on every page and checks where they land).
   - 'Everything you can use, you can reach from a keyboard, and you can see where you are: a “Skip to content” link is the first stop on every page, and every link and the theme button draws the same two-pixel ring when it takes focus.'
-  - 'The controls are big enough to hit: every link in the navigation strip, in the row of profiles and in the footer is a target at least 24 by 24 pixels, on every screen down to 320 pixels wide. A link set inside a sentence is left at the size of the words around it.'
+  - 'The controls are big enough to hit: every link in the navigation strip, in the row of profiles and in the footer, and my name at the top of a page, which leads back to the home page, is a target at least 24 by 24 pixels, on every screen down to 320 pixels wide. A link set inside a sentence is left at the size of the words around it.'
   - 'Nothing moves on its own. The only motion is a short color fade and smooth scrolling, and both are switched off for a visitor whose system asks for reduced motion.'
-  - 'The markup says what things are: one first-level heading per page, headings that never skip a level, lists marked up as lists, the navigation in a named landmark with the current page marked, and a language set on the document.'
+  # "wherever it lists it": on a phone the strip leaves "Home" out (the name at the top of every other page
+  # is the link home), so on the home page itself the strip marks nothing there; the heading is the name.
+  - 'The markup says what things are: one first-level heading per page, headings that never skip a level, lists marked up as lists, the navigation in a named landmark that marks the page you are on wherever it lists it, and a language set on the document.'
   - 'Every picture that carries information has a text alternative: the paper’s figure is described in full for a reader who cannot see it. The portrait beside my name, and the small marks beside Email, GitHub and Bluesky, are hidden from screen readers, because the words beside them already say it.'
   # Three things since the home page went back to three open news items (WP-S17, 2026-09-26): without the
   # script the older news prints closed, because a closed expander hides its content in the browser itself

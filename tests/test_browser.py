@@ -124,7 +124,9 @@ def test_structure_and_alt_text(browser, slug):
 @pytest.mark.parametrize("slug", NAV_SLUGS)
 def test_the_navigation_reaches_every_page_without_javascript(browser, slug):
     """Ordinary links: a browser with scripting off follows them, and each one lands on a page whose own strip
-    marks it as the one you are on."""
+    marks it as the one you are on. On a phone the strip shows four of the five -- "Home" is left out there
+    by the stylesheet, the markup unchanged (WP-S21) -- and the way home is the name at the top of every
+    other page, an ordinary link as well; the home page itself needs none."""
     ctx = browser.new_context(viewport={"width": 1280, "height": 900}, java_script_enabled=False)
     page = ctx.new_page()
     page.goto((ROOT / slug / "index.html").as_uri())
@@ -142,6 +144,18 @@ def test_the_navigation_reaches_every_page_without_javascript(browser, slug):
         page.goto((ROOT / other / "index.html").as_uri())
         assert page.locator('.sitenav a[aria-current="page"]').inner_text().strip() == NAV[index]
         page.goto((ROOT / slug / "index.html").as_uri())
+    page.set_viewport_size({"width": 390, "height": 900})
+    assert page.locator(".sitenav a").count() == len(NAV) + 1           # the markup is the same five links
+    assert [" ".join(t.split()) for t in page.locator(".sitenav a:visible").all_inner_texts()] == NAV[1:] + [CV_NAME]
+    assert not page.locator(".sitenav__home a").is_visible()
+    home = page.locator(".byline__home")
+    if slug:
+        assert home.count() == 1 and home.is_visible()
+        assert home.evaluate("a => a.href") == ROOT.as_uri().rstrip("/") + "/"
+        page.goto(home.evaluate("a => a.href") + "index.html")
+        assert page.locator(".masthead h1").inner_text().strip() == SITE["name"]
+    else:
+        assert home.count() == 0 and page.locator(".masthead h1").is_visible()
     ctx.close()
 
 
@@ -254,6 +268,82 @@ def test_a_deep_landing_still_says_whose_site_it_is(browser, slug):
     assert page.locator(".masthead").count() == 0                       # and the bio is not repeated here
 
 
+# The byline's link home: its box, what answers to it under the pointer (a 23px box centred on the name, the
+# portrait's centre and four corners, the gap between them) and what does not (three pixels left of the
+# portrait, the first word of the role line), and how it is painted.
+BYLINE_HOME_JS = """
+() => {
+  const a = document.querySelector('.byline__home');
+  if (!a) return {count: 0};
+  const r = a.getBoundingClientRect(), img = document.querySelector('.byline__who img').getBoundingClientRect();
+  const isLink = (x, y) => { const el = document.elementFromPoint(x, y); return !!(el && el.closest('a') === a); };
+  const s = getComputedStyle(a);
+  const range = document.createRange(); range.selectNodeContents(document.querySelector('.byline .role li'));
+  const word = range.getClientRects()[0];
+  return {count: document.querySelectorAll('.byline__home').length, href: a.getAttribute('href'), resolved: a.href,
+          name: a.textContent.replace(/\\s+/g, ' ').trim(), height: r.height,
+          corners: [[-11.5, -11.5], [11.5, -11.5], [-11.5, 11.5], [11.5, 11.5]].every(([dx, dy]) => isLink(r.left + r.width / 2 + dx, r.top + r.height / 2 + dy)),
+          portrait: {centre: isLink(img.left + img.width / 2, img.top + img.height / 2),
+                     corners: [[2, 2], [-2, 2], [2, -2], [-2, -2]].every(([dx, dy]) => isLink(dx > 0 ? img.left + dx : img.right + dx, dy > 0 ? img.top + dy : img.bottom + dy)),
+                     gap: isLink((img.right + r.left) / 2, img.top + img.height / 2),
+                     beyond: isLink(img.left - 3, img.top + img.height / 2)},
+          role: isLink(word.left + 4, word.top + word.height / 2),
+          colour: s.color, ink: getComputedStyle(document.body).color, underline: s.textDecorationLine};
+}
+"""
+
+
+@pytest.mark.parametrize("slug", SLUGS[1:])
+@pytest.mark.parametrize("width", WIDTHS)
+def test_the_name_at_the_top_of_every_other_page_is_the_link_home(browser, width, slug):
+    """On every page but the home page the name beside the portrait is a link home, at every width
+    (controller decision C5 item 16 under owner ruling 18, 2026-09-25, on the site's external review; the
+    mechanics of PLAN WP-S14; WP-S21) -- and on a phone the only one, since the strip leaves "Home" out
+    there. It is set in ink with no underline, so the identity does not read as a control, and takes an ink
+    underline when pointed at, not the accent; its box clears the 24px a target needs (WCAG 2.2 SC 2.5.8:
+    24.4px on a phone and 25.4 on a laptop, one pixel of padding above and below the name, taken back by
+    the margin so nothing moves); its accessible name is the name and then, hidden, where it leads, as the
+    site's other page links say theirs (PA-05). The portrait is part of the same target -- the link's
+    overlay reaches over the picture and the gap between them, so its centre, its four corners and the gap
+    all answer to the link, and pointing at it underlines the name -- and nothing else is: three pixels
+    left of the picture and the first word of the role line under the name are not. One link, not two."""
+    page, _, _ = _page(browser, width, slug=slug)
+    m = page.evaluate(BYLINE_HOME_JS)
+    assert m["count"] == 1 and m["href"] == "../" and m["resolved"] == ROOT.as_uri().rstrip("/") + "/", m
+    assert m["name"] == f'{SITE["name"]} (home page)', m
+    assert m["height"] >= 24 and m["corners"], (width, slug, m)
+    assert m["colour"] == m["ink"] and m["underline"] == "none", m
+    assert m["portrait"] == {"centre": True, "corners": True, "gap": True, "beyond": False}, (width, slug, m)
+    assert not m["role"], (width, slug, m)
+    page.hover(".byline__home")
+    page.wait_for_timeout(150)
+    hovered = page.evaluate("() => { const s = getComputedStyle(document.querySelector('.byline__home')); return [s.textDecorationLine, s.color]; }")
+    assert hovered == ["underline", m["ink"]], hovered                         # underlined in ink, not the accent
+    box = page.evaluate("document.querySelector('.byline__who img').getBoundingClientRect().toJSON()")
+    page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+    page.wait_for_timeout(150)
+    assert page.evaluate("getComputedStyle(document.querySelector('.byline__home')).textDecorationLine") == "underline"
+
+
+@pytest.mark.parametrize("width", [390, 1280])
+def test_a_tap_on_the_name_or_on_the_portrait_goes_home(browser, served, width):
+    """Followed on the site as the host serves it: the name leads to the front door, and so does the
+    portrait, through the same link; the front door itself carries no such link (WP-S21)."""
+    ctx = browser.new_context(viewport={"width": width, "height": 900})
+    page = ctx.new_page()
+    page.goto(f"{served}/research/")
+    page.click(".byline__home")
+    page.wait_for_url(f"{served}/")
+    assert page.locator(".masthead h1").inner_text().strip() == SITE["name"]
+    assert page.locator(".byline__home").count() == 0
+    page.goto(f"{served}/teaching/")
+    box = page.locator(".byline__who img").bounding_box()
+    page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+    page.wait_for_url(f"{served}/")
+    assert page.locator(".masthead h1").inner_text().strip() == SITE["name"]
+    ctx.close()
+
+
 def test_no_theme_filters_the_card_figure(browser):
     """A figure is printed as it is, in both themes. What answers the dark page is the mount: a light card
     behind the print, which has to stay light in either theme and has to be told apart from the sheet it is
@@ -271,7 +361,9 @@ def test_no_theme_filters_the_card_figure(browser):
 
 
 HIT_TEST_JS = """
-(selector) => [...document.querySelectorAll(selector)].map(a => {
+(selector) => [...document.querySelectorAll(selector)].filter(a => a.checkVisibility()).map(a => {
+  // A link the stylesheet leaves out at this width -- the strip's "Home" on a phone (WP-S21) -- is not a
+  // target and has no box to measure; the tests say which links they expect to see.
   // elementFromPoint answers for the viewport only, and the profile links stand in the colophon at the foot
   // of the page, so each target is brought into view before it is pointed at. "instant" because the
   // stylesheet asks for smooth scrolling and a rect read mid-animation is a rect of nowhere in particular.
@@ -309,10 +401,13 @@ def test_every_profile_link_is_at_least_a_24px_target(browser, width, slug):
 @pytest.mark.parametrize("width", WIDTHS)
 def test_every_navigation_link_is_at_least_a_24px_target(browser, width, slug):
     """The strip is on every page and is how the site is used, so it is held to the same rule as the profile
-    row: 24 by 24 CSS px, at every width, the CV chip included."""
+    row: 24 by 24 CSS px, at every width, the CV chip included. Below 45rem the strip shows four of its five
+    links: "Home" is left out on a phone (controller decision C5 item 16 under owner ruling 18, 2026-09-25;
+    WP-S21), so it is not a target there and is not measured; the name at the top of every other page is
+    the link home at every width, and is held to the same rule in its own test below."""
     page, _, _ = _page(browser, width, slug=slug)
     links = page.evaluate(HIT_TEST_JS, ".sitenav a")
-    assert [l["label"] for l in links] == NAV + [CV_NAME]
+    assert [l["label"] for l in links] == (NAV if width >= 720 else NAV[1:]) + [CV_NAME]
     assert [l for l in links if l["height"] < 24 or not l["covered"]] == []
 
 
@@ -337,29 +432,39 @@ def test_the_theme_toggle_is_invisible_until_the_script_unhides_it(browser):
 @pytest.mark.parametrize("width", WIDTHS)
 def test_the_current_page_tick_sits_on_the_strip_rule(browser, width, slug):
     """The tick that marks the page you are on is the section tick of the margin rule, one floor up: 2px of
-    ink lying on the hairline under the strip. That is exactly true while the strip is one line, which it is
-    from 356px up now that a phone's theme button stands in the colophon and the five items have the line
-    to themselves (deep review 2026-09-25, PA-04). Below that the CV chip drops to a second line, the tick
-    can no longer reach the hairline, and what it must do instead is stay an underline under its own link
-    and keep off the line beneath it."""
+    ink lying on the hairline under the strip. That is exactly true while the strip is one line, which it
+    now is at every width from 320px: a phone's theme button stands in the colophon (deep review
+    2026-09-25, PA-04) and "Home" is left out of the strip on a phone (controller decision C5 item 16 under
+    owner ruling 18, 2026-09-25; WP-S21), where with it the CV chip alone dropped to a second line at
+    320-352px. So the strip is measured as one line here and the tick as lying on the rule, at every width
+    and on every page the strip carries -- except the home page on a phone, where the item that would take
+    the tick is the one left out, and the masthead under the strip is what says where you are. Lines are
+    counted as clusters of link tops within 2px, because the CV chip's box sits a fraction of a pixel lower
+    than the plain links' and a rounded top counted it as a line of its own -- which, with the tick's foot
+    once computed as its bottom edge plus its height, meant this test measured nothing at any width until
+    WP-S21: the two-line branch always ran, and it asked only that the tick keep off a line below it, of
+    which there was none. The foot is the tick's bottom edge, as the laptop test computes it."""
     page, _, _ = _page(browser, width, slug=slug)
+    if slug == "" and width < 720:
+        assert page.locator('.sitenav a[aria-current="page"]').count() == 1          # in the markup
+        assert not page.locator('.sitenav a[aria-current="page"]').is_visible()      # not on the phone's strip
+        assert page.locator(".sitenav a:visible").count() == len(NAV)                # the other three and the CV
+        return
     measured = page.evaluate("""() => {
       const a = document.querySelector('.sitenav a[aria-current="page"]');
-      const links = [...document.querySelectorAll('.sitenav a')];
+      const links = [...document.querySelectorAll('.sitenav a')].filter(l => l.checkVisibility());
       const t = getComputedStyle(a, '::before');
       const r = a.getBoundingClientRect();
-      const bottom = r.bottom - parseFloat(t.bottom) + parseFloat(t.height);
-      const lines = new Set(links.map(l => Math.round(l.getBoundingClientRect().top))).size;
-      const below = links.filter(l => l !== a && l.getBoundingClientRect().top > r.bottom)
-                         .map(l => l.getBoundingClientRect().top);
-      return {bottom: bottom, rule: document.querySelector('.topstrip').getBoundingClientRect().bottom,
-              lines: lines, nextLine: below.length ? Math.min(...below) : null};
+      const bottom = r.bottom - parseFloat(t.bottom);          /* the tick's bottom edge: bottom is negative */
+      const tops = links.map(l => l.getBoundingClientRect().top).sort((p, q) => p - q);
+      let lines = 1;
+      for (let i = 1; i < tops.length; i++) if (tops[i] - tops[i - 1] > 2) lines++;
+      return {shown: a.checkVisibility(), bottom: bottom, lines: lines,
+              rule: document.querySelector('.topstrip').getBoundingClientRect().bottom};
     }""")
     assert parse_px(page.evaluate("getComputedStyle(document.querySelector('.sitenav a[aria-current=\\'page\\']'), '::before').height")) == 2
-    if measured["lines"] == 1:
-        assert abs(measured["bottom"] - measured["rule"]) <= 1.5, (width, slug, measured)
-    else:
-        assert measured["nextLine"] is None or measured["bottom"] < measured["nextLine"], (width, slug, measured)
+    assert measured["shown"] and measured["lines"] == 1, (width, slug, measured)
+    assert abs(measured["bottom"] - measured["rule"]) <= 1.5, (width, slug, measured)
 
 
 def test_the_research_card_on_a_phone_puts_the_figure_under_the_title(browser):
@@ -577,15 +682,21 @@ def test_a_phone_meets_the_name_before_the_preferences(browser, width, scheme):
     assert foot.inner_text().strip() == ("Use light theme" if scheme == "light" else "Use dark theme")
 
 
-@pytest.mark.parametrize("width", [360, 390, 414, 430])
+@pytest.mark.parametrize("width", [320, 344, 360, 390, 414, 430])
 @pytest.mark.parametrize("slug", NAV_SLUGS)
 def test_the_strip_is_one_line_on_a_phone(browser, width, slug):
     """With the theme button out of the strip the five items fit one line from 356px up -- every common
     phone width -- where they wrapped to two at all of them before (deep review 2026-09-25, PA-04, measured
-    in Chromium and WebKit). The line is about 60px tall; the strip used to be 109-111px."""
+    in Chromium and WebKit); with "Home" left out as well (controller decision C5 item 16 under owner ruling
+    18, 2026-09-25; WP-S21) the four that remain fit one line from 320px, where the CV chip alone had
+    dropped to a second line at 320-352px. The line is 59.8px tall in Chromium and WebKit at every width
+    from 320 to 719; the strip used to be 109-111px. With the reader's text at 200% it is two lines (220px)
+    from 350px, three at 346-348 and one item a line at 320-344 (418px), against four lines (322px) at
+    360-390 before."""
     page, _, _ = _page(browser, width, slug=slug)
-    tops = page.evaluate("[...document.querySelectorAll('.sitenav li')].map(l => Math.round(l.getBoundingClientRect().top))")
-    assert max(tops) - min(tops) <= 2, (width, slug, tops)
+    tops = page.evaluate("[...document.querySelectorAll('.sitenav li')].filter(l => l.checkVisibility()).map(l => Math.round(l.getBoundingClientRect().top))")
+    assert len(tops) == len(NAV) and max(tops) - min(tops) <= 2, (width, slug, tops)       # four items, one line
+    assert not page.locator(".sitenav__home a").is_visible()
     strip = page.evaluate("document.querySelector('.topstrip').getBoundingClientRect().height")
     assert strip <= 64, (width, slug, strip)
     assert page.evaluate("document.querySelector('.topstrip .toggle').checkVisibility()") is False
@@ -597,9 +708,11 @@ def test_the_strip_keeps_the_laptops_gap_between_a_phone_and_a_laptop(browser, w
     719px the items were strewn across the whole line with gaps of 39 to 99px and snapped back to 18px at
     720 -- a stretched tab bar the site uses nowhere else, seen in a split-screen laptop window (WP-S9
     review). The spread stops at 30rem now: from 480px the strip is one line at the laptop's 1.125rem gap,
-    still without the theme button, which returns at 720."""
+    still without the theme button, which returns at 720 -- and still without "Home", which returns there
+    too (WP-S21): the gaps are measured between the four items that are shown."""
     page, _, _ = _page(browser, width)
-    boxes = page.evaluate("[...document.querySelectorAll('.sitenav li')].map(l => l.getBoundingClientRect().toJSON())")
+    boxes = page.evaluate("[...document.querySelectorAll('.sitenav li')].filter(l => l.checkVisibility()).map(l => l.getBoundingClientRect().toJSON())")
+    assert len(boxes) == len(NAV), (width, boxes)
     assert max(b["top"] for b in boxes) - min(b["top"] for b in boxes) <= 2, (width, boxes)
     gaps = [boxes[i + 1]["left"] - boxes[i]["right"] for i in range(len(boxes) - 1)]
     assert all(abs(gap - 18) <= 1 for gap in gaps), (width, gaps)
