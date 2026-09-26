@@ -31,6 +31,13 @@
     </div>
 {% endblock %}
 
+{# The margin rule on the front door starts at Now, not at About (controller decision C5 item 17 under owner
+   ruling 18, 2026-09-26: the rule is kept where the content is dated and dropped where it is not; external
+   review 2 §7 asked for About to read as prose and the featured paper as a visual explanation). main opens
+   on plain paper, and each ruled section draws its own stretch of the rule -- Now, News and the invitations,
+   down to the colophon's "Last updated" -- which is what a phone already does, one log at a time. About and
+   the featured paper stand without the rule and without its section tick. #}
+{% block main_class %} class="opens-plain"{% endblock %}
 {% block main %}
 
     <section id="about" aria-labelledby="about-h">
@@ -72,14 +79,19 @@
 {% endfor %}
           </ol>
 {% endif %}
-          <p class="feature__links">
+{# A list, not a line of prose with typed dots: the separator is drawn by the stylesheet in each item's left
+   padding and clipped where an item opens a line, so no line ever ends or opens on a bare "·" -- the role
+   line's mechanism (review of WP-S17, 2026-09-26: at 320-410px the row broke after "Video ·", and at 200%
+   text the dot stood alone on a line of its own). role="list" as on the role line: Safari drops the list
+   semantics of a list without markers, and a screen reader then hears the links without their count. #}
+          <ul class="feature__links" role="list">
 {% for label, shown in [("Paper", "Paper"), ("Code", "Code"), ("NeurIPS 2025 video", "Video")] %}
 {% for button in card.get("buttons") or [] if button.label == label %}
-            <a href="{{ button.url }}">{{ shown }}{% if button.get("context") %}<span class="vh"> {{ button.context }}</span>{% endif %}</a> ·
+            <li><a href="{{ button.url }}">{{ shown }}{% if button.get("context") %}<span class="vh"> {{ button.context }}</span>{% endif %}</a></li>
 {% endfor %}
 {% endfor %}
-            <a href="{{ 'research/'|local(base) }}">More on the research page</a>
-          </p>
+            <li><a href="{{ 'research/'|local(base) }}">More on the research page</a></li>
+          </ul>
         </div>
       </div>
     </section>
@@ -88,7 +100,7 @@
 {# What he is doing at the moment, dated, so it is read as a snapshot and not as a standing claim. The date
    takes the gutter and its tick like every other date on the site. One line is a paragraph in the text
    column; two or more are one dotted list there, because none of them is an event with a date of its own. #}
-    <section id="now" aria-labelledby="now-h">
+    <section id="now" class="ruled" aria-labelledby="now-h">
       <h2 id="now-h" class="inset">Now</h2>
       <ul class="log" role="list">
         <li class="row">
@@ -106,7 +118,7 @@
       </ul>
     </section>
 
-    <section id="news" aria-labelledby="news-h">
+    <section id="news" class="ruled" aria-labelledby="news-h">
       <h2 id="news-h" class="inset">News</h2>
       <ul class="log log--tight" role="list">
         {{ m.news_rows(news_shown)|trim }}
@@ -126,7 +138,7 @@
    clause on what else is there -- see the note over `elsewhere` in site.yaml for why the rows take no tick
    and no heading. aria-label, because the section has no heading of its own to be labelled by. #}
 {% if site.get("elsewhere") %}
-    <section id="elsewhere" class="invitations" aria-label="Elsewhere on this site">
+    <section id="elsewhere" class="invitations ruled" aria-label="Elsewhere on this site">
       <ul class="log log--tight log--go" role="list">
         {{ m.elsewhere_rows(site.elsewhere)|trim }}
       </ul>

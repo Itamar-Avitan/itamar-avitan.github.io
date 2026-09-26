@@ -163,8 +163,10 @@
   </header>
 
 {# A page headed by its own h1 opens the margin rule half a line lower than a page that opens on an h2,
-   because the rule starts on the first tick and the tick sits at the middle of that heading's first line. #}
-  <main id="content" tabindex="-1"{% if page.get("heading") %} class="opens-with-h1"{% endif %}>
+   because the rule starts on the first tick and the tick sits at the middle of that heading's first line.
+   The class is a block so that a page can say how its rule starts: the home page opens on plain paper
+   (opens-plain), and its ruled sections draw the rule themselves from Now down (see home.html.j2). #}
+  <main id="content" tabindex="-1"{% block main_class %}{% if page.get("heading") %} class="opens-with-h1"{% endif %}{% endblock %}>
 {% block main %}{% endblock %}
   </main>
 

@@ -66,7 +66,10 @@ the site prints; a test checks each one. The home page's `<title>` and descripti
 ("NeuroAI PhD candidate, Ben-Gurion University") for the same reason: a result that says only his name
 cannot be told from the other Itamar Avitan's.
 
-**Every page names its sections**, and every section takes a 2px ink tick on the margin rule. The home page
+**Every page names its sections**, and every section takes a 2px ink tick on the margin rule — except that
+the home page opens on plain paper: About and the featured paper are not dated, so the rule and its ticks
+start at Now and run from there to "Last updated" (controller decision C5 item 17, 2026-09-26; record kept
+privately), which is what a phone shows on every page, one log at a time. The home page
 runs masthead (the mark above the name, the two-sentence identity line, the address with GitHub and Google
 Scholar beside it), `about` (two short paragraphs: who he is, and the rest of the person), the featured
 paper, `now` (one dated line), the news feed (three items open, the rest behind "Older news"), and the two
@@ -106,9 +109,12 @@ is a "Skip to content" link, painted only while it holds focus.
 toggle or by the system, used to print its name and lede in a 2.91:1 grey), one scale step down, with the
 strip, the colophon row and the mark left off the paper and the address printed after every link on the
 card, in the rows and under a title, so a link on paper still leads somewhere. The older news prints open:
-the script opens the expander on `beforeprint` and closes it again after. Measured with Chrome's default
-margins: home takes two A4 sheets, `/research/` three (its card is taller than a sheet, so the card's parts
-keep whole rather than the card), `/teaching/` one, `/commonplace/` two and `/accessibility/` three.
+the script opens the expander on `beforeprint` and closes it again after (without the script the older
+news prints closed, and the accessibility statement says so). The four small marks under the featured
+paper stay off the paper: with them the home page ran to a third sheet carrying only "Last updated", and
+the research page prints the full diagram. Measured with Chrome's default margins, the older news open:
+home takes two A4 sheets, `/research/` three (its card is taller than a sheet, so the card's parts keep
+whole rather than the card), `/teaching/` one, `/commonplace/` two and `/accessibility/` three.
 
 **The `about` and `now` blocks are drafts** written on 2026-09-21, rewritten on 2026-09-26, and marked as
 such in `site.yaml`. They stand in for the owner's own words until he replaces them. Every clause in them

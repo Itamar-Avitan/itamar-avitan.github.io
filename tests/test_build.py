@@ -399,13 +399,18 @@ def test_home_hands_the_visitor_on_to_the_two_pages_about_the_person():
     section = html.partition('<section id="elsewhere"')[2].partition("</section>")[0]
     assert [row["page"] for row in SITE["elsewhere"]] == [page(s)["nav"] for s in NAV_SLUGS[2:]] == ["Teaching", "Commonplace"]
     assert section.count('<li class="row">') == 2 and "<h2" not in section
-    assert '<section id="elsewhere" class="invitations" aria-label="Elsewhere on this site">' in html
+    assert '<section id="elsewhere" class="invitations ruled" aria-label="Elsewhere on this site">' in html
     for row in SITE["elsewhere"]:
         assert f'<span class="tag">{row["page"]}</span>' in section, row["page"]   # a label, never a link
         assert f'<a href="{row["url"]}">' in section, row["url"]                   # relative to the root page
-        assert row["label"] in _visible_text(section) and row["text"] in _visible_text(section)
+        # _visible_text folds a no-break space into a space; the label reaches the page with its ties intact
+        assert row["label"].replace("\u00a0", " ") in _visible_text(section) and row["text"] in _visible_text(section)
+        assert row["label"] in section
         assert "read more" not in row["label"].lower() and row["label"] != row["page"]
         assert not re.search(r"\b(?:one|two|three|four|five|six|\d+)\b", row["text"]), row["text"]   # no count
+    # "is not" is tied: at 320-370px the link broke "what a mind is / not", and "not" opening the second line
+    # split the meaning (review of WP-S17). tests/test_browser.py sweeps the invitations' line breaks.
+    assert "what a mind is\u00a0not" in next(r["label"] for r in SITE["elsewhere"] if r["page"] == "Commonplace")
     assert '<p class="when">' not in section          # the gutter carries an address here, so it takes no tick
     assert section.count("<a ") == 2                  # one way out of each row, and nothing else
     assert "tag--venue" not in section and "feature" not in section
@@ -459,6 +464,16 @@ def test_the_front_door_features_the_paper():
                      (by["NeurIPS 2025 video"]["url"], "Video", by["NeurIPS 2025 video"]["context"]),
                      ("research/", "More on the research page", "")]
     assert "CCN" not in section                       # the preliminary version is never the paper's link
+    # A list, one link to an item, and no dot typed between them: the separator is the stylesheet's, drawn in
+    # each item's left padding and clipped where an item opens a line, as on the role line, so no line ends or
+    # opens on a bare "·" (review of WP-S17; tests/test_browser.py reads the pixels). The empty alternative
+    # text keeps the dot out of what a screen reader says.
+    row = section.partition('<ul class="feature__links" role="list">')[2].partition("</ul>")[0]
+    assert row.count("<li>") == row.count("</li>") == row.count("<a ") == 4 and "·" not in row
+    css = _css()
+    assert re.search(r'\.feature__links li::before \{\s*content: "\\00B7" / "";', css)
+    assert ".feature__links li { position: relative; padding-left: var(--step); }" in css
+    assert "clip-path: inset(-6px -6px -6px calc(var(--step) - 6px));" in css
     # the block is the home page's alone, under About and above Now
     assert html.index('id="about"') < html.index('id="research"') < html.index('id="now"') < html.index('id="news"') < html.index('id="elsewhere"')
     for slug in SLUGS[1:]:
@@ -1025,7 +1040,7 @@ def test_optional_keys_may_be_absent():
     site["research"][0]["feature"] = SITE["research"][0]["feature"]     # the block back, without its badge or its buttons
     home = html_of("", site)
     assert 'class="feature"' in home and 'class="feature__venue"' not in home
-    assert re.search(r'<p class="feature__links">\s*<a href="research/">More on the research page</a>\s*</p>', home)
+    assert re.search(r'<ul class="feature__links" role="list">\s*<li><a href="research/">More on the research page</a></li>\s*</ul>', home)
     assert "<h3>Embodied Brain Technology Practicum</h3>" in pages["research/"]
     assert "Cognitive Computational Neuroscience (CCN) 2025" in pages["research/"]
 
@@ -1115,6 +1130,35 @@ def test_the_about_and_now_drafts_are_marked_as_drafts_in_site_yaml():
     # two short paragraphs since WP-S17 (astra's 90-140 words as the starting range, 80-150 here)
     assert len(SITE["about"]) == 2 and 80 <= sum(len(p.split()) for p in SITE["about"]) <= 150
     assert 1 <= len(SITE["now"]) <= 3
+
+
+def test_the_front_door_opens_on_plain_paper_and_the_rule_starts_at_now():
+    """The margin rule is a time axis, and on the home page it starts at Now (controller decision C5 item 17
+    under owner ruling 18, 2026-09-26; record kept privately): About and the featured paper are not dated
+    and stand on plain paper, without the rule and without its section tick, and Now, News and the
+    invitations draw the rule themselves, each its own stretch, down to the colophon's "Last updated". main
+    says so with a class the stylesheet reads (a block in base.html.j2), and every other page keeps the rule
+    from its first tick. The phone block is untouched: there each log already draws its own stretch.
+    tests/test_browser.py measures the stretches and reads the gutter beside About for bare paper."""
+    home = html_of("")
+    assert '<main id="content" tabindex="-1" class="opens-plain">' in home
+    assert '<section id="about" aria-labelledby="about-h">' in home and '<section id="research" aria-labelledby="research-h">' in home
+    for section in ("now", "news"):
+        assert f'<section id="{section}" class="ruled" aria-labelledby="{section}-h">' in home, section
+    assert '<section id="elsewhere" class="invitations ruled" aria-label="Elsewhere on this site">' in home
+    for slug, html in every_page().items():
+        if slug:
+            assert "opens-plain" not in html and 'class="ruled"' not in html, slug
+    css = _css()
+    laptop = css.partition("@media (min-width: 45rem) {")[2].partition("@media (min-width: 64rem)")[0]
+    assert "main.opens-plain::before { content: none; }" in laptop
+    assert "main.opens-plain > section:not(.ruled) > h2.inset::before { content: none; }" in laptop
+    assert re.search(r"section\.ruled::before \{[^}]*top: calc\(-1 \* var\(--section-gap\)\);\s*bottom: 0;\s*"
+                     r"left: calc\(var\(--gutter\) \+ var\(--gap\) / 2\);\s*width: 1px;\s*background: var\(--spine\);", laptop)
+    assert "section:not(.ruled) + section.ruled::before { top: var(--spine-top); }" in laptop
+    assert "--section-gap: 4.5rem;" in laptop and "section + section { margin-top: var(--section-gap); }" in laptop
+    phone = css.partition("@media (max-width: 44.99rem) {")[2].partition("\n}\n")[0]
+    assert ".ruled" not in phone and ".log { border-left: 1px solid var(--spine); padding-left: 0.875rem; }" in phone
 
 
 def test_teaching_is_two_sections_and_every_row_is_dated_and_titled():
@@ -1522,7 +1566,7 @@ def test_the_first_thing_on_every_page_is_a_way_past_the_strip():
         body = html.partition("<body>")[2]
         assert body.lstrip().startswith('<a class="skip" href="#content">Skip to content</a>'), slug
         assert html.count('<a class="skip"') == 1 and html.count('id="content"') == 1, slug
-        assert re.search(r'<main id="content" tabindex="-1"( class="opens-with-h1")?>', html), slug
+        assert re.search(r'<main id="content" tabindex="-1"( class="(?:opens-with-h1|opens-plain)")?>', html), slug
     not_found = (build.ROOT / "404.html").read_text(encoding="utf-8")
     assert '<a class="skip" href="#content">Skip to content</a>' in not_found       # the 404 page inherits it
     css = _css()
@@ -1553,9 +1597,13 @@ def test_paper_gets_the_light_palette_and_the_addresses_whatever_the_screen_show
     assert "html { font-size: 87.5%; }" in block and "body { background: #fff; }" in block
     hidden = re.search(r"\n  (\.skip,[^{]*)\{ display: none !important; \}", block).group(1)
     for furniture in (".skip", ".topstrip", ".colophon-nav", ".mark", ".mark-row", "main::before",
-                      ".colophon .links-nav::before", ".colophon .row::before", "h1.inset::before",
-                      "h2.inset::before", ".row > .when::after"):
+                      "section.ruled::before", ".colophon .links-nav::before", ".colophon .row::before",
+                      "h1.inset::before", "h2.inset::before", ".row > .when::after"):
         assert furniture in [s.strip() for s in hidden.split(",")], furniture
+    # The four small marks under the featured paper stay on the screen: with them the home page ran to a
+    # third A4 sheet carrying only "Last updated" at Chrome's default margins (review of WP-S17; measured
+    # back to two without them, tests/test_browser.py counts). The link row keeps whole on paper.
+    assert ".recovery-diagram--small { display: none; }" in block and ".feature__links { break-inside: avoid; }" in block
     assert ".btn--primary { color: var(--accent); background: none; border: 0; padding-inline: 0; text-decoration: underline; }" in block
     addresses = re.search(r"(\.buttons a\[href\^=\"http\"\]::after[^{]*)\{([^}]*)\}", block)
     assert addresses and 'content: " <" attr(href) ">";' in addresses.group(2)
@@ -1830,6 +1878,10 @@ def test_the_statement_claims_only_what_something_actually_checks():
     assert "The portrait beside my name, and the small marks beside Email, GitHub and Bluesky, are hidden from screen readers" in done[6]
     assert "Every image carries a description" not in " ".join(done)                   # false once the portrait is decorative
     assert done[7].endswith("made into a link in your browser.") and "harvest" not in done[7]   # cv.pdf prints both addresses
+    # three things need the script since the home page shows three news items and the rest behind an
+    # expander (WP-S17): without it the older news prints closed (tests/test_browser.py prints it open)
+    assert "Three things need it" in done[7] and "the older news on the home page, which prints closed without it" in done[7]
+    assert "Two things need it" not in " ".join(done)
     assert "the middle of the three levels" in SITE["accessibility"]["aim"]
     css = _css()
     motion = re.search(r"@media \(prefers-reduced-motion: reduce\) \{[^@]*\}\s*\}", css)

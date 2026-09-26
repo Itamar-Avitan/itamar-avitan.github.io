@@ -221,11 +221,13 @@ identity_line: I study human vision with computational models. I’m interested 
 # project row alone. The ALS expansion is this page's first use of the acronym. Do not add to this clause.
 #
 # Ties: the space before the em dash in the first paragraph is a no-break space (U+00A0), so the dash never
-# opens a line. Word count 79 + 67 = 146 of the 80-150 the test allows (str.split() counts the dash and the
+# opens a line. Word count 79 + 69 = 148 of the 80-150 the test allows (str.split() counts the dash and the
 # colon-less "with"); nothing may be added without a cut, and if the count ever trips, cut "on courses" first.
+# The three teaching subjects each take their own "in" ("in computation and cognition, in neuroimaging and in
+# deep learning"): without it the list read as two pairs (reviews of WP-X1 and WP-S17).
 about:
 - 'I work in NeuroAI and computational cognitive neuroscience, with Dr. Tal Golan in the Brains and Machines Lab at Ben-Gurion University of the Negev. I came to it from psychology and cognitive and brain sciences, and my work combines human behavioral data, machine learning and model-recovery simulations. The larger question is how to compare models with minds so that competing ideas can be told apart — which experiments separate them, and how people differ in the way they see.'
-- 'I have been a teaching assistant on courses in computation and cognition, neuroimaging and deep learning, and have mentored two undergraduates in the lab. I like building things with other people: a brain–computer interface that let a person with amyotrophic lateral sclerosis (ALS) answer yes or no, and a headphone add-on designed to filter the sounds that set anxiety off. And I collect lines about the mind.'
+- 'I have been a teaching assistant on courses in computation and cognition, in neuroimaging and in deep learning, and have mentored two undergraduates in the lab. I like building things with other people: a brain–computer interface that let a person with amyotrophic lateral sclerosis (ALS) answer yes or no, and a headphone add-on designed to filter the sounds that set anxiety off. And I collect lines about the mind.'
 # DRAFT, as above. Short enough to keep true: rewrite it whenever it stops being what you are doing.
 # One dated line since 2026-09-26 (WP-S17; astra's wireframe, controller decision C1 under owner ruling 18):
 # the current activity, not a list, and not the paper's question again -- that lives in the featured Research
@@ -277,14 +279,20 @@ now:
 # the owner's ruling. Naming the speaker and the subject gets a reader there without a second reproduction.
 # The Teaching label is the course he has helped teach longest (four academic years with 2026/27: owner
 # ruling 11), printed in its official order (ruling 19); the clause no longer says so, because the Now line
-# said "again" a screen above it and the two read as one fact told twice (review of WP-S17).
+# said "again" a screen above it and the two read as one fact told twice (review of WP-S17). The space in
+# the Commonplace label's "is not" is a no-break space (U+00A0): at 320-370px the link broke "what a mind is /
+# not", and "not" opening the second line split the meaning (review of WP-S17).
+# On the front door the margin rule itself starts at Now (controller decision C5 item 17 under owner ruling
+# 18, applied 2026-09-26): About and the featured paper are not dated and stand on plain paper, and the rule
+# runs from Now's tick past these two rows down to "Last updated", as it does on a phone, where each log
+# draws its own stretch of it. The rows sit on the rule without a tick, as before.
 elsewhere:
 - page: Teaching
   label: Introduction to Computation and Cognition
   url: teaching/
   text: and the other courses beside it.
 - page: Commonplace
-  label: Severus Snape on what a mind is not
+  label: Severus Snape on what a mind is not
   url: commonplace/
   text: and the other lines I keep coming back to.
 
@@ -844,9 +852,10 @@ teaching:
   # The title is the course's official English title in the BGU course catalogue, "Introduction to
   # Computation and Cognition" (owner ruling 19, 2026-09-26, superseding the word order ruled on 2026-09-21;
   # record kept privately -- the CV register, FACTS TEACH-TA-MAIN, holds the catalogue URL and the history).
-  # It is printed in this order everywhere: here, as the Teaching invitation's label on the home page, in the
-  # Now line on his 2026/27 teaching, and in lower case in the About paragraph on his teaching.
-  # tests/test_build.py pins the four and refuses the old order in the visible text of every page.
+  # It is printed in this order everywhere: here, as the Teaching invitation's label on the home page, and in
+  # lower case in the About paragraph on his teaching (the Now line names Academic Writing alone since the
+  # review of WP-S17). tests/test_build.py pins the three and refuses the old order in the visible text of
+  # every page.
   # The fourth year, 2026/27, is the owner's (owner ruling 11, 2026-09-25; record kept privately -- FACTS
   # TEACH-TA-MAIN); the first three are the register's. Listed in full rather than as a range because the
   # list is short enough to read and a range would hide a gap if one ever opens. The date is the longest in
@@ -919,7 +928,10 @@ accessibility:
   - 'Nothing moves on its own. The only motion is a short color fade and smooth scrolling, and both are switched off for a visitor whose system asks for reduced motion.'
   - 'The markup says what things are: one first-level heading per page, headings that never skip a level, lists marked up as lists, the navigation in a named landmark with the current page marked, and a language set on the document.'
   - 'Every picture that carries information has a text alternative: the paper’s figure is described in full for a reader who cannot see it. The portrait beside my name, and the small marks beside Email, GitHub and Bluesky, are hidden from screen readers, because the words beside them already say it.'
-  - 'The site works with JavaScript switched off: the pages are plain HTML joined by ordinary links. Two things need it, and both fail quietly — the theme button, which stays hidden until the script has run rather than sitting there doing nothing, and my email address, which is written as text and made into a link in your browser.'
+  # Three things since the home page went back to three open news items (WP-S17, 2026-09-26): without the
+  # script the older news prints closed, because a closed expander hides its content in the browser itself
+  # (the print note over `@media print` in style.css). Handed here by the reviews of WP-S8 and WP-S9.
+  - 'The site works with JavaScript switched off: the pages are plain HTML joined by ordinary links. Three things need it, and all three fail quietly — the theme button, which stays hidden until the script has run rather than sitting there doing nothing; the older news on the home page, which prints closed without it; and my email address, which is written as text and made into a link in your browser.'
   - 'Body text is set at 16 pixels or larger, the layout reflows into one column on a phone, and no page scrolls sideways at any width down to 320 pixels.'
   limits_intro: 'The gaps I know about, so that the list above is not read for more than it says:'
   limits:

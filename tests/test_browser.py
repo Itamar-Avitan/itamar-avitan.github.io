@@ -406,15 +406,39 @@ def test_the_laptop_gets_a_composition_of_its_own(browser):
     assert abs(narrow.evaluate(tick_foot)) <= 0.5 and abs(wide.evaluate(tick_foot)) <= 0.5
 
 
+FEATURE_ROW_JS = """
+() => { const ul = document.querySelector('.feature__links'), u = ul.getBoundingClientRect(), y = window.scrollY;
+  return [...ul.querySelectorAll('li')].map(li => {
+    const r = li.getBoundingClientRect(), a = li.querySelector('a').getBoundingClientRect();
+    return {label: li.textContent.trim().split(' ')[0], opens: Math.abs(r.left - u.left) < 0.5, left: r.left,
+            linkLeft: a.left, top: a.top + y, bottom: a.bottom + y, dot: getComputedStyle(li, '::before').content}; }); }
+"""
+
+
+def _separators_are_never_bare(page, where):
+    """Each item of the featured paper's link row either opens a line -- then the strip of its own padding
+    before the link, where its dot would land, is bare paper -- or follows another on the same line, and
+    then the strip carries the dot. Read from the pixels, as the hung dot of the kind tags is."""
+    items = page.evaluate(FEATURE_ROW_JS)
+    assert [i["label"] for i in items] == ["Paper", "Code", "Video", "More"] and all("·" in i["dot"] for i in items)
+    for i in items:
+        strip = _colours(page, i["left"] + 0.5, i["top"] + 1, i["linkLeft"] - 0.5, i["bottom"] - 1)
+        assert (len(strip) == 1) == i["opens"], (where, i["label"], i["opens"], len(strip))
+
+
 @pytest.mark.parametrize("width", WIDTHS)
 def test_the_featured_papers_links_are_24px_targets_and_its_strip_keeps_its_order(browser, width):
-    """The front door's "Paper · Code · Video · More on the research page" is set like the card's mono labels
-    in a line of prose, and each link's box is padded to the 24px a target needs (WCAG 2.2 SC 2.5.8) without
-    moving the line (WP-S17). The four marks under the paragraph read in order: one row of four from 45rem
-    up, two rows of two below it -- never three and a stranded fourth. The row of four is asked of the text
-    column, not the viewport (a container query; WP-S17 review fix): with the reader's text at 200% the
-    column is 21rem at 1280, where four columns broke every caption under its counter and at 720-730px put
-    the last one past the viewport, so the strip keeps the two rows of two there at every width."""
+    """The front door's "Paper · Code · Video · More on the research page" is a list set like the card's mono
+    labels, and each link's box is padded to the 24px a target needs (WCAG 2.2 SC 2.5.8) (WP-S17). The dot
+    between two items is drawn in each item's left padding and clipped where an item opens a line, as on the
+    role line, so the row never ends a line on a bare dot or opens one with it: until the review of WP-S17
+    the dots were typed into a paragraph, and at 320-410px the row broke after "Video ·" while at 200% text
+    the dot had a line of its own. Checked at both text sizes by reading the pixels. The four marks under
+    the paragraph read in order: one row of four from 45rem up, two rows of two below it -- never three and
+    a stranded fourth. The row of four is asked of the text column, not the viewport (a container query;
+    WP-S17 review fix): with the reader's text at 200% the column is 21rem at 1280, where four columns broke
+    every caption under its counter and at 720-730px put the last one past the viewport, so the strip keeps
+    the two rows of two there at every width."""
     page, _, _ = _page(browser, width)
     links = page.evaluate(HIT_TEST_JS, ".feature__links a")
     assert [l["label"].split(" ")[0] for l in links] == ["Paper", "Code", "Video", "More"]
@@ -422,10 +446,48 @@ def test_the_featured_papers_links_are_24px_targets_and_its_strip_keeps_its_orde
     rows_js = """() => { const t = [...document.querySelectorAll('.recovery-diagram--small li')].map(l => Math.round(l.getBoundingClientRect().top));
       return [...new Set(t)].sort((a, b) => a - b).map(r => t.filter(x => x === r).length); }"""
     assert page.evaluate(rows_js) == ([4] if width >= 720 else [2, 2]), width
+    _separators_are_never_bare(page, (width, 16))
     page.evaluate("document.documentElement.style.fontSize = '32px'")
     page.wait_for_timeout(50)
     assert page.evaluate(rows_js) == [2, 2], width
     assert page.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0, width
+    _separators_are_never_bare(page, (width, 32))
+
+
+@pytest.mark.parametrize("width", [1280, 1440])
+def test_the_front_doors_rule_starts_at_now_and_runs_unbroken_to_last_updated(browser, width):
+    """The home page opens on plain paper (controller decision C5 item 17 under owner ruling 18, 2026-09-26;
+    record kept privately): About and the featured paper are not dated, so main draws no rule and their
+    headings take no tick, and the gutter beside them is bare. Now, News and the invitations each draw their
+    own stretch of the rule, and the stretches have to join: the first starts on Now's tick, each next one
+    starts where the last ended, the last ends on main's foot, where the colophon's segment picks the rule
+    up on the same column -- so the reader sees one rule from Now to "Last updated", not three. Every
+    other page keeps main's rule from its first tick."""
+    page, _, _ = _page(browser, width)
+    m = page.evaluate("""() => {
+      const y = window.scrollY, px = v => parseFloat(v);
+      const seg = el => { const s = getComputedStyle(el, '::before'), r = el.getBoundingClientRect();
+                          return {x: r.left + px(s.left), top: r.top + y + px(s.top), bottom: r.top + y + px(s.top) + px(s.height)}; };
+      const tick = id => { const h = document.getElementById(id), s = getComputedStyle(h, '::before'), r = h.getBoundingClientRect();
+                           return {content: s.content, top: r.top + y, mid: r.top + y + px(s.top) + px(s.height) / 2}; };
+      const main = document.querySelector('main');
+      return {main: getComputedStyle(main, '::before').content, mainBottom: main.getBoundingClientRect().bottom + y,
+              about: tick('about-h'), research: tick('research-h'), now: tick('now-h'), news: tick('news-h'),
+              segs: ['now', 'news', 'elsewhere'].map(id => seg(document.getElementById(id))),
+              colophon: seg(document.querySelector('.colophon .links-nav'))}; }""")
+    assert m["main"] == "none" and m["about"]["content"] == "none" and m["research"]["content"] == "none"
+    assert m["now"]["content"] == '""' and m["news"]["content"] == '""'
+    segs = m["segs"]
+    assert abs(segs[0]["top"] - m["now"]["mid"]) <= 2, (segs[0]["top"], m["now"]["mid"])   # starts on Now's tick
+    for a, b in zip(segs, segs[1:]):
+        assert abs(b["top"] - a["bottom"]) < 0.5 and abs(b["x"] - a["x"]) < 0.5, (a, b)   # joined, on one column
+    assert abs(segs[-1]["bottom"] - m["mainBottom"]) < 0.5 and abs(m["colophon"]["top"] - m["mainBottom"]) < 0.5
+    assert abs(m["colophon"]["x"] - segs[0]["x"]) < 0.5
+    x = segs[0]["x"]
+    paper = _colours(page, x - 1, m["about"]["top"], x + 2, m["now"]["top"] - 2)     # the rule's column beside About and the paper
+    assert len(paper) == 1, paper
+    deep, _, _ = _page(browser, width, slug="research/")
+    assert deep.evaluate("getComputedStyle(document.querySelector('main'), '::before').content") == '""'
 
 
 @pytest.mark.parametrize("scheme", ["light", "dark"])
