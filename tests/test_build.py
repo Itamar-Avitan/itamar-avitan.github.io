@@ -636,7 +636,7 @@ def test_research_card_shows_every_field():
              *card["authors"], card["venue"], *card["badges"], *(b["label"] for b in card["buttons"]),
              *(u["label"] for u in card["uses"]), *card["how"], *card["open"]]
     assert [s for s in shown if " ".join(s.split()) not in text] == []
-    # the card as an argument (controller decision C4 under owner ruling 18, 2026-09-26; WP-S18): five run-in
+    # the card as an argument (controller decision C4 under owner ruling 18, 2026-09-25; WP-S18): five run-in
     # blocks in this order, the four stages of the diagram under Test, then the paper's own open questions
     # and the citation last; the Summary, "How the test works" and "What we found" of WP-S3 are gone
     assert list(card["argument"]) == ["question", "setup", "test", "result", "scope"]
@@ -666,7 +666,7 @@ def test_research_card_shows_every_field():
 
 def test_the_card_reads_as_an_argument_traced_to_the_paper():
     """The paper card is a small argument, not a summary beside a picture (controller decision C4 under owner
-    ruling 18, 2026-09-26; external review 3 §23; WP-S18): Question, Setup, Test, Result, Scope, each one
+    ruling 18, 2026-09-25; external review 3 §23; WP-S18): Question, Setup, Test, Result, Scope, each one
     paragraph, the owner's diagram (ruling 3) under Test as the illustration of Setup and Test, the paper's
     own open questions after Scope (owner ruling 16: they stay the paper's, never his directions). Every
     clause was checked against arXiv 2510.23321 before it was printed (the note over `argument` in site.yaml
@@ -709,7 +709,7 @@ def test_the_card_reads_as_an_argument_traced_to_the_paper():
 
 
 def test_the_links_are_grouped_by_what_a_reader_does_with_them():
-    """Read, Reproduce, Watch (controller decision C4, 2026-09-26; external review 3 §23; WP-S18): the card's
+    """Read, Reproduce, Watch (controller decision C4, 2026-09-25; external review 3 §23; WP-S18): the card's
     links print as three labelled rows in that order rather than as one string of five, `uses` in site.yaml
     naming the groups and each button its group. The paper's own link is still the one filled button, the
     CCN recording joins the Watch row, and build.py refuses a button whose `use` names no group -- it would
@@ -1237,7 +1237,7 @@ def test_the_about_and_now_drafts_are_marked_as_drafts_in_site_yaml():
 
 def test_the_front_door_opens_on_plain_paper_and_the_rule_starts_at_now():
     """The margin rule is a time axis, and on the home page it starts at Now (controller decision C5 item 17
-    under owner ruling 18, 2026-09-26; record kept privately): About and the featured paper are not dated
+    under owner ruling 18, 2026-09-25; record kept privately): About and the featured paper are not dated
     and stand on plain paper, without the rule and without its section tick, and Now, News and the
     invitations draw the rule themselves, each its own stretch, down to the colophon's "Last updated". main
     says so with a class the stylesheet reads (a block in base.html.j2), and every other page keeps the rule
@@ -1377,13 +1377,14 @@ def test_a_teaching_row_without_a_sentence_still_renders():
 
 # The four source lines as the page prints them, character for character (the ties are U+00A0): the one-string
 # attribution each entry carried until 2026-09-26, composed since then by the template from the entry's fields
-# (speaker, author, work, year, chapter, quoting), so that splitting the string changed no fact.
+# (speaker, author, work, year, chapter, quoting), so that splitting the string changed no fact. The three ties
+# inside the Doyle title and after "Mr." are the review of WP-S19's (site.yaml, the note over `quotes`).
 SOURCE_LINES = {
     "snape-mind-not-a-book": "Severus Snape, in J.K. Rowling, Harry Potter and the Order of the Phoenix\u00a0(2003), Chapter\u00a024, “Occlumency”",
-    "holmes-brain-attic": "Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet\u00a0(1887), Part\u00a0I, Chapter\u00a0II, “The Science of Deduction”",
-    "watson-proper-study": ("Dr. John Watson, in Arthur Conan Doyle, A Study in Scarlet\u00a0(1887), Part\u00a0I, Chapter\u00a0I, “Mr. Sherlock Holmes”"
+    "holmes-brain-attic": "Sherlock Holmes, in Arthur Conan Doyle, A\u00a0Study in\u00a0Scarlet\u00a0(1887), Part\u00a0I, Chapter\u00a0II, “The Science of Deduction”",
+    "watson-proper-study": ("Dr. John Watson, in Arthur Conan Doyle, A\u00a0Study in\u00a0Scarlet\u00a0(1887), Part\u00a0I, Chapter\u00a0I, “Mr.\u00a0Sherlock Holmes”"
                             "\u00a0— quoting Alexander Pope, An\u00a0Essay\u00a0on\u00a0Man\u00a0(1733–34), Epistle\u00a0II"),
-    "holmes-thousand-and-first": "Sherlock Holmes, in Arthur Conan Doyle, A Study in Scarlet\u00a0(1887), Part\u00a0I, Chapter\u00a0II, “The Science of Deduction”",
+    "holmes-thousand-and-first": "Sherlock Holmes, in Arthur Conan Doyle, A\u00a0Study in\u00a0Scarlet\u00a0(1887), Part\u00a0I, Chapter\u00a0II, “The Science of Deduction”",
 }
 
 
@@ -1394,11 +1395,12 @@ def _source_line(section: str, slug: str) -> str:
 
 
 def test_quotes_print_the_line_its_source_and_its_context_and_nothing_else():
-    """A reading room (external review 3 §24; controller decision C2 under owner ruling 18, 2026-09-26; record
+    """A reading room (external review 3 §24; controller decision C2 under owner ruling 18, 2026-09-25; record
     kept privately): the line, then its source on one line, then the note -- and no date gutter, so nothing
     on the page reads as a chronology (C5 item 10). The source line is composed from the entry's fields and
-    reads, character for character, as the one-string attribution did before the fields were split
-    (SOURCE_LINES): splitting it changed no fact."""
+    reads as the one-string attribution did before the fields were split, apart from the three no-break ties
+    the review of WP-S19 added inside the Doyle title and after "Mr." (SOURCE_LINES): splitting it changed no
+    fact."""
     html = html_of("commonplace/")
     section = html.partition('<section id="quotes"')[2].partition("</section>")[0]
     shown = _visible_text(section)
@@ -1440,7 +1442,7 @@ def test_the_family_resemblance_line_is_the_verified_one():
                              "unravel the thousand and first.”")
     assert "can't" not in quote["text"]
     assert (quote["speaker"], quote["author"], quote["work"], quote["year"]) == (
-        "Sherlock Holmes", "Arthur Conan Doyle", "A Study in Scarlet", "1887")
+        "Sherlock Holmes", "Arthur Conan Doyle", "A\u00a0Study in\u00a0Scarlet", "1887")     # the title's ties: see site.yaml
     assert quote["chapter"] == "Part\u00a0I, Chapter\u00a0II, “The Science of Deduction”"      # numerals tied
     assert quote["source_url"] == "https://www.gutenberg.org/ebooks/244"                    # the text it was checked against
     assert quote["status"] == "verified" and quote["copyright"] == "public-domain"
@@ -1449,7 +1451,7 @@ def test_the_family_resemblance_line_is_the_verified_one():
 def test_the_commonplace_runs_in_the_owners_order_with_snape_first():
     """It used to run oldest first, so that the years in the gutter only went forward. The owner ruled on
     2026-09-21 that the Snape line comes first (record kept privately), so that rule is gone: a commonplace book
-    is a person's own order, not a chronology -- and since the years left the gutter (C5 item 10, 2026-09-26)
+    is a person's own order, not a chronology -- and since the years left the gutter (C5 item 10, 2026-09-25)
     nothing on the page reads as one. Nothing else moved: the three A Study in Scarlet lines keep the order
     they were in, and the page prints them in it."""
     years = [q["year"] for q in SITE["quotes"]]
@@ -1593,7 +1595,7 @@ def test_the_statement_reports_before_it_lists():
 def test_the_commonplace_has_no_date_gutter():
     """The years used to stand in the gutter, each with a tick, and "1887" three times over asked the reader to
     read a chronology the page is deliberately not using (external review 3 §24; controller decision C5 item
-    10 under owner ruling 18, 2026-09-26; record kept privately). The year is printed once now, in the source
+    10 under owner ruling 18, 2026-09-25; record kept privately). The year is printed once now, in the source
     line after the work's title and tied to it; the list is not a log -- it draws no rule of its own on a
     phone, and on a laptop stands in the text column by its inset, with no tick of its own, while the page's
     margin rule runs past it (decided by render). `year` stays a field, so the source line is composed and
@@ -1642,7 +1644,7 @@ def test_the_source_line_is_composed_from_the_entrys_fields():
         assert line.startswith(f'{q["speaker"]}, in {q["author"]}, {q["work"]}\u00a0({q["year"]}), {q["chapter"]}'), line
         assert line == SOURCE_LINES[q["slug"]]
     assert _source_line(section, "watson-proper-study").endswith(
-        "“Mr. Sherlock Holmes”\u00a0— quoting Alexander Pope, An\u00a0Essay\u00a0on\u00a0Man\u00a0(1733–34), Epistle\u00a0II")
+        "“Mr.\u00a0Sherlock Holmes”\u00a0— quoting Alexander Pope, An\u00a0Essay\u00a0on\u00a0Man\u00a0(1733–34), Epistle\u00a0II")
     site = copy.deepcopy(SITE)
     del site["quotes"][1]["author"]
     assert any("author is missing" in p and "I consider that a man" in p for p in build.validate(site))
@@ -1676,7 +1678,7 @@ def test_the_works_title_is_the_link_to_a_free_text_of_the_work_where_one_exists
         entry = section[section.index(f'id="{q["slug"]}"'):].partition("</li>")[0]
         if q["author"] == "Arthur Conan Doyle":
             assert q["source_url"] == url and "Project Gutenberg ebook #244" in q["evidence"], q["slug"]
-            assert f'<a class="quote__source" href="{url}"><i class="work">A Study in Scarlet</i></a>\u00a0(1887)' in entry
+            assert f'<a class="quote__source" href="{url}"><i class="work">A\u00a0Study in\u00a0Scarlet</i></a>\u00a0(1887)' in entry
         else:
             assert "source_url" not in q and 'class="quote__source"' not in entry
             assert '<i class="work">Harry Potter and the Order of the Phoenix</i>\u00a0(2003)' in entry
@@ -1689,7 +1691,7 @@ def test_the_works_title_is_the_link_to_a_free_text_of_the_work_where_one_exists
 
 def test_the_commonplace_intro_is_the_reading_rooms_one_sentence():
     """One understated sentence gives the selection a reason without explaining each line (external review 3
-    §24, taken as written under the owner's delegation of this page: ruling 18, decision C2, 2026-09-26;
+    §24, taken as written under the owner's delegation of this page: ruling 18, decision C2, 2026-09-25;
     record kept privately). It answers the page's one question -- what does he choose to keep thinking
     about -- and nothing else on the page does; the description names the genre for a reader who has not
     met the word and follows the intro's question. The sentence is not in his own words, and Q-N item 18
@@ -1765,7 +1767,7 @@ def test_a_link_says_where_it_leads_to_a_reader_who_cannot_see_the_card():
     in site.yaml -- per button, never one suffix for all, which would have called a CCN recording part of
     the NeurIPS paper -- printed after the label in a hidden span; the hand-off link names its page the same
     way; the home Research row's Paper and Code carry the card's own contexts. The two generated glyphs the
-    stylesheet draws, the role line's dots and the attribution's dash, carry empty alternative text so they
+    stylesheet draws, the role line's dots and the source line's dash, carry empty alternative text so they
     are not read either."""
     card, research = SITE["research"][0], html_of("research/")
     contexts = {b["label"]: b.get("context") for b in card["buttons"]}
@@ -1941,7 +1943,7 @@ def test_every_work_title_is_set_in_italic_and_matches_the_content():
     """The titles of works (`works` in site.yaml) are set in <i class="work"> wherever the text names one, in
     a self-hosted italic face (deep review 2026-09-25, DS-07): a book or a long poem is italic in prose, and
     the chapter titles beside them keep their quotation marks. Like a `nobreak` term, a title that matches
-    nothing is dead configuration. <i>, not <cite>: the attributions open with a speaker, and the test above
+    nothing is dead configuration. <i>, not <cite>: the source lines open with a speaker, and the test above
     forbids <cite> on that page. The face is a local file, declared once, so the "nothing loads from anyone
     else" bullet of the accessibility statement stays true."""
     pages = every_page()

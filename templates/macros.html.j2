@@ -275,7 +275,7 @@
 {% endmacro -%}
 
 {#- A commonplace book read as a reading room (external review 3 §24; controller decision C2 under owner
-    ruling 18, 2026-09-26; record kept privately): the line first, large; then its source, compact, on one
+    ruling 18, 2026-09-25; record kept privately): the line first, large; then its source, compact, on one
     muted line; then one note of context, smaller and lighter. Nothing is dated in a gutter -- the year is part
     of the source, printed after the work's title, and the page has no time axis to put it on (C5 item 10) --
     so an entry is not a log row: no "when", no tick. The source line is composed here from the entry's
@@ -283,7 +283,8 @@
     the same author/work/year/chapter), so the design can tell the speaker from the work and a year cannot
     drift from the title it belongs to. The ties are the ones the one-string attribution carried before it
     was split: a no-break space between a title and its year, and before the dash of "— quoting"
-    (tests/test_browser.py measures the line starts); the numerals' ties travel inside the chapter field. The
+    (tests/test_browser.py measures the line starts and ends); the numerals' ties travel inside the chapter
+    field, as do the ties inside the Doyle title and after "Mr." (site.yaml says which and why). The
     work's title is set in italic by nb() (`works`, DS-07), and is the link to a free text of the work where
     the entry gives a source_url. The source stands outside the blockquote, as the quoting rules ask, and is a
     paragraph rather than a <cite>, because it opens with a person and <cite> marks the title of a work. Each

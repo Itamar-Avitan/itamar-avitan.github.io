@@ -121,7 +121,7 @@ def validate(site: dict) -> list[str]:
             problems.append(f"quotation slug {slug!r} is used twice")
         seen.add(slug)
         # A quotation's source is its fields, not a string (the reading room, controller decision C2 under
-        # owner ruling 18, 2026-09-26): speaker, author, work and year are required; chapter, source_url
+        # owner ruling 18, 2026-09-25): speaker, author, work and year are required; chapter, source_url
         # and `quoting` (author, work, year and chapter of the work the line itself quotes) are optional.
         # The old one-string `attribution` is refused, so a source is written in one place and cannot
         # disagree with itself; a source_url is an https address, since a reader is sent to it.

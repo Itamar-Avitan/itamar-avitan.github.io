@@ -5,7 +5,7 @@
    them and works as a time axis: a 2px ink tick marks each section, a 1px
    accent tick crosses the axis at every dated entry. On the front door the
    rule starts at Now: About and the featured paper are not dated and stand
-   on plain paper (controller decision C5 item 17, 2026-09-26; the laptop
+   on plain paper (controller decision C5 item 17, 2026-09-25; the laptop
    block's note on main.opens-plain).
 
    Four pages now, not one scroll (2026-09-21). The navigation strip at the top
@@ -943,7 +943,7 @@ li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
 
 /* ---------- Reading: the commonplace, one line at a time ----------
    The line first, then its source, then one note (a reading room: external review 3 §24; controller decision
-   C2 under owner ruling 18, 2026-09-26). The entries are not dated in a gutter -- the year is in the source
+   C2 under owner ruling 18, 2026-09-25). The entries are not dated in a gutter -- the year is in the source
    line -- so they are not log rows: on a laptop the list stands in the text column by its inset, with no date
    beside it and no tick of its own; on a phone it draws no rule of its own, and the quotation takes the whole
    measure. Body face, and on a phone body size: a quotation is not a heading and must not read as one -- the
@@ -966,7 +966,7 @@ li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
   color: var(--ink-2);
   text-wrap: pretty;
 }
-/* the dash is drawn, not read: the empty alternative text keeps it out of the attribution's accessible
+/* the dash is drawn, not read: the empty alternative text keeps it out of the source line's accessible
    text, as the role line's dots are kept out of the role line's (PA-05) */
 .quote__by::before { content: "\2014\00A0" / ""; }
 .quote__note {
@@ -976,12 +976,12 @@ li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
   color: var(--muted);
   text-wrap: pretty;
 }
-/* The permalink: a small "§" at the end of the attribution, in the mono of the gutter labels and their muted
-   colour, lifting to the link colour when pointed at or focused. Always painted -- a keyboard or a finger
+/* The permalink: a small "§" at the end of the source line, in the mono face the site's dates and badges
+   use and their muted colour, lifting to the link colour when pointed at or focused. Always painted -- a keyboard or a finger
    cannot hover. The padding is what makes a one-glyph link a 24px target (WCAG 2.2 SC 2.5.8): the box is
    padded all round rather than widened by the overlay the profile row uses, because here nothing stands to
    its right to keep a rhythm with. Measured: the "§" is 7.8px wide at 13px, so 0.5rem a side left a 23.8px
-   box; 0.5625rem a side makes it 25.8. Inline padding, so the attribution's line height does not grow. */
+   box; 0.5625rem a side makes it 25.8. Inline padding, so the source line's line height does not grow. */
 .quote__link {
   margin-left: 0.5rem;
   padding: 0.5rem 0.5625rem;
@@ -1224,7 +1224,7 @@ li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
     width: 1px;
     background: var(--spine);
   }
-  /* The front door opens on plain paper (controller decision C5 item 17 under owner ruling 18, 2026-09-26:
+  /* The front door opens on plain paper (controller decision C5 item 17 under owner ruling 18, 2026-09-25:
      the rule is kept where the content is dated and dropped where it is not; external review 2 §7 asked for
      About to read as prose and the featured paper as a visual explanation). main draws no rule there; each
      ruled section -- Now, News, the invitations -- draws its own stretch instead, reaching up through the

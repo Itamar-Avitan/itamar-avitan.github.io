@@ -68,7 +68,7 @@ cannot be told from the other Itamar Avitan's.
 
 **Every page names its sections**, and every section takes a 2px ink tick on the margin rule — except that
 the home page opens on plain paper: About and the featured paper are not dated, so the rule and its ticks
-start at Now and run from there to "Last updated" (controller decision C5 item 17, 2026-09-26; record kept
+start at Now and run from there to "Last updated" (controller decision C5 item 17, 2026-09-25; record kept
 privately), which is what a phone shows on every page, one log at a time. The home page
 runs masthead (the mark above the name, the two-sentence identity line, the address with GitHub and Google
 Scholar beside it), `about` (two short paragraphs: who he is, and the rest of the person), the featured

@@ -19,7 +19,7 @@ show_cv: true
 # (build.py, visible_research).
 show_ongoing: false
 # Three items stand open and the rest go behind "Older news" (astra's wireframe, controller decision C1 under
-# owner ruling 18, 2026-09-26; record kept privately). The front door answers "what changed recently" with the
+# owner ruling 18, 2026-09-25; record kept privately). The front door answers "what changed recently" with the
 # three latest events, each linking the thing it names; the whole story, back to the PhD start, is one click
 # away in the expander. It stood at 8 (every item open) from 2026-09-25 until the home page was rebuilt.
 news_visible: 3
@@ -157,13 +157,14 @@ nobreak:
 # poem is set in running prose (Chicago 8.171, MLA, APA), while a chapter title keeps its quotation marks. The
 # template wraps each in <i class="work"> after the no-break wrapping (macros.html.j2, nb()); the italic face is
 # fonts/fira-sans-latin-400-italic.woff2, self-hosted like the other four, so the page still asks no other host
-# for anything (deep review 2026-09-25, DS-07). Not <cite>: the attributions are paragraphs that open with a
+# for anything (deep review 2026-09-25, DS-07). Not <cite>: the source lines are paragraphs that open with a
 # speaker, and a test forbids <cite> on that page. A title here must occur in the content exactly as written,
-# spaces included -- "An Essay on Man" is tied with no-break spaces in the Pope attribution, so it is tied here
-# too -- and tests/test_build.py fails on an entry that matches nothing, as it does for `nobreak`.
+# spaces included -- "An Essay on Man" is tied with no-break spaces in the Watson line's Pope source, so it is
+# tied here too, and "A Study in Scarlet" carries the two ties its `work` fields carry (the note over `quotes`
+# says why) -- and tests/test_build.py fails on an entry that matches nothing, as it does for `nobreak`.
 works:
 - Harry Potter and the Order of the Phoenix
-- A Study in Scarlet
+- A Study in Scarlet
 - An Essay on Man
 
 # --- content (text verbatim from the fact-checked seed) ---
@@ -267,7 +268,7 @@ now:
 - From 2026/27, also teaching assistant for Academic Writing.
 
 # The two invitations at the foot of the front door (astra's wireframe: "small invitations: Teaching ·
-# Commonplace"; controller decision C1 under owner ruling 18, 2026-09-26; record kept privately). Until then this
+# Commonplace"; controller decision C1 under owner ruling 18, 2026-09-25; record kept privately). Until then this
 # was "Elsewhere on this site", three rows under a heading, one per other page; the Research row is now the
 # featured block under About, drawn from the paper card, and the heading is gone -- two rows on the grid, the
 # page's name in the gutter, say where they lead without announcing themselves. Each row says something real
@@ -451,7 +452,7 @@ research:
   # academic CVs print it, and the BibTeX block below carries the same one (build.py refuses a disagreement).
   published: {periodical: Advances in Neural Information Processing Systems, volume: '38', year: '2025'}
   doi: 10.52202/085713-0404
-  # THE CARD AS AN ARGUMENT (controller decision C4 under owner ruling 18, 2026-09-26, built by WP-S18; the
+  # THE CARD AS AN ARGUMENT (controller decision C4 under owner ruling 18, 2026-09-25, built by WP-S18; the
   # shape is external review 3 §23's table). Five run-in blocks -- Question, Setup, Test, Result, Scope -- in
   # place of the Summary, the "How the test works" heading and the "What we found" paragraph of WP-S3: the
   # diagram strip stands under Test and illustrates Setup and Test (its captions are `how`, below), and what
@@ -599,7 +600,7 @@ research:
   # the NeurIPS paper, and the ruling keeps CCN a preliminary version. The home page's Paper and Code links
   # of the featured Research block carry the same contexts (templates/pages/home.html.j2), "Video" for the
   # poster video among them.
-  # GROUPED BY USE (controller decision C4, 2026-09-26, WP-S18; external review 3 §23): the card prints its
+  # GROUPED BY USE (controller decision C4, 2026-09-25, WP-S18; external review 3 §23): the card prints its
   # links as three labelled rows in the order a research reader takes them -- Read, Reproduce, Watch -- rather
   # than as one flat string. `uses` names the groups and their order; each button says which it belongs to
   # in `use`, and build.py refuses a button whose `use` is not one of the keys, since it would otherwise be
@@ -782,7 +783,7 @@ projects:
   period: 2022–2023
   blurb: In a team of five, we built a brain–computer interface (BCI) that let a person with amyotrophic lateral sclerosis (ALS) answer yes/no questions through the P300 brain response measured with electroencephalography (EEG). The person it was built for used it live. I worked on the data collection, the signal processing and the real-time system.
 # Lines about the mind, collected, and read as a reading room (external review 3 §24; controller decision C2
-# under owner ruling 18, 2026-09-26; record kept privately): the line first, then its source, then one note of
+# under owner ruling 18, 2026-09-25; record kept privately): the line first, then its source, then one note of
 # context. Printed keys: text; the source line, which the template composes from speaker, author, work, year
 # and chapter (and, for a line that itself quotes another work, `quoting`, with the same author/work/year/
 # chapter); note; and source_url, which makes the work's title a link to a free text of the work where one
@@ -804,7 +805,7 @@ projects:
 # still starts from the single sentence.
 # The quotation marks belong to the text here, not to a CSS rule, so that a reader who copies a line gets the
 # marks with it. The year is printed once, in the source line after the work's title: the page has no date
-# gutter (controller decision C5 item 10, 2026-09-26, after external review 3 §24 -- the same "1887" beside
+# gutter (controller decision C5 item 10, 2026-09-25, after external review 3 §24 -- the same "1887" beside
 # three of the four lines asked the reader to read a chronology the page is not using). A date that needs a
 # parenthetical (Pope's 1733–34) has room in the source line to say it properly.
 # ORDER: the owner's -- the Snape line first (owner ruling, 2026-09-21; record kept privately). The list used to
@@ -823,7 +824,14 @@ projects:
 # its title (Phoenix (2003), Scarlet (1887)) and the Watson line's dash to the word before it: with the
 # permalink at the end, the Watson source ran to three lines on a laptop and opened its second on a lone "I",
 # which reads as the pronoun, and the Snape line opened one on "(2003)," on a 320px phone (review of WP-S4,
-# 2026-09-25). tests/test_browser.py measures the line starts.
+# 2026-09-25). The Doyle title is tied as "A Study" and "in Scarlet" (U+00A0 after "A" and before "Scarlet"),
+# and "Mr." to "Sherlock" in the Watson chapter: once the title was a link, a lone underlined "A" ended a
+# line at every common iPhone width in WebKit (360-430) and at 340-380 and 420-470 in Chromium, and
+# "Study in / Scarlet" at 400-410 and 470-490; "“Mr. / Sherlock Holmes”" broke the same way at 360-414. The
+# whole title tied split "(1887)," mid-word at 200% text on a 340-400px phone, so the one break left is
+# between "Study" and "in" (review of WP-S19, 2026-09-26). The Snape title's "…the Order of the / Phoenix"
+# on a laptop is accepted as a bibliographic wrap: every tie that would move it splits "(2003)," or "Phoenix"
+# mid-word at 200% text on a 320px phone (measured). tests/test_browser.py measures the line starts and ends.
 quotes_intro: 'I keep these lines because they return to a question I find difficult to leave alone: what can we infer about a mind from what it does?'
 quotes:
 # The owner was shown that this novel is in copyright and that the single sentence “The mind is not a book…”
@@ -862,7 +870,7 @@ quotes:
 - text: “I consider that a man’s brain originally is like a little empty attic, and you have to stock it with such furniture as you choose.”
   speaker: Sherlock Holmes
   author: Arthur Conan Doyle
-  work: A Study in Scarlet
+  work: A Study in Scarlet
   year: '1887'
   chapter: Part I, Chapter II, “The Science of Deduction”
   source_url: https://www.gutenberg.org/ebooks/244
@@ -882,9 +890,9 @@ quotes:
 - text: “The proper study of mankind is man.”
   speaker: Dr. John Watson
   author: Arthur Conan Doyle
-  work: A Study in Scarlet
+  work: A Study in Scarlet
   year: '1887'
-  chapter: Part I, Chapter I, “Mr. Sherlock Holmes”
+  chapter: Part I, Chapter I, “Mr. Sherlock Holmes”
   source_url: https://www.gutenberg.org/ebooks/244
   # The line is Pope's, in Watson's mouth: the source line says so after a dash ("— quoting ..."), with the
   # poem's own author, title, span and epistle. The span sits after the poem's title, as the novel's year sits
@@ -918,7 +926,7 @@ quotes:
 - text: “There is a strong family resemblance about misdeeds, and if you have all the details of a thousand at your finger ends, it is odd if you can’t unravel the thousand and first.”
   speaker: Sherlock Holmes
   author: Arthur Conan Doyle
-  work: A Study in Scarlet
+  work: A Study in Scarlet
   year: '1887'
   chapter: Part I, Chapter II, “The Science of Deduction”
   source_url: https://www.gutenberg.org/ebooks/244

@@ -496,7 +496,7 @@ def test_the_resource_rows_keep_their_label_with_their_first_link(browser, width
 
 @pytest.mark.parametrize("width", [1280, 1440])
 def test_the_front_doors_rule_starts_at_now_and_runs_unbroken_to_last_updated(browser, width):
-    """The home page opens on plain paper (controller decision C5 item 17 under owner ruling 18, 2026-09-26;
+    """The home page opens on plain paper (controller decision C5 item 17 under owner ruling 18, 2026-09-25;
     record kept privately): About and the featured paper are not dated, so main draws no rule and their
     headings take no tick, and the gutter beside them is bare. Now, News and the invitations each draw their
     own stretch of the rule, and the stretches have to join: the first starts on Now's tick, each next one
@@ -987,7 +987,7 @@ def test_every_quotation_permalink_is_a_24px_target_and_marks_its_entry(browser,
     tint. The panel is measured, not read off the stylesheet, because the plan's 2px ring around the text was
     found running through the quotation's hanging opening mark on a laptop and across the date that then
     stood above the entry on a phone (review of WP-S4): the panel has to enclose the source line and the
-    first glyph (there is no date since C5 item 10, 2026-09-26; on a laptop the entry's left edge is now the
+    first glyph (there is no date since C5 item 10, 2026-09-25; on a laptop the entry's left edge is now the
     text's, so the spread steps up there), stay inside the entry's own air and inside the viewport, be a
     colour of its own, and keep every text on it at 4.5:1, in both themes."""
     page, _, _ = _page(browser, width, slug="commonplace/")
@@ -1019,7 +1019,7 @@ def test_every_quotation_permalink_is_a_24px_target_and_marks_its_entry(browser,
 
 @pytest.mark.parametrize("width", [400, 1280, 1440])
 def test_the_reading_room_sets_the_source_under_the_line_at_a_shorter_measure(browser, width):
-    """The reading room (external review 3 §24; controller decision C2 under owner ruling 18, 2026-09-26): the
+    """The reading room (external review 3 §24; controller decision C2 under owner ruling 18, 2026-09-25): the
     quotation takes the column every other page has, and on a laptop the source and the note take a shorter
     measure under it, so the apparatus reads as subordinate to the line it places; nothing stands in the
     gutter beside an entry, and the hanging opening mark keeps its air from the margin rule, which runs past
@@ -1048,8 +1048,10 @@ def test_the_reading_room_sets_the_source_under_the_line_at_a_shorter_measure(br
         assert m["by"] == pytest.approx(m["quoteWidth"], abs=0.5) and not m["ruleDrawn"], m
 
 
-# The first word of each line of every source line, at the widths the layout and the type change at and the
-# ones between them, where the wrap moves one word at a time.
+# The words of each line of every source line, at the widths the layout and the type change at and the ones
+# between them, where the wrap moves one word at a time. Words are grouped into lines by the vertical centre of
+# their boxes: the "§" is a 13px glyph on a 15px line, and its box top sits 4px under the words', so grouping by
+# the top put it on a line of its own (review of WP-S19).
 LINE_STARTS_JS = r"""
 () => [...document.querySelectorAll('.quote__by')].map(p => {
   const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT), words = [];
@@ -1057,13 +1059,13 @@ LINE_STARTS_JS = r"""
     for (let m, re = /\S+/g; (m = re.exec(node.data));) {
       const r = document.createRange(); r.setStart(node, m.index); r.setEnd(node, m.index + m[0].length);
       const rect = r.getClientRects()[0];
-      if (rect) words.push({word: m[0], top: Math.round(rect.top)});
+      if (rect) words.push({word: m[0], top: Math.round((rect.top + rect.bottom) / 2)});
     }
   }
   const lines = [];
   for (const w of words) {
     const last = lines[lines.length - 1];
-    if (last && Math.abs(last.top - w.top) < 4) last.words.push(w.word); else lines.push({top: w.top, words: [w.word]});
+    if (last && Math.abs(last.top - w.top) < 8) last.words.push(w.word); else lines.push({top: w.top, words: [w.word]});
   }
   return lines.map(l => l.words);
 })
@@ -1071,18 +1073,26 @@ LINE_STARTS_JS = r"""
 
 
 @pytest.mark.parametrize("width", sorted(set(WIDTHS) | {360, 390, 430, 1024, 1440}))
-def test_no_attribution_line_opens_on_a_numeral_a_date_or_a_dash(browser, width):
+def test_no_source_line_opens_on_a_numeral_a_date_or_a_dash_or_ends_on_a_lone_a_or_on_mr(browser, width):
     """"Part I, Chapter I" split as "Chapter | I," on a laptop once the permalink made the Watson source line
     three lines, and the lone "I" read as the pronoun (review of WP-S4). The numerals are tied to their nouns
     with U+00A0, each work's year to its title (the Snape line opened one on "(2003)," at 320 and 768), Pope's
     title to its span, and the dash to the word before it, so no line of any source line opens on a Roman
-    numeral, on a year, on a piece of the Essay's title, or on an em dash."""
+    numeral, on a year, on a piece of either title, or on an em dash. Then the title became a link (WP-S19)
+    and ended a line on a lone underlined "A" at every common iPhone width in WebKit and at 340-380 and
+    420-470 in Chromium, and the Watson chapter broke as "“Mr. / Sherlock Holmes”" (review of WP-S19): the
+    "A" is tied to "Study", "in" to "Scarlet" and "Mr." to "Sherlock", so no line ends on a one-letter word
+    or on "“Mr.", and the "§" never stands on a line of its own at the default text size."""
     page, _, _ = _page(browser, width, slug="commonplace/")
     for lines in page.evaluate(LINE_STARTS_JS):
         for line in lines[1:]:
             first = line[0]
             assert not re.fullmatch(r"[IVXLC]+[,.;:]?", first), (width, line)
-            assert not re.match(r"\(\d", first) and first not in ("Essay", "on", "Man", "—"), (width, line)
+            assert not re.match(r"\(\d", first), (width, line)
+            assert first not in ("Essay", "on", "Man", "Study", "Scarlet", "—", "§"), (width, line)
+        for line in lines[:-1]:
+            last = line[-1]
+            assert not (len(last) == 1 and last.isalpha()) and last != "“Mr.", (width, line)
 
 
 @pytest.mark.parametrize("width", [360, 412])
