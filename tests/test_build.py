@@ -999,28 +999,30 @@ def test_the_now_block_is_dated_once_and_its_lines_are_not_events():
 def test_now_says_nothing_about_what_he_is_looking_for_or_the_neat_work():
     """Two owner rulings of 2026-09-25 fix what the Now block leaves out (WP-S11; record kept privately -- the
     review's rulings file, and the note beside `now` in site.yaml). Ruling 14: the site says nothing about
-    what he is looking for -- no internship, no availability window, no invitation to write; the résumés
-    carry that. Ruling 16: the NEAT 2026 flash talk stands on the site as title, co-authors, place and date
-    only, so the research line in Now is built from public facts (the paper's own question) and does not
-    describe the talk's work: the talk's framing, "system identification", is printed exactly twice on the
-    whole site, as its title in the news item and in the talk row, and nowhere as prose; the talk row carries
-    no note; the Students row does not tie a project to it; and the research card's open questions stay the
-    paper's own, under "Questions the paper leaves open" and never as his directions. The build already
-    refuses "in preparation" wording (build.UNPUBLISHED); this pins the two rulings the regex cannot see."""
+    what he is looking for -- no availability line and no invitation to write, on any page. Ruling 16: the
+    NEAT 2026 flash talk stands on the site as title, co-authors, place and date only, so the research line
+    in Now is built from public facts (the paper's own question) and does not describe the talk's work: the
+    talk's framing, "system identification", is printed exactly twice on the whole site, as its title in the
+    news item and in the talk row, and nowhere as prose; the talk row carries no note; the Students row does
+    not tie a project to it; and the research card's open questions stay the paper's own, under "Questions
+    the paper leaves open" and never as his directions. The scans read a hyphen as a space, so the hyphenated
+    framing is caught too (review of WP-S11). The build already refuses "in preparation" wording
+    (build.UNPUBLISHED); this pins the two rulings the regex cannot see."""
     everywhere = " ".join(_visible_text(h) for h in every_page().values())
-    low = everywhere.lower()
-    for phrase in ("looking for", "internship", "available for", "availability"):
+    low = everywhere.lower().replace("-", " ")
+    for phrase in ("looking for", "internship", "available for", "availability",
+                   "open to", "hear from", "get in touch", "write to me", "reach out"):
         assert phrase not in low, phrase
-    now = " ".join(SITE["now"])
+    now = " ".join(SITE["now"]).lower().replace("-", " ")
     for phrase in ("looking", "internship", "availab", "open to", "hear from", "get in touch", "write to me",
                    "reach out", "ongoing", "in preparation", "system identification"):
-        assert phrase not in now.lower(), phrase
-    assert not re.search(r"\bi will\b", now.lower())
+        assert phrase not in now, phrase
+    assert not re.search(r"\bi will\b", now)
     # Now may point at the talk ("gave a flash talk at NEAT 2026") but never carry its title or its framing
     neat = SITE["talks"][0]
     assert neat["venue"] == "Neuro-AI-Talks (NEAT) 2026" and neat["kind"] == "Flash talk"
     assert set(neat) == {"date", "kind", "venue", "place", "title", "authors", "url"}   # no note, no gist
-    assert neat["title"] not in now
+    assert neat["title"].lower() not in now
     assert everywhere.count(neat["title"]) == 2 and low.count("system identification") == 2
     assert not any("NEAT" in s["what"] or "talk" in s["what"].lower() for s in SITE["teaching"]["students"])
     research = html_of("research/")
