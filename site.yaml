@@ -212,7 +212,7 @@ identity_line: I study how to tell which neural network models of human vision a
 about:
 - 'To ask whether a network sees the way people do, you fit a flexible linear mapping from its features to people’s judgments and check how well it predicts — but the mapping reshapes the network’s features, and that can let the wrong network win. When we let each of twenty networks generate judgments, the comparison picked the right one less than 80% of the time: far above the one in twenty of guessing, but wrong more than one time in five, even with millions of simulated trials. That is our paper at the Conference on Neural Information Processing Systems (NeurIPS) 2025.'
 - I work in NeuroAI and computational cognitive neuroscience. I started my PhD with Dr. Tal Golan in 2024, coming from cognitive and brain sciences and psychology, and expect to finish in 2029.
-- I have been a teaching assistant on courses in cognition and computation, neuroimaging and deep learning, and have mentored two undergraduates in the lab. I like building things with other people — a brain–computer interface that let a person with amyotrophic lateral sclerosis (ALS) answer yes or no, and a headphone add-on for the noises that set anxiety off. And I collect lines about the mind.
+- I have been a teaching assistant on courses in computation and cognition, neuroimaging and deep learning, and have mentored two undergraduates in the lab. I like building things with other people — a brain–computer interface that let a person with amyotrophic lateral sclerosis (ALS) answer yes or no, and a headphone add-on for the noises that set anxiety off. And I collect lines about the mind.
 # DRAFT, as above. Short enough to keep true: rewrite it whenever it stops being what you are doing.
 # Two lines since 2026-09-25 (WP-S1). Line 1 repeats the lede's question on purpose: it is the interim until
 # the owner says what may be said about the current work (Q-H). The mentoring line went because MENT-YEARS is
@@ -261,7 +261,7 @@ elsewhere:
 # is a count the tests already pin to len(quotes): tests/test_build.py asserts the word and the length side
 # by side, so the two move together.
 - page: Teaching
-  label: Introduction to Cognition and Computation
+  label: Introduction to Computation and Cognition
   url: teaching/
   text: the course I have helped teach longest, the others beside it, and the students I have mentored and tutored.
 - page: Commonplace
@@ -758,7 +758,13 @@ teaching:
   - title: An academic writing course
     kind: Teaching team
     when: from 2026/27
-  - title: Introduction to Cognition and Computation
+  # The title is the course's official English title in the BGU course catalogue, "Introduction to
+  # Computation and Cognition" (owner ruling 19, 2026-09-26, superseding the word order ruled on 2026-09-21;
+  # record kept privately -- the CV register, FACTS TEACH-TA-MAIN, holds the catalogue URL and the history).
+  # It is printed in this order everywhere: here, as the Elsewhere Teaching label on the home page, and in
+  # lower case in the About paragraph on his teaching. tests/test_build.py pins the three and refuses the
+  # old order in the visible text of every page.
+  - title: Introduction to Computation and Cognition
     kind: Teaching assistant
     when: 2023/24, 2024/25 and 2025/26
     what: 'An introduction to treating a mind as something that computes: the questions cognitive science asks, and the models built to answer them.'

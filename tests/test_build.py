@@ -1040,7 +1040,7 @@ def test_the_teaching_page_carries_the_course_home_announces():
     assert "academic writing course" in SITE["now"][-1]
     assert writing["title"] in _visible_text(html_of("teaching/"))
     assert "what" not in writing and writing["kind"] == "Teaching team"      # a description, and no invented sentence
-    assert [c["title"] for c in courses] == ["An academic writing course", "Introduction to Cognition and Computation",
+    assert [c["title"] for c in courses] == ["An academic writing course", "Introduction to Computation and Cognition",
                                              "Deep Learning for Neuroscience and Cognition",
                                              "Computational Approaches to Neuroimaging"]
     # the gutter reads one direction down the whole page: the years of the six rows, in page order
@@ -1048,6 +1048,28 @@ def test_the_teaching_page_carries_the_course_home_announces():
     whens = re.findall(r'<p class="when">(.*?)</p>', html)
     assert [_visible_text(w) for w in whens] == ["from 2026/27", "2023/24, 2024/25 and 2025/26", "spring 2026", "2024",
                                                  "2025–2026", "2021–2023"]
+
+
+def test_the_course_prints_under_its_official_title():
+    """The course's English title in the BGU course catalogue is "Introduction to Computation and Cognition",
+    and the site and the six CVs print it in that order (owner ruling 19, 2026-09-26, superseding the word
+    order ruled on 2026-09-21; WP-X1; record kept privately -- the CV register, FACTS TEACH-TA-MAIN, holds the
+    catalogue URL and the history). The title stands in three places: the course row on the teaching page,
+    the Elsewhere Teaching label on the home page and, in lower case, the About paragraph on his teaching.
+    The old order must not come back in any of them in either case, so the refusal is case-insensitive and
+    runs over the visible text of every page and over every content string in site.yaml: a lower-case
+    mention is caught with a title. The CV repository pins the same title in its own checks."""
+    official = "Introduction to Computation and Cognition"
+    titles = [c["title"] for c in SITE["teaching"]["courses"]]
+    assert official in titles
+    assert SITE["teaching"]["courses"][titles.index(official)]["kind"] == "Teaching assistant"
+    assert [r["label"] for r in SITE["elsewhere"] if r["page"] == "Teaching"] == [official]
+    assert sum("computation and cognition" in p for p in SITE["about"]) == 1
+    assert official in _visible_text(html_of("teaching/")) and official in _visible_text(html_of(""))
+    everywhere = " ".join(_visible_text(h) for h in every_page().values()).lower()
+    assert everywhere.count("computation and cognition") == 3            # the row, the label, the About mention
+    assert "cognition and computation" not in everywhere
+    assert not any("cognition and computation" in s.lower() for s in _values(SITE))
 
 
 def test_a_teaching_row_without_a_sentence_still_renders():
