@@ -828,8 +828,12 @@ def test_the_practicum_leads_with_the_programme_and_ends_on_his_one_clause():
     his own part back, in the ruled wording "I led the system integration", and ruling 8 gave BCI4ALS its
     clause (the three areas he ticked, not leadership); this test used to be named
     "...says_nothing_about_who_did_what" and forbade the first person in the blurb, which those rulings
-    supersede. The sensor inventory and the business-plan detail stay deleted. See the note over `projects`
-    in site.yaml, and shared/projects.tex in the CV repository, which carries the same shape."""
+    supersede. The sensor inventory and the business-plan detail stay deleted. Ruling 15 of the same day
+    (built by WP-S13, 2026-09-26) settled the claim itself: EarBetter is described by what it was designed
+    to do -- "designed to read biosignals and filter out" on the row, "designed to filter" in News -- and
+    never as a filter that works, because the README the row's Code link opens calls the selective path
+    experimental; About's clause was purpose-phrased already. See the note over `projects` in site.yaml,
+    and shared/projects.tex in the CV repository, which carries the same shape."""
     entry = next(p for p in SITE["projects"] if "Practicum" in p["title"])
     bci = next(p for p in SITE["projects"] if p["title"] == "BCI4ALS")
     news = next(n for n in SITE["news"] if "Practicum" in n["text"])
@@ -845,6 +849,14 @@ def test_the_practicum_leads_with_the_programme_and_ends_on_his_one_clause():
     for phrase in ("EarBetter", "add-on", "any headphones", "biosignals", "anxiety"):
         assert phrase in entry["blurb"], phrase
     assert "headphone add-on" in news["text"] and "designed, built and pitched" in news["text"]
+    # and by its purpose, in the ruled wording (ruling 15): what it was designed to do, not that it does it
+    assert "an add-on for any headphones, designed to read biosignals and filter out the sounds" in entry["blurb"]
+    assert "a headphone add-on designed to filter the sounds" in news["text"]
+    about_clause = next(p for p in SITE["about"] if "add-on" in p)
+    assert "a headphone add-on for the noises that set anxiety off" in about_clause
+    for text in (entry["blurb"], news["text"], about_clause):
+        for claim in ("filters", "reads biosignals", "works with"):
+            assert claim not in text, (claim, text)
 
     # DELETED AT HIS REQUEST, from the whole site: the retired clause's wording, the sensors, the business-plan detail
     everywhere = " ".join(_visible_text(h) for h in every_page().values())

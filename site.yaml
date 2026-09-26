@@ -342,12 +342,16 @@ news:
 # full) and kept, because it already obeyed it: the programme leads the sentence, EarBetter is named in a
 # clause, and nothing here says who did what. One word of repetition went -- the line named Brown University
 # twice in twenty words, once in the programme's name and once as the place -- and nothing else changed.
+# Since 2026-09-26 the add-on is named by its purpose, "designed to filter" (owner ruling 15 of 2026-09-25;
+# WP-S13): the line no longer says that it filters, and claims no result. Why, and the row's fuller form,
+# are under RULINGS in the note over `projects`. The wording here is the ruled one for News, word for word;
+# the "designed, built and pitched" before it is the test's pin, so the sentence keeps both "designed".
 # US spelling, here and everywhere the site speaks in its own words ("program", "behavior", "color"): the
 # paper's title is US and cannot change, so US is the one consistent choice (deep review 2026-09-25, RN-04).
 # Quoted text keeps its own spelling -- "skilful" in the commonplace evidence -- and comments and test names
 # that say "programme-first" keep the ruling's name.
 - date: Aug 2026
-  text: Completed the Embodied Brain Technology Practicum, a joint Brown University–Ben-Gurion University program held at Brown, where our team of five designed, built and pitched EarBetter, a headphone add-on that filters the sounds that set a person’s anxiety off.
+  text: Completed the Embodied Brain Technology Practicum, a joint Brown University–Ben-Gurion University program held at Brown, where our team of five designed, built and pitched EarBetter, a headphone add-on designed to filter the sounds that set a person’s anxiety off.
 # The full paper title is not repeated here: it is printed on the card and in the Elsewhere label, and a
 # third copy on the home page said the same thing three times in two screens. The phrase links to the card.
 - date: Dec 2025
@@ -559,18 +563,29 @@ talks:
 # 'pitched' is all that survives of the pitch. 2026-09-25, rulings 4 and 7: one short clause on his own part is
 # allowed again, in the ruled wording, 'I led the system integration' (owner ruling 7, 2026-09-25; record kept
 # privately). Do not grow it into a list of what he did; do not restore the sensors or the business plan; do
-# not put it in News or About. (The wordings retired by these rulings are not kept here, and neither are the
-# owner's own messages: a sentence retired from the page but kept word for word in a public repository is not
-# off the site. The history lives in FACTS PROJ-EBT-DESC and the private ledgers; deep review 2026-09-25,
-# external review 2 §16.)
+# not put it in News or About. 2026-09-25, ruling 15 (built 2026-09-26, WP-S13): EarBetter is described by
+# what it was designed to do, never as a working filter -- on this row "an add-on for any headphones,
+# designed to read biosignals and filter out the sounds that set a person’s anxiety off", in News "a
+# headphone add-on designed to filter the sounds that set a person’s anxiety off" -- superseding, for this
+# clause alone, the ruling of 2026-09-21 that the entry say the system worked. The README the Code link
+# opens calls the selective path experimental and says anxiety inference was not evaluated or claimed, so
+# the printed claim and the evidence it links agree. About's "a headphone add-on for the noises that set
+# anxiety off" was purpose-phrased already and stands. The comma after "headphones" is the site's own (the
+# plan's site wording has none; the CVs' long form has it): without it, "headphones designed to read
+# biosignals" reads as the headphones' design, not the add-on's. (The wordings retired by these rulings are
+# not kept here, and
+# neither are the owner's own messages: a sentence retired from the page but kept word for word in a public
+# repository is not off the site. The history lives in FACTS PROJ-EBT-DESC and the private ledgers; deep
+# review 2026-09-25, external review 2 §16.)
 #
 # FACTS THE ENTRY MAY STATE, all established: the practicum is the Embodied Brain Technology Practicum, run
 # jointly by Ben-Gurion University and Brown University; it ran at Brown, in Providence, USA, from 24 July to
-# 6 August 2026; entry was competitive; his team of five designed, built and pitched EarBetter; he led the
-# system integration (ruling 7). "Two weeks" is derived from the dates in `period`, not asserted. NOT stated,
-# because no source gives them: a course code, the size of the Brown cohort, and any award. One number attached
-# to this entry is private and is NOT printed either (owner ruling, 2026-09-21; the CV register records it), and
-# the entry says the entry was competitive and stops.
+# 6 August 2026; entry was competitive; his team of five designed, built and pitched EarBetter, an add-on for
+# any headphones designed to read biosignals and filter out anxiety-triggering sounds (its purpose, not a
+# result: ruling 15); he led the system integration (ruling 7). "Two weeks" is derived from the dates in
+# `period`, not asserted. NOT stated, because no source gives them: a course code, the size of the Brown
+# cohort, and any award. One number attached to this entry is private and is NOT printed either (owner
+# ruling, 2026-09-21; the CV register records it), and the entry says the entry was competitive and stops.
 projects:
 # Titled by the programme, not by the product: under a heading a reader's eye reaches first, "EarBetter" would
 # have led and the practicum would have been the clause, which is the ruling upside down. The title links the
@@ -583,7 +598,8 @@ projects:
 - title: Embodied Brain Technology Practicum
   period: 24 Jul–6 Aug 2026
   # 65 words against the 64 of the wording it replaced, so the reframe cost the Research page one word; the
-  # ruled clause of 2026-09-25 adds five (70). This row still sits below the peer-reviewed paper's own
+  # ruled clause of 2026-09-25 adds five (70), and the purpose wording of ruling 15 (WP-S13, 2026-09-26)
+  # swapped 27 words for 27, so 70 stands. This row still sits below the peer-reviewed paper's own
   # summary and still weighs less than it, which is right. The order is programme -> team -> product -> his
   # clause, and the clause stays last and stays one sentence. Line ends measured (2026-09-26, WP-S10; Chromium
   # and WebKit, every 10px from 320 to 1280): at 16px text neither this row nor BCI4ALS ever leaves one word
@@ -597,7 +613,13 @@ projects:
   # and 412 among them; WebKit did not. "real-time" is in `nobreak` for it; re-measured with the span, neither
   # engine splits it at 16px or 32px, no one-word last line appears at 16px, and at 32px "system." alone gains
   # only 320-340, inside the 200% band above. tests/test_browser.py holds the span to one client rect.
-  blurb: 'Two weeks at Brown University in Providence, on a program run jointly with Ben-Gurion University: graduate students from the two universities, admitted by competitive selection, work in small teams, each building a piece of neurotechnology and pitching it. Our five-person team built and pitched EarBetter, an add-on that works with any headphones, reads biosignals and filters out the sounds that set a person’s anxiety off. I led the system integration.'
+  # Re-measured for the purpose wording (2026-09-26, WP-S13; the same sweep, 320 to 1440 every 10px, both
+  # engines, 16px and 32px): at 16px no one-word last line and no split, on this row or on the Aug 2026
+  # news item, in either engine; at 32px "integration." alone stands at 28 widths in Chromium (31 before)
+  # and the same 13 in WebKit (320-400, 720-750), and the news item never leaves a word alone. The one split
+  # either engine makes is "neurotechnology" at 32px on 320-360 and 720, in the first sentence, before and
+  # after; a 15-letter word in a 200%-text phone column, not this wording's.
+  blurb: 'Two weeks at Brown University in Providence, on a program run jointly with Ben-Gurion University: graduate students from the two universities, admitted by competitive selection, work in small teams, each building a piece of neurotechnology and pitching it. Our five-person team built and pitched EarBetter, an add-on for any headphones, designed to read biosignals and filter out the sounds that set a person’s anxiety off. I led the system integration.'
   url: https://sites.google.com/brown.edu/ebt/2026-practicum
   links:
   - label: Code
