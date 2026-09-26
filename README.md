@@ -121,10 +121,15 @@ such in `site.yaml`. They stand in for the owner's own words until he replaces t
 comes from a fact already on the site, on the CVs or ruled by him; the one sentence on his broader interests
 names questions at the level a researcher states on a homepage and nothing of what he plans to do about
 them. Do not add anything to them that he has not said. The one-sentence descriptions under the courses
-in `teaching` are drafts of the same kind: they say what each course is about, drawn from its own name, and
-say nothing about what he does inside it beyond the role in its `kind` tag, because nothing on record does.
-The Academic Writing row carries no sentence at all: its title and his role are the owner's (owner ruling,
-2026-09-25), and nothing on record says what the course covers. The two rows under Students carry the
+in `teaching` are not drafts any more: since 2026-09-26 each follows the course's public record — the BGU
+course catalogue's summary of it, or the syllabus the catalogue serves for the year he lists — and the
+comment over its row cites the page, URL and fetch date (controller decision C3 under the owner's delegation
+of 2026-09-25; record kept privately). They say what each course teaches and nothing about what he does
+inside it beyond the role in its `kind` tag, because nothing on record does; a test pins the sentences,
+requires the citation over every row that carries one, and refuses a first person in them. The
+neuroimaging row's semester, spring 2024, is the catalogue's too. The Academic Writing row carries no
+sentence at all: its title and his role are the owner's (owner ruling, 2026-09-25), and no public record of
+the course was found. The two rows under Students carry the
 register's own sentences (the mentoring topics, the tutoring subjects), which the CV already prints. Two
 things `now` leaves out on purpose (owner rulings, 2026-09-25): it says nothing about what he is looking
 for, and nothing about the NEAT 2026 flash talk beyond a pointer to it. On this site that talk is a title,

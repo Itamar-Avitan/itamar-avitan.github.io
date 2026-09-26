@@ -91,8 +91,16 @@ pages:
 - slug: teaching/
   nav: Teaching
   heading: Teaching
-  intro: Courses I help teach at Ben-Gurion University of the Negev, and the students I have mentored and tutored.
-  description: Courses Itamar Avitan helps teach at Ben-Gurion University of the Negev, and the students he has mentored and tutored.
+  # The intro answers this page's one question, what does he help people learn (external review 3's
+  # page-promise rule, controller decision C1 under owner ruling 18, 2026-09-25; record kept privately;
+  # WP-S20): it names the subject the courses share, "most of them" because the Academic Writing row is the
+  # exception, and keeps the mentoring and the tutoring in the past tense -- the tutoring ended in 2023 and the
+  # mentoring is dated 2025-2026, so the intro makes no present-tense claim about either. The description
+  # follows the intro in the third person, as every page's does. The space in "and tutored" is a no-break
+  # space (U+00A0), so the last line is never "tutored." alone (it was, at 200% text, at 25 of 113 widths
+  # from 320 to 1440); the description carries the same tie.
+  intro: Courses I help teach at Ben-Gurion University of the Negev, most of them on studying minds and brains with computational models, and the students I have mentored and tutored.
+  description: Courses Itamar Avitan helps teach at Ben-Gurion University of the Negev, most of them on studying minds and brains with computational models, and the students he has mentored and tutored.
 - slug: commonplace/
   nav: Commonplace
   heading: Commonplace
@@ -967,10 +975,15 @@ quotes:
 #          A role noun in every row (Teaching assistant, Mentor, Tutor): a gerund there read as an activity,
 #          and "Joining" read as attending (deep review 2026-09-25, CS-17).
 #   when   the years. Lifted into the gutter and ticked on the margin rule like every other date on the site.
-#   what   Under Courses: DRAFT. One sentence on what the course is about, written from the course's own name
-#          and from what this site already says; the rows carry no claim about his duties beyond the role in
-#          "kind", because nothing here records them. What he actually does inside each course is his to say
-#          (Q-G) -- when he says it, replace these sentences with his words rather than adding to them.
+#   what   Under Courses: one sentence on what the course teaches, written from the course's public record --
+#          the BGU course catalogue's summary of it, or the syllabus the catalogue serves for the year he
+#          lists -- and cited, URL and fetch date, in the note over its row (controller decision C3 under
+#          owner ruling 18, 2026-09-25; record kept privately; WP-S20). The sentence says what the course
+#          covers, never what he does inside it: the rows carry no claim about his duties beyond the role in
+#          "kind", because nothing on record does, and a course with no public record carries no sentence
+#          (Academic Writing). tests/test_build.py pins the three sentences, requires a catalogue citation
+#          over every row that carries one, and refuses a first person in them. Until 2026-09-26 the three
+#          were drafts written from each course's name.
 #          Under Students: not a draft. The two sentences are the register's own words (FACTS TEACH-MENT-DESC
 #          and TEACH-TUTOR), which cv.pdf already prints; this page was the one place that said less.
 teaching:
@@ -1001,21 +1014,62 @@ teaching:
   # list is short enough to read and a range would hide a gap if one ever opens. The date is the longest in
   # any gutter on the site: on phones its label drops under it (style.css, the phone block's note on the
   # hung middle dot), which tests/test_browser.py checks.
+  # The sentence follows the catalogue's own summary of the course for 2026/27, the same text as 2025/26:
+  # basic approaches in computational neuroscience and machine learning and the connections between them;
+  # artificial neural networks for supervised, unsupervised and reinforcement learning; Bayesian models of
+  # perception and decision-making; homework of mathematical analyses and programming in Python. Source:
+  # https://bgu4u.bgu.ac.il/pls/scwp/!app.ann?lang=en&st=a&step=3&rn_course=6&rn_course_department=19&rn_course_degree_level=1&rn_course_ins=0&rn_year=2027&rn_semester=1&rn_course_details=
+  # (course 019.1.0006, 197.1.0006 up to 2024/25; the page lists Dr. T. Golan and, as an exercise group,
+  # Mr. I. Avitan; fetched 2026-09-25 by the deep review's course-research pass, read again 2026-09-26). The
+  # catalogue's summary changed over the years -- the 2024/25 text agrees with this one, the 2023/24 text is
+  # an older syllabus -- so the sentence follows the current text (WP-S20). It opens on a noun, as the other
+  # sentences on this page do, rather than on "Introduces", which the title already says. NOT TIED: the last
+  # pair, "Python assignments.", is wider than a 320px phone column at 200% text, so a no-break space between
+  # the two words split "assignme / nts." at 320-780px; untied, the last line is "assignments." alone at
+  # 330-340px only (2 of 113 widths from 320 to 1440 at 16px). The rule for a tie on this page is the branch's
+  # (review of WP-S19): only where the tied unit never breaks inside a word at 200% text on a 320-390px phone.
+  # The same test rules out "and cognition." below (split at 320px) and "imaging (fMRI)" (split at 320px);
+  # "in Python." at the end of the neuroimaging sentence holds, and is tied (WP-S20).
   - title: Introduction to Computation and Cognition
     kind: Teaching assistant
     when: 2023/24, 2024/25, 2025/26 and 2026/27
-    what: 'An introduction to treating a mind as something that computes: the questions cognitive science asks, and the models built to answer them.'
+    what: 'Basic approaches in computational neuroscience and machine learning: artificial neural networks for supervised, unsupervised and reinforcement learning, and Bayesian models of perception and decision-making, with Python assignments.'
+  # The sentence follows the catalogue's summary (theoretical and practical familiarity with the branches of
+  # deep learning as a contemporary engineering tool, with example applications in neuroscience and cognition)
+  # and takes its three named branches from the syllabus for spring 2026, the semester he lists: convolutional
+  # networks; attention and the Transformer; autoencoders, diffusion models and generative adversarial
+  # networks, which the sentence calls generative models. Catalogue:
+  # https://bgu4u.bgu.ac.il/pls/scwp/!app.ann?lang=en&st=a&step=3&rn_course=8&rn_course_department=19&rn_course_degree_level=1&rn_course_ins=0&rn_year=2026&rn_semester=2&rn_course_details=
+  # (course 019.1.0008, 197.1.0045 in 2024/25; the page lists Dr. T. Golan and, as exercise group 11,
+  # Mr. I. Avitan). Syllabus: the same address with lang=he and step=6, which serves a PDF. Both fetched
+  # 2026-09-25 by the deep review's course-research pass and read again 2026-09-26 (WP-S20).
   - title: Deep Learning for Neuroscience and Cognition
     kind: Teaching assistant
     when: spring 2026
-    what: 'Deep networks as models of brains and behavior: how one is built and trained, and what it takes to read it as a claim about a mind.'
-  # Quote the year. `when` is lifted into the gutter and split on the en dash by the template, so a bare 2024
-  # is read by YAML as an integer and the build stops on it. This is the one row whose date is a bare year;
-  # which semester of 2024 it was is his to say (Q-G).
+    what: 'A theoretical and hands-on introduction to the main branches of modern deep learning, from convolutional networks to transformers and generative models, and their applications in neuroscience and cognition.'
+  # The semester is the catalogue's: its lecturer search, run on his name by the deep review's course-research
+  # pass on 2026-09-25, lists this course (197.1.0124) for spring 2024 -- the catalogue's 2024-2, academic year
+  # 2023/24 -- although the course's own page shows only the lecture group. The search is a form the catalogue
+  # answers by POST, so it has no address to cite; the course page for that offering, the address below with
+  # lang=en and step=3, is headed Spring Semester 2024 and names Dr. T. Golan (read 2026-09-26; WP-S20). Until
+  # 2026-09-26 the row printed the bare year the CV register holds (FACTS TEACH-NI), quoted because YAML reads
+  # 2024 as an integer and the build stops on it; "spring 2024" is a string, and the template leaves it as
+  # plain text in the gutter, as it does "spring 2026" above.
+  # The sentence follows the syllabus the catalogue serves for spring 2024, the year he lists (in Hebrew: the
+  # general linear model on fMRI data, "mind reading" with machine-learning decoding models, representational
+  # similarity analysis, predicting neural activity with linear encoding models, artificial neural networks in
+  # these roles, and real fMRI data analysed in Python during the course):
+  # https://bgu4u.bgu.ac.il/pls/scwp/!app.ann?lang=he&st=a&step=6&rn_course=124&rn_course_department=197&rn_course_degree_level=1&rn_course_ins=0&rn_year=2024&rn_semester=2&rn_course_details=
+  # (a PDF; fetched 2026-09-25 by the deep review's course-research pass, read again 2026-09-26). The
+  # catalogue's summary of the same offering, the same address with lang=en and step=3, says the same in fewer
+  # words. fMRI is expanded at its first use, as every acronym on the site is; the site's lists take no
+  # serial comma, as the tutoring row shows. The space in "in Python" is a no-break space (U+00A0), so the
+  # last line is never "Python." alone (it was, at 200% text, at 14 widths from 320 to 800); the acronym is
+  # not tied to "imaging", because that unit splits inside the parenthesis on a 320px phone at 200% text.
   - title: Computational Approaches to Neuroimaging
     kind: Teaching assistant
-    when: '2024'
-    what: 'Turning brain images into numbers: the computational methods that take imaging data and make a measurement out of it.'
+    when: spring 2024
+    what: 'Computational analysis of human functional magnetic resonance imaging (fMRI) data: the general linear model, machine-learning decoding, representational similarity analysis and encoding models, including artificial neural networks, applied in Python.'
   students:
   # One topic per student, in the register's words (TEACH-MENT-DESC; the students are not named, MENT-NAMES),
   # spelled "modeling" because the site spells US (RN-04).

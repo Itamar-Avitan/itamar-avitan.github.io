@@ -1320,7 +1320,7 @@ def test_the_teaching_page_carries_the_course_home_announces():
     html = html_of("teaching/")
     whens = re.findall(r'<p class="when">(.*?)</p>', html)
     assert [_visible_text(w) for w in whens] == ["from 2026/27", "2023/24, 2024/25, 2025/26 and 2026/27", "spring 2026",
-                                                 "2024", "2025–2026", "2021–2023"]
+                                                 "spring 2024", "2025–2026", "2021–2023"]
 
 
 def test_the_course_prints_under_its_official_title():
@@ -1373,6 +1373,104 @@ def test_a_teaching_row_without_a_sentence_still_renders():
     site["teaching"] = {"courses": [{"title": "A course", "kind": "Teaching assistant", "when": "2026"}]}
     only = html_of("teaching/", site)
     assert "<h3>A course</h3>" in only and '<section id="students"' not in only
+
+
+# The three course sentences as the page prints them, each written from the course's public record -- the BGU
+# course catalogue's summary of it, or the syllabus the catalogue serves for the year he lists -- and cited,
+# URL and fetch date, in the comment over its row in site.yaml (controller decision C3 under owner ruling 18,
+# 2026-09-25; record kept privately; WP-S20). Until 2026-09-26 they were drafts written from each course's name.
+COURSE_SENTENCES = {
+    "Introduction to Computation and Cognition":
+        "Basic approaches in computational neuroscience and machine learning: artificial neural networks for "
+        "supervised, unsupervised and reinforcement learning, and Bayesian models of perception and "
+        "decision-making, with Python assignments.",
+    "Deep Learning for Neuroscience and Cognition":
+        "A theoretical and hands-on introduction to the main branches of modern deep learning, from convolutional "
+        "networks to transformers and generative models, and their applications in neuroscience and cognition.",
+    "Computational Approaches to Neuroimaging":
+        "Computational analysis of human functional magnetic resonance imaging (fMRI) data: the general linear "
+        "model, machine-learning decoding, representational similarity analysis and encoding models, including "
+        "artificial neural networks, applied in Python.",
+}
+CATALOGUE = "https://bgu4u.bgu.ac.il/pls/scwp/!app.ann?"
+
+
+def _course_rows_with_their_notes() -> list[dict]:
+    """The `courses` list of site.yaml read as text, because the citations are comments: each row with the
+    comment lines directly over it (`note`) and its own field lines (`fields`)."""
+    text = (build.ROOT / "site.yaml").read_text(encoding="utf-8")
+    block = text.partition("\nteaching:\n")[2].partition("\n  students:\n")[0]
+    rows, note = [], []
+    for line in block.splitlines():
+        if line.startswith("  - title: "):
+            rows.append({"title": line.partition(": ")[2], "note": " ".join(note), "fields": []})   # a comment wraps
+            note = []
+        elif line.lstrip().startswith("#"):
+            note.append(line.strip().lstrip("#").strip())
+        elif rows:
+            rows[-1]["fields"].append(line)
+    return rows
+
+
+def test_every_course_sentence_follows_a_cited_public_source():
+    """A course row's sentence says what the course teaches, in the words of the BGU course catalogue's
+    summary or of the syllabus the catalogue serves for the year he lists, and the comment over the row in
+    site.yaml cites the page, URL and fetch date, so a reader of the source can check every clause
+    (controller decision C3 under owner ruling 18, 2026-09-25; record kept privately; WP-S20). The three
+    sentences were drafts written from each course's name until 2026-09-26; the external reviews asked for
+    confirmed descriptions or none. Three guards: the sentences are pinned; a row that carries a sentence has
+    a catalogue citation with a fetch date in the comment directly over it; and no sentence claims a duty --
+    the rows carry no claim about what he does inside a course beyond the role in "kind", so no first person
+    and no verb of his own doing. The Academic Writing row has no public record and no sentence (the test
+    above). The neuroimaging row's semester is the catalogue's too -- its lecturer search lists the course
+    for spring 2024 -- printed as plain text in the gutter like "spring 2026", where the bare year the CV
+    register holds stood until 2026-09-26. fMRI is expanded at its first use, as every acronym on the site
+    is, and the sentence carries the expansion, not the intro or a heading."""
+    courses = SITE["teaching"]["courses"]
+    assert {c["title"]: c["what"] for c in courses if "what" in c} == COURSE_SENTENCES
+    for title, sentence in COURSE_SENTENCES.items():
+        assert not re.search(r"\b(?:I|my|me|we|our|led|taught|teach|ran|wrote|graded|helped)\b", sentence), title
+        assert sentence.count("(") == sentence.count(")") == (1 if "fMRI" in sentence else 0) and sentence.endswith("."), title
+        assert "in preparation" not in sentence and "ongoing" not in sentence
+    rows = _course_rows_with_their_notes()
+    assert [r["title"] for r in rows] == [c["title"] for c in courses]
+    for row in rows:
+        if any(f.startswith("    what: ") for f in row["fields"]):
+            assert CATALOGUE in row["note"] and "fetched 2026-09-25" in row["note"], row["title"]
+        else:
+            assert row["title"] == "Academic Writing", row["title"]                    # the one row with no public record
+    neuroimaging = courses[[c["title"] for c in courses].index("Computational Approaches to Neuroimaging")]
+    assert neuroimaging["when"] == "spring 2024" and isinstance(neuroimaging["when"], str)
+    html = html_of("teaching/")
+    assert '<p class="when">spring 2024</p>' in html and 'datetime="2024"' not in html
+    text = _visible_text(html)
+    assert "functional magnetic resonance imaging (fMRI)" in text and text.count("fMRI") == 1
+    for sentence in COURSE_SENTENCES.values():
+        assert sentence.replace(" ", " ") in text, sentence[:40]
+        assert sentence in html                                    # the ties reach the page as U+00A0, untouched
+    # one tie: the neuroimaging sentence keeps "in Python." whole, so its last line is never one word (the Now
+    # line's rule). The other two last pairs, and "imaging (fMRI)", are NOT tied: each is wider than a 320px
+    # phone column at 200% text, so a tie there broke inside a word (the branch's rule for ties, review of
+    # WP-S19; measured 320-1440 at 16px and 32px root, WP-S20 -- the note over the course rows has the widths)
+    assert [sentence.count(" ") for sentence in COURSE_SENTENCES.values()] == [0, 0, 1]
+
+
+def test_the_teaching_intro_says_what_he_helps_people_learn_and_keeps_the_tutoring_in_the_past():
+    """The page's one question is what does he help people learn (external review 3's page-promise rule,
+    controller decision C1 under owner ruling 18, 2026-09-25; record kept privately; WP-S20), so the intro
+    names the subject the courses share -- "most of them", because the Academic Writing row is the
+    exception -- and keeps the mentoring and the tutoring in the past tense: the tutoring ended in 2023 and
+    the mentoring is dated 2025-2026, so no present-tense claim is made about either. The description
+    follows the intro in the third person."""
+    entry = page("teaching/")
+    intro = ("Courses I help teach at Ben-Gurion University of the Negev, most of them on studying minds and "
+             "brains with computational models, and the students I have mentored and tutored.")   # the last pair whole
+    assert entry["intro"] == intro
+    assert entry["description"] == intro.replace("I help teach", "Itamar Avitan helps teach").replace("I have", "he has")
+    assert "have mentored and tutored" in intro and not re.search(r"\b(?:I tutor|I mentor|tutoring|mentoring)\b", intro)
+    assert "computation and cognition" not in intro.lower()                               # the title's count is the row's, the label's and About's
+    html = html_of("teaching/")
+    assert f'<p class="page-intro inset">{intro.replace("Ben-Gurion", "<span class=\"nb\">Ben-Gurion</span>")}</p>' in html
 
 
 # The four source lines as the page prints them, character for character (the ties are U+00A0): the one-string
