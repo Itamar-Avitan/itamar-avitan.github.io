@@ -2309,12 +2309,16 @@ def test_the_published_cv_is_the_public_build_and_obeys_the_programme_ruling():
     detail from the CVs; if the published PDF still held them, the site would contradict its own project
     entry from its own navigation bar. It is the public build (no phone number) of the cv repository.
     Since 2026-09-25 (rulings 4, 7 and 8) one role clause per project is printed again -- "Led system
-    integration." and "Worked on data collection ..." -- so "system integration" left the list below; the
-    assertion that the PDF carries those clauses is added by the commit that republishes it (WP-C8's
-    publish), because until then the served file is the older build.
+    integration." and "Worked on data collection ..." -- so "system integration" left the list below, and
+    the republish after the second polish pass (2026-09-26) asserts both clauses. The same republish pins
+    what else the public copy now says where the site says it too: EarBetter by its purpose, "designed to
+    filter" (owner ruling 15, 2026-09-25; the older "that filters" is gone), the course under its official
+    title (owner ruling 19, 2026-09-26), and no References section -- a public document offering referees
+    to anyone states nothing (controller decision under owner ruling 18, 2026-09-25; the two application
+    CVs keep "Available on request", owner ruling 2).
 
-    This checks what the file says, not how fresh it is: a cv.pdf ten commits stale would pass every line
-    below, because none of these phrases would have moved. Freshness is guarded where the drift is caused
+    This checks what the file says, not how fresh it is: a file older than that republish fails here, but
+    one a few commits stale would pass every line below. Freshness is guarded where the drift is caused
     and where both sides can be built -- `make check-published` in the cv repository, which is part of its
     `make test`. Do not turn this into an agreement check against site.yaml: it would need an allow-list
     covering nearly half the claims and would still miss the drift that guard catches."""
@@ -2324,10 +2328,16 @@ def test_the_published_cv_is_the_public_build_and_obeys_the_programme_ruling():
     assert out.returncode == 0, "pdftotext is needed to check the published CV; install poppler"
     text = " ".join(out.stdout.split())
     for gone in ("control software", "Muse headband", "heart-rate variability",
-                 "skin conductance", "go-to-market", "business plan", "selective audio attenuation"):
+                 "skin conductance", "go-to-market", "business plan", "selective audio attenuation",
+                 "that filters", "Cognition and Computation"):
         assert gone not in text, gone
     assert "Embodied Brain Technology Practicum" in text and "EarBetter" in text
     assert "biosignal-driven add-on for any headphones" in text
+    assert "designed to filter the sounds which trigger anxiety. Led system integration." in text
+    assert "Worked on data collection, signal processing" in text
+    assert "real-time prediction on OpenBCI hardware" in text
+    assert "Introduction to Computation and Cognition" in text
+    assert "references" not in text.lower() and "available on request" not in text.lower()
     assert not re.search(r"(?:\+?972|\b0)[\s\-.]?5\d(?:[\s\-.]?\d){7}\b", text)   # the public build
 
 def test_the_accessibility_page_tells_the_truth_about_where_the_address_is():
