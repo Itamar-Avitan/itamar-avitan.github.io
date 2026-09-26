@@ -216,12 +216,18 @@ about:
 # DRAFT, as above. Short enough to keep true: rewrite it whenever it stops being what you are doing.
 # Two lines since 2026-09-25 (WP-S1). Line 1 repeats the lede's question on purpose: it is the interim until
 # the owner says what may be said about the current work (Q-H). The mentoring line went because MENT-YEARS is
-# 2025-2026 by his own account, so it is not "now"; the teaching-assistant line went because no source records
-# a 2026/27 assistantship (Q-G). The writing course stays: it is the one forthcoming thing he has dated.
+# 2025-2026 by his own account, so it is not "now". Line 2 is his teaching in 2026/27, said once: he is the
+# teaching assistant for Introduction to Computation and Cognition again that year (owner ruling 11,
+# 2026-09-25; the fourth year on the course row under `teaching`) and, from the same year, for Academic
+# Writing (owner ruling 13, 2026-09-25: the course's title and his role; record kept privately -- the CV
+# register, FACTS TEACH-TA-MAIN and TEACH-WRITING). Until those rulings the line said only "helping teach an
+# academic writing course", because no source recorded the 2026/27 assistantship or the course's title
+# (WP-S12). One line for both facts, not two: the site says nothing twice, and the teaching page carries
+# each course as a row of its own. The course title is printed in its official order (ruling 19).
 now_as_of: Sep 2026
 now:
 - 'Carrying the NeurIPS 2025 work forward: can an alignment measure identify the right model of human vision, or only the best-fitting one?'
-- From 2026/27, helping teach an academic writing course.
+- Teaching assistant again for Introduction to Computation and Cognition, and from 2026/27 for Academic Writing.
 
 # The front door has to hand a visitor on. Added 2026-09-21: the home page named the commonplace, the teaching
 # and the NeurIPS paper without a way to reach any of them, so the only route into the site was the navigation
@@ -255,9 +261,10 @@ elsewhere:
   label: When the Best-Fitting Model Isn’t the Right One
   url: research/
   text: the paper with its code and data, the talks and posters around it, and two things I built with other people.
-# The label is the course he has helped teach longest (three academic years). The Teaching row names no count
-# on purpose: the course list changes with his answers on the writing course and the 2026/27 assistantship
-# (Q-G), and a stale number in a teaser is worse than none (external review 2). The Commonplace row's "four"
+# The label is the course he has helped teach longest (three academic years, and 2026/27 the fourth: owner
+# ruling 11, 2026-09-25). The Teaching row names no count on purpose: the course list has changed with his
+# answers (the writing course's title and the 2026/27 assistantship, rulings 11 and 13) and may again, and a
+# stale number in a teaser is worse than none (external review 2). The Commonplace row's "four"
 # is a count the tests already pin to len(quotes): tests/test_build.py asserts the word and the length side
 # by side, so the two move together.
 - page: Teaching
@@ -729,13 +736,13 @@ quotes:
 # ORDER: newest first, like every list on the site (deep review 2026-09-25, FL-08). Courses was the one list
 # on the site that ran the other way, so the gutter changed direction between it and Students; it now reads
 # one direction down the whole page, and the CV prints the courses in the same order.
-#   title  the course, or the students -- or, for the one course whose registrar title is not printed yet, a
-#          description of it (see the note over that row).
+#   title  the course, or the students. Every course is under its own title now; the writing course was
+#          described, not titled, until the owner gave its title (see the note over that row).
 #   kind   what he is in it: a tag in the gutter, under the dates -- the same label a talk carries, set as a
 #          small uppercase mono label rather than an outlined box (deep review 2026-09-25, DS-03: six
 #          identical boxes were the loudest thing in this page's gutter).
-#          A role noun in every row (Teaching assistant, Teaching team, Mentor, Tutor): a gerund there read as
-#          an activity, and "Joining" read as attending (deep review 2026-09-25, CS-17).
+#          A role noun in every row (Teaching assistant, Mentor, Tutor): a gerund there read as an activity,
+#          and "Joining" read as attending (deep review 2026-09-25, CS-17).
 #   when   the years. Lifted into the gutter and ticked on the margin rule like every other date on the site.
 #   what   Under Courses: DRAFT. One sentence on what the course is about, written from the course's own name
 #          and from what this site already says; the rows carry no claim about his duties beyond the role in
@@ -745,28 +752,34 @@ quotes:
 #          and TEACH-TUTOR), which cv.pdf already prints; this page was the one place that said less.
 teaching:
   courses:
-  # DESCRIBED, NOT TITLED, until the title is printed. The course's own title is recorded nowhere on the site
-  # or in the register (FACTS TEACH-WRITING, "title unconfirmed"), so the row says what the course is rather
-  # than setting a stand-in in the title slot beside three real titles, and it carries no sentence: a line
-  # about the content of a course nobody has named would be the one claim on the site with no source (deep
-  # review 2026-09-25, AK-03 and CS-17). Owner ruling 13 of 2026-09-25 has since given the title ("Academic
-  # Writing") and the role (teaching assistant, from 2026/27); printing them is WP-S12, with the CV line in
-  # WP-C13, and this row waits for that package rather than pre-empting it.
-  # Teaching team: the course is under his teaching appointment (spec §8, source E), which is all that is
-  # recorded here, and the tag claims no more than the Now line's "helping teach"; the exact role is his to
-  # give, and the ruling above gives it -- WP-S12 prints it.
-  - title: An academic writing course
-    kind: Teaching team
+  # The title and the role are the owner's (owner ruling 13, 2026-09-25: "Academic Writing", teaching
+  # assistant, from 2026/27; record kept privately -- the CV register, FACTS TEACH-WRITING, and the CV's own
+  # teaching line). Until that ruling the row was described, not titled ("An academic writing course", tag
+  # "Teaching team"), because no source recorded the course's title or his exact role in it, and a stand-in
+  # title beside three real titles would have been the one unsourced name on the page (deep review
+  # 2026-09-25, AK-03 and CS-17; printed under its title by WP-S12).
+  # NO SENTENCE under this title, on purpose: nothing on record says what the course covers or what he does
+  # in it beyond the role in "kind", and no public source ties him to a particular course of that name that
+  # could be cited (deep review course research, 2026-09-25). A line written from the title alone would be
+  # the one claim on this page with no source. The row is also the real row that proves a course renders
+  # without a sentence (tests/test_build.py).
+  - title: Academic Writing
+    kind: Teaching assistant
     when: from 2026/27
   # The title is the course's official English title in the BGU course catalogue, "Introduction to
   # Computation and Cognition" (owner ruling 19, 2026-09-26, superseding the word order ruled on 2026-09-21;
   # record kept privately -- the CV register, FACTS TEACH-TA-MAIN, holds the catalogue URL and the history).
-  # It is printed in this order everywhere: here, as the Elsewhere Teaching label on the home page, and in
-  # lower case in the About paragraph on his teaching. tests/test_build.py pins the three and refuses the
-  # old order in the visible text of every page.
+  # It is printed in this order everywhere: here, as the Elsewhere Teaching label on the home page, in the
+  # Now line on his 2026/27 teaching, and in lower case in the About paragraph on his teaching.
+  # tests/test_build.py pins the four and refuses the old order in the visible text of every page.
+  # The fourth year, 2026/27, is the owner's (owner ruling 11, 2026-09-25; record kept privately -- FACTS
+  # TEACH-TA-MAIN); the first three are the register's. Listed in full rather than as a range because the
+  # list is short enough to read and a range would hide a gap if one ever opens. The date is the longest in
+  # any gutter on the site: on phones its label drops under it (style.css, the phone block's note on the
+  # hung middle dot), which tests/test_browser.py checks.
   - title: Introduction to Computation and Cognition
     kind: Teaching assistant
-    when: 2023/24, 2024/25 and 2025/26
+    when: 2023/24, 2024/25, 2025/26 and 2026/27
     what: 'An introduction to treating a mind as something that computes: the questions cognitive science asks, and the models built to answer them.'
   - title: Deep Learning for Neuroscience and Cognition
     kind: Teaching assistant

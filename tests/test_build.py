@@ -1023,60 +1023,77 @@ def test_teaching_is_two_sections_and_every_row_is_dated_and_titled():
     assert rows == len(SITE["teaching"]["courses"]) + len(SITE["teaching"]["students"])
     for entry in SITE["teaching"]["courses"] + SITE["teaching"]["students"]:
         assert f'<span class="tag">{entry["kind"]}</span>' in html, entry["title"]
-    assert '<p class="when">2023/24, 2024/25 and 2025/26</p>' in html          # not a date the page can read
+    assert '<p class="when">2023/24, 2024/25, 2025/26 and 2026/27</p>' in html   # not a date the page can read
     assert '<p class="when"><time datetime="2021">2021</time>–<time datetime="2023">2023</time></p>' in html
     assert '<h3>Two undergraduate research students</h3>' in html              # its own row, not a line in a list
 
 
 def test_the_teaching_page_carries_the_course_home_announces():
-    """This page is the authority on his teaching, and it did not list the academic writing course that "now"
-    on the home page announces for 2026/27. The course is described, not titled: its title is not printed
-    yet (deep review 2026-09-25, AK-03 and CS-17; WP-S12 prints the one ruling 13 gave), and the list runs
-    newest first like every list on the site (FL-08): it was the one list that ran the other way, so the
-    gutter changed direction between Courses and Students. The order is the CV's."""
+    """This page is the authority on his teaching, and it once did not list the writing course that "now" on
+    the home page announces for 2026/27. The course is printed under its own title and his role in it,
+    "Academic Writing", teaching assistant, from 2026/27 (owner ruling 13, 2026-09-25; record kept privately --
+    the CV register, FACTS TEACH-WRITING); until that ruling it was described, not titled (deep review
+    2026-09-25, AK-03 and CS-17; WP-S12). The same year he is the teaching assistant for Introduction to
+    Computation and Cognition again (owner ruling 11, 2026-09-25), so that row's date gains 2026/27 and the
+    Now line says both, once. The list runs newest first like every list on the site (FL-08): it was the one
+    list that ran the other way, so the gutter changed direction between Courses and Students. The order is
+    the CV's."""
     courses = SITE["teaching"]["courses"]
-    writing = next(c for c in courses if "writing" in c["title"].lower())
-    assert writing["when"] == "from 2026/27" and "2026/27" in SITE["now"][1]
-    assert "academic writing course" in SITE["now"][-1]
-    assert writing["title"] in _visible_text(html_of("teaching/"))
-    assert "what" not in writing and writing["kind"] == "Teaching team"      # a description, and no invented sentence
-    assert [c["title"] for c in courses] == ["An academic writing course", "Introduction to Computation and Cognition",
-                                             "Deep Learning for Neuroscience and Cognition",
-                                             "Computational Approaches to Neuroimaging"]
+    titles = [c["title"] for c in courses]
+    assert "Academic Writing" in titles
+    writing = courses[titles.index("Academic Writing")]
+    assert writing["when"] == "from 2026/27" and writing["kind"] == "Teaching assistant"
+    assert "what" not in writing                                             # no invented sentence under the title
+    assert "Academic Writing" in _visible_text(html_of("teaching/"))
+    assert titles == ["Academic Writing", "Introduction to Computation and Cognition",
+                      "Deep Learning for Neuroscience and Cognition", "Computational Approaches to Neuroimaging"]
+    # the fourth year on the course he has helped teach longest, listed in full, not as a range
+    assert courses[1]["when"] == "2023/24, 2024/25, 2025/26 and 2026/27"
+    # Now says the 2026/27 teaching in one line: the course again, and the writing course from that year.
+    # Neither fact appears in a second Now line, and the writing course is named by its title, not described.
+    teaching_lines = [line for line in SITE["now"] if "Teaching assistant" in line or "2026/27" in line]
+    assert teaching_lines == [SITE["now"][-1]]
+    assert SITE["now"][-1] == ("Teaching assistant again for Introduction to Computation and Cognition, "
+                               "and from 2026/27 for Academic Writing.")
+    assert not any("writing course" in line for line in SITE["now"])
     # the gutter reads one direction down the whole page: the years of the six rows, in page order
     html = html_of("teaching/")
     whens = re.findall(r'<p class="when">(.*?)</p>', html)
-    assert [_visible_text(w) for w in whens] == ["from 2026/27", "2023/24, 2024/25 and 2025/26", "spring 2026", "2024",
-                                                 "2025–2026", "2021–2023"]
+    assert [_visible_text(w) for w in whens] == ["from 2026/27", "2023/24, 2024/25, 2025/26 and 2026/27", "spring 2026",
+                                                 "2024", "2025–2026", "2021–2023"]
 
 
 def test_the_course_prints_under_its_official_title():
     """The course's English title in the BGU course catalogue is "Introduction to Computation and Cognition",
     and the site and the six CVs print it in that order (owner ruling 19, 2026-09-26, superseding the word
     order ruled on 2026-09-21; WP-X1; record kept privately -- the CV register, FACTS TEACH-TA-MAIN, holds the
-    catalogue URL and the history). The title stands in three places: the course row on the teaching page,
-    the Elsewhere Teaching label on the home page and, in lower case, the About paragraph on his teaching.
-    The old order must not come back in any of them in either case, so the refusal is case-insensitive and
-    runs over the visible text of every page and over every content string in site.yaml: a lower-case
-    mention is caught with a title. The CV repository pins the same title in its own checks."""
+    catalogue URL and the history). The title stands in four places: the course row on the teaching page,
+    the Elsewhere Teaching label on the home page, the Now line on his 2026/27 teaching (WP-S12, owner
+    ruling 11) and, in lower case, the About paragraph on his teaching. The old order must not come back in
+    any of them in either case, so the refusal is case-insensitive and runs over the visible text of every
+    page and over every content string in site.yaml: a lower-case mention is caught with a title. The CV
+    repository pins the same title in its own checks."""
     official = "Introduction to Computation and Cognition"
     titles = [c["title"] for c in SITE["teaching"]["courses"]]
     assert official in titles
     assert SITE["teaching"]["courses"][titles.index(official)]["kind"] == "Teaching assistant"
     assert [r["label"] for r in SITE["elsewhere"] if r["page"] == "Teaching"] == [official]
     assert sum("computation and cognition" in p for p in SITE["about"]) == 1
+    assert sum(official in line for line in SITE["now"]) == 1
     assert official in _visible_text(html_of("teaching/")) and official in _visible_text(html_of(""))
     everywhere = " ".join(_visible_text(h) for h in every_page().values()).lower()
-    assert everywhere.count("computation and cognition") == 3            # the row, the label, the About mention
+    assert everywhere.count("computation and cognition") == 4            # the row, the label, the Now line, the About mention
     assert "cognition and computation" not in everywhere
     assert not any("cognition and computation" in s.lower() for s in _values(SITE))
 
 
 def test_a_teaching_row_without_a_sentence_still_renders():
     """The rows under "Students" carry the register's own sentence under the title (the mentoring topics and
-    the tutoring subjects, which cv.pdf already prints); the one row with nothing under its title is now the
-    writing course under "Courses", so the no-sentence path is still exercised by a real row (deep review
-    2026-09-25, AC-12 and CS-17). The synthetic site below proves it on its own as well."""
+    the tutoring subjects, which cv.pdf already prints); the one row with nothing under its title is the
+    Academic Writing row under "Courses" -- nothing on record says what the course covers, so no sentence is
+    written for it (deep review 2026-09-25, AC-12 and CS-17; the title is owner ruling 13's, WP-S12) -- and
+    the no-sentence path is still exercised by a real row. The synthetic site below proves it on its own as
+    well."""
     html = html_of("teaching/")
     students = html.partition('<section id="students"')[2].partition("</section>")[0]
     assert students.count("<h3>") == 2 and students.count("<p>") == 2
@@ -1085,8 +1102,9 @@ def test_a_teaching_row_without_a_sentence_still_renders():
     assert "<p>Calculus, linear algebra and statistics.</p>" in students
     assert "statistical modeling of neural spiking data" in students                   # US spelling, FACTS TEACH-MENT-DESC
     courses = html.partition('<section id="courses"')[2].partition("</section>")[0]
-    writing = re.search(r'<li class="row">(?:(?!</li>).)*An academic writing course(?:(?!</li>).)*</li>', courses, re.S).group(0)
-    assert "<h3>An academic writing course</h3>" in writing and "<p>" not in writing
+    writing = re.search(r'<li class="row">(?:(?!</li>).)*<h3>Academic Writing</h3>(?:(?!</li>).)*</li>', courses, re.S).group(0)
+    assert "<h3>Academic Writing</h3>" in writing and "<p>" not in writing
+    assert '<span class="tag">Teaching assistant</span>' in writing
     assert 'log--tight' not in html                          # both lists take the ordinary step: every row may carry a sentence
     site = copy.deepcopy(SITE)
     site["teaching"] = {"courses": [{"title": "A course", "kind": "Teaching assistant", "when": "2026"}]}

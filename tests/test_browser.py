@@ -909,3 +909,50 @@ def test_real_time_stays_on_one_line_on_the_bci4als_row(browser, width):
     rects = page.evaluate("""() => { const s = [...document.querySelectorAll('span.nb')].find(s => s.textContent === 'real-time');
                                    return s ? s.getClientRects().length : 0; }""")
     assert rects == 1, (width, rects)
+
+
+# Every kind row on a phone: the date's box, the label's box, and where the label's first glyph is.
+KIND_PAIRS_JS = r"""
+() => [...document.querySelectorAll('.log--kind .row')].map(row => {
+  const when = row.querySelector('.when'), kind = row.querySelector('.kind'), tag = row.querySelector('.kind .tag');
+  const text = [...tag.childNodes].find(n => n.nodeType === 3 && n.data.trim());
+  const r = document.createRange(); r.setStart(text, 0); r.setEnd(text, 1);
+  const glyph = r.getBoundingClientRect(), date = when.getBoundingClientRect(), box = kind.getBoundingClientRect();
+  return {date: when.textContent.trim(), label: tag.textContent.trim(),
+          rem: parseFloat(getComputedStyle(document.documentElement).fontSize),
+          dot: getComputedStyle(tag, '::before').content,
+          glyphLeft: glyph.left, glyphTop: glyph.top, dateRight: date.right, dateBottom: date.bottom, boxLeft: box.left};
+})
+"""
+
+
+@pytest.mark.parametrize("text", [16, 32])
+@pytest.mark.parametrize("width", [320, 390, 430, 480])
+@pytest.mark.parametrize("slug", ["teaching/", "research/"])
+def test_the_hung_dot_never_opens_a_kind_label_that_drops_under_its_date(browser, slug, width, text):
+    """On a phone the kind label follows its date on one line, "Spring 2026 · TEACHING ASSISTANT", and the
+    middle dot between them is hung in the date's right margin rather than typed into the label (style.css,
+    the phone block). When the date is too long for the label to sit beside it, the label drops a line, and
+    the dot has to go with the pair, not with the label: a line that opened "· TEACHING ASSISTANT" was the
+    regression the review of WP-S7 caught. The course he has helped teach longest carries four academic
+    years since WP-S12 (owner ruling 11, 2026-09-25), the longest date in any gutter, and its label drops
+    under it at every phone width up to 480px, so this now happens on every phone. Each pair therefore has
+    to be one of two things: the label beside its date, 1.25rem to the right of it with the dot in that gap;
+    or the label on a line of its own, opening on a letter at the left edge of its own box, the dot's block
+    clipped away outside it. Both pages with kind rows, at the default text size and at 200%."""
+    page, _, _ = _page(browser, width, slug=slug)
+    page.evaluate(f"document.documentElement.style.fontSize = '{text}px'")
+    page.wait_for_timeout(50)
+    pairs = page.evaluate(KIND_PAIRS_JS)
+    assert pairs, slug
+    dropped = []
+    for p in pairs:
+        where = (slug, width, text, p["date"], p["label"])
+        assert "·" in p["dot"], where                                      # the dot is the label's ::before, still
+        if p["glyphTop"] >= p["dateBottom"] - 1:                           # the label dropped under its date
+            dropped.append(p["date"])
+            assert abs(p["glyphLeft"] - p["boxLeft"]) < 0.5, where         # opens at its box's edge: the dot is clipped
+        else:
+            assert abs(p["glyphLeft"] - p["dateRight"] - 1.25 * p["rem"]) < 0.5, where   # beside the date, the dot between
+    if slug == "teaching/":
+        assert "2023/24, 2024/25, 2025/26 and 2026/27" in dropped, (width, text)    # the case this test exists for

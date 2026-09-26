@@ -986,12 +986,13 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   /* The kind follows its date on one line here ("14–15 Sep 2026 · FLASH TALK"). The middle dot between them is
      hung, not typed: the date keeps a 1.25rem margin on its right, and the label opens with an inline block of
      that width pulled back by its own width, the dot centred in it. Beside the date the block fills the gap.
-     When a long date sends the label down a line ("2023/24, 2024/25 and 2025/26" over TEACHING ASSISTANT at
-     every phone width; the CCN kind at 320) the block lands outside the gutter's left edge and overflow-x:
-     clip cuts it off, so the label opens its line with a letter, not a dot. Clip, not hidden: hidden would
-     open a new formatting context and push the whole label out from beside the floated date. The label's line
-     box matches the date's; 13px and 11px text in two 1.5rem lines still put the two baselines 1px apart, and
-     vertical-align takes that up. */
+     When a long date sends the label down a line ("2023/24, 2024/25, 2025/26 and 2026/27" over TEACHING
+     ASSISTANT at every phone width; the CCN kind at 320) the block lands outside the gutter's left edge and
+     overflow-x: clip cuts it off, so the label opens its line with a letter, not a dot. Clip, not hidden:
+     hidden would open a new formatting context and push the whole label out from beside the floated date.
+     The label's line box matches the date's; 13px and 11px text in two 1.5rem lines still put the two
+     baselines 1px apart, and vertical-align takes that up. tests/test_browser.py checks the pair on every
+     kind row on phones: the label shares its date's line, or it opens on a letter at the gutter's edge. */
   .log--kind .when { margin-right: 1.25rem; }
   .log--kind .kind { line-height: 1.5rem; overflow-x: clip; }
   .log--kind .kind .tag { vertical-align: 1px; }
