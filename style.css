@@ -992,7 +992,8 @@ main.opens-with-h1 { margin-top: 2.25rem; }
      hidden would open a new formatting context and push the whole label out from beside the floated date.
      The label's line box matches the date's; 13px and 11px text in two 1.5rem lines still put the two
      baselines 1px apart, and vertical-align takes that up. tests/test_browser.py checks the pair on every
-     kind row on phones: the label shares its date's line, or it opens on a letter at the gutter's edge. */
+     kind row on phones: the label shares its date's line, or it opens on a letter at the gutter's edge with
+     its box set to clip and, read from the pixels, no dot painted in the gutter beside that line. */
   .log--kind .when { margin-right: 1.25rem; }
   .log--kind .kind { line-height: 1.5rem; overflow-x: clip; }
   .log--kind .kind .tag { vertical-align: 1px; }

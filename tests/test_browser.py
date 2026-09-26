@@ -1,6 +1,7 @@
 import copy
 import http.server
 import io
+import math
 import re
 import subprocess
 import sys
@@ -9,6 +10,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+from PIL import Image
 from playwright.sync_api import sync_playwright
 
 try:
@@ -911,19 +913,30 @@ def test_real_time_stays_on_one_line_on_the_bci4als_row(browser, width):
     assert rects == 1, (width, rects)
 
 
-# Every kind row on a phone: the date's box, the label's box, and where the label's first glyph is.
+# Every kind row on a phone: the date's box, the label's box and whether it clips sideways, where the label's
+# first glyph is, and the gutter's inner edge (the right side of the spine), which bounds the strip of paper the
+# dot's pulled-back block lands in when the label has dropped under its date. Page coordinates.
 KIND_PAIRS_JS = r"""
 () => [...document.querySelectorAll('.log--kind .row')].map(row => {
   const when = row.querySelector('.when'), kind = row.querySelector('.kind'), tag = row.querySelector('.kind .tag');
+  const log = row.closest('.log'), y = window.scrollY;
   const text = [...tag.childNodes].find(n => n.nodeType === 3 && n.data.trim());
   const r = document.createRange(); r.setStart(text, 0); r.setEnd(text, 1);
   const glyph = r.getBoundingClientRect(), date = when.getBoundingClientRect(), box = kind.getBoundingClientRect();
   return {date: when.textContent.trim(), label: tag.textContent.trim(),
           rem: parseFloat(getComputedStyle(document.documentElement).fontSize),
-          dot: getComputedStyle(tag, '::before').content,
-          glyphLeft: glyph.left, glyphTop: glyph.top, dateRight: date.right, dateBottom: date.bottom, boxLeft: box.left};
+          dot: getComputedStyle(tag, '::before').content, clip: getComputedStyle(kind).overflowX,
+          glyphLeft: glyph.left, glyphTop: glyph.top + y, glyphBottom: glyph.bottom + y,
+          dateRight: date.right, dateBottom: date.bottom + y, boxLeft: box.left,
+          gutterLeft: log.getBoundingClientRect().left + parseFloat(getComputedStyle(log).borderLeftWidth)};
 })
 """
+
+
+def _colours(page, x0, y0, x1, y1):
+    """The distinct colours painted inside a rectangle of the page (page coordinates, shrunk to whole pixels)."""
+    clip = {"x": math.ceil(x0), "y": math.ceil(y0), "width": math.floor(x1) - math.ceil(x0), "height": math.floor(y1) - math.ceil(y0)}
+    return set(Image.open(io.BytesIO(page.screenshot(clip=clip, full_page=True))).convert("RGB").getdata())
 
 
 @pytest.mark.parametrize("text", [16, 32])
@@ -938,8 +951,12 @@ def test_the_hung_dot_never_opens_a_kind_label_that_drops_under_its_date(browser
     years since WP-S12 (owner ruling 11, 2026-09-25), the longest date in any gutter, and its label drops
     under it at every phone width up to 480px, so this now happens on every phone. Each pair therefore has
     to be one of two things: the label beside its date, 1.25rem to the right of it with the dot in that gap;
-    or the label on a line of its own, opening on a letter at the left edge of its own box, the dot's block
-    clipped away outside it. Both pages with kind rows, at the default text size and at 200%."""
+    or the label on a line of its own, opening on a letter at the left edge of its own box, with the box set
+    to clip what overflows it sideways (clip by name: hidden would push the label out from beside the floated
+    date) and the strip of gutter beside that line, where the dot's block lands, bare paper. The strip is
+    read from the pixels, because the letter opens at the box's edge whether or not the block is cut off:
+    with the clip removed the label still measured in place and the dot was painted in the gutter (review of
+    WP-S12). Both pages with kind rows, at the default text size and at 200%."""
     page, _, _ = _page(browser, width, slug=slug)
     page.evaluate(f"document.documentElement.style.fontSize = '{text}px'")
     page.wait_for_timeout(50)
@@ -951,7 +968,10 @@ def test_the_hung_dot_never_opens_a_kind_label_that_drops_under_its_date(browser
         assert "·" in p["dot"], where                                      # the dot is the label's ::before, still
         if p["glyphTop"] >= p["dateBottom"] - 1:                           # the label dropped under its date
             dropped.append(p["date"])
-            assert abs(p["glyphLeft"] - p["boxLeft"]) < 0.5, where         # opens at its box's edge: the dot is clipped
+            assert abs(p["glyphLeft"] - p["boxLeft"]) < 0.5, where         # opens at its box's edge
+            assert p["clip"] == "clip", where                              # which cuts the dot's block off, without a new formatting context
+            paper = _colours(page, p["gutterLeft"] + 1, p["glyphTop"] + 1, p["boxLeft"] - 1, p["glyphBottom"] - 1)
+            assert len(paper) == 1, (where, paper)                         # and no dot is painted in the gutter beside the line
         else:
             assert abs(p["glyphLeft"] - p["dateRight"] - 1.25 * p["rem"]) < 0.5, where   # beside the date, the dot between
     if slug == "teaching/":

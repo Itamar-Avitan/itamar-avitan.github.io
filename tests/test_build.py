@@ -1054,7 +1054,7 @@ def test_the_teaching_page_carries_the_course_home_announces():
     teaching_lines = [line for line in SITE["now"] if "Teaching assistant" in line or "2026/27" in line]
     assert teaching_lines == [SITE["now"][-1]]
     assert SITE["now"][-1] == ("Teaching assistant again for Introduction to Computation and Cognition, "
-                               "and from 2026/27 for Academic Writing.")
+                               "and from 2026/27 for Academic Writing.")     # the year tied to its preposition, the title whole
     assert not any("writing course" in line for line in SITE["now"])
     # the gutter reads one direction down the whole page: the years of the six rows, in page order
     html = html_of("teaching/")
@@ -1102,7 +1102,9 @@ def test_a_teaching_row_without_a_sentence_still_renders():
     assert "<p>Calculus, linear algebra and statistics.</p>" in students
     assert "statistical modeling of neural spiking data" in students                   # US spelling, FACTS TEACH-MENT-DESC
     courses = html.partition('<section id="courses"')[2].partition("</section>")[0]
-    writing = re.search(r'<li class="row">(?:(?!</li>).)*<h3>Academic Writing</h3>(?:(?!</li>).)*</li>', courses, re.S).group(0)
+    m = re.search(r'<li class="row">(?:(?!</li>).)*<h3>Academic Writing</h3>(?:(?!</li>).)*</li>', courses, re.S)
+    assert m, "Academic Writing row missing"
+    writing = m.group(0)
     assert "<h3>Academic Writing</h3>" in writing and "<p>" not in writing
     assert '<span class="tag">Teaching assistant</span>' in writing
     assert 'log--tight' not in html                          # both lists take the ordinary step: every row may carry a sentence

@@ -223,11 +223,14 @@ about:
 # register, FACTS TEACH-TA-MAIN and TEACH-WRITING). Until those rulings the line said only "helping teach an
 # academic writing course", because no source recorded the 2026/27 assistantship or the course's title
 # (WP-S12). One line for both facts, not two: the site says nothing twice, and the teaching page carries
-# each course as a row of its own. The course title is printed in its official order (ruling 19).
+# each course as a row of its own. The course title is printed in its official order (ruling 19). Two no-break
+# spaces: one ties "from" to its year, because at 320px the line opened on "2026/27" (review of WP-S12), and
+# one keeps the title's two words together, because tied at "from" alone the line ended on "Writing." by
+# itself -- the last pair is kept whole, as "wrong winner" is in the figure's caption.
 now_as_of: Sep 2026
 now:
 - 'Carrying the NeurIPS 2025 work forward: can an alignment measure identify the right model of human vision, or only the best-fitting one?'
-- Teaching assistant again for Introduction to Computation and Cognition, and from 2026/27 for Academic Writing.
+- Teaching assistant again for Introduction to Computation and Cognition, and from 2026/27 for Academic Writing.
 
 # The front door has to hand a visitor on. Added 2026-09-21: the home page named the commonplace, the teaching
 # and the NeurIPS paper without a way to reach any of them, so the only route into the site was the navigation
