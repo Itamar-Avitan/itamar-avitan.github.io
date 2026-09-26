@@ -673,12 +673,15 @@ def test_the_card_reads_as_an_argument_traced_to_the_paper():
     traces each to its section); this pins the facts a reader is given -- the twenty models, the 4.5 million
     judgments, the held-out test, the number with its chance baseline, the mechanism -- and the scope
     sentence's own words, which are what keep a non-specialist from hearing "linear probing is invalid" and
-    a specialist from hearing a claim about every flexible comparison. The number is printed once on the
-    card; the private number "12" nowhere on the page (the note over `projects`)."""
+    a specialist from hearing a claim about every flexible evaluation. The number is printed once on the
+    card; the private number "12" nowhere on the page (the note over `projects`). The strip's captions are
+    stage names, a short phrase each and no full stop (review of WP-S18): as sentences they said the
+    procedure a second time straight after Test. "4.5 million" is tied with a no-break space, since at
+    every laptop width from 1030 to 1440 the number stood at a line's end without its unit."""
     card, html = SITE["research"][0], html_of("research/")
     a = card["argument"]
     assert "linear probing" in a["question"] and "fits it best" in a["question"]
-    assert all(w in a["setup"] for w in ("20 vision models", "4.5 million", "odd-one-out", "THINGS", "calibrated"))
+    assert all(w in a["setup"] for w in ("20 vision models", "4.5\u00a0million", "odd-one-out", "THINGS", "calibrated"))
     assert "in turn" in a["test"] and "from scratch" in a["test"] and "held-out" in a["test"]
     assert all(w in a["result"] for w in ("below 80%", "one in twenty", "one time in five", "millions of simulated trials",
                                           "representational geometry"))
@@ -689,6 +692,8 @@ def test_the_card_reads_as_an_argument_traced_to_the_paper():
     text = _visible_text(html.partition('<article class="paper">')[2].partition("</article>")[0])
     assert text.count("80%") == 1 and "12" not in _visible_text(html)
     assert all(" ".join(step.split()) in text for step in card["how"]) and "networks" not in text.partition("Talks")[0]
+    assert all(len(step.split()) <= 8 and not step.endswith(".") for step in card["how"]), card["how"]   # names, not sentences
+    assert "generator" in card["how"][0] and "generator" in card["how"][3] and "in turn" not in " ".join(card["how"])
     assert "a brain" in card["open"][1] and "candidate\u00a0set?" in card["open"][1]    # the closed-set caveat, tied
     assert '<span class="nb">held-out</span>' in html                          # the hyphen never breaks
     # the strip illustrates Setup and Test: it stands between the Test block and the Result block
@@ -697,8 +702,9 @@ def test_the_card_reads_as_an_argument_traced_to_the_paper():
     # the intro frames the paper as one instance of the larger question (ADDENDUM Part 3 item 19, at the owner's
     # request of 2026-09-25; record kept privately): one sentence, an interest and not a plan
     intro = page("research/")["intro"]
-    assert "It is one instance of a larger question, how to compare models with minds so that competing ideas can be told apart." in intro
+    assert "It is one instance of a larger question: how to compare models with minds so that competing ideas can be told apart." in intro
     assert intro.count(". ") == 3 and "the world" not in intro and "images the way people do" in intro
+    assert "I\u00a0ask" in intro                                               # the "I" never ends a line
     assert not re.search(r"\b(will|plan|planning|developing|ongoing|next|preparation)\b", intro)
 
 
@@ -710,7 +716,12 @@ def test_the_links_are_grouped_by_what_a_reader_does_with_them():
     otherwise be drawn nowhere -- and a group key named twice. The label stands beside its first link when
     the card is wide enough for the widest label beside the widest link and above it when it is not (a 320px
     phone at 150% text or more): a container query on the card, because the failing case is the reader's
-    text size; tests/test_browser.py measures both. A row keeps whole on paper."""
+    text size; tests/test_browser.py measures both. The three rows lay their label and list into one pair
+    of columns (subgrid), so the first links of Read, Reproduce and Watch stand on one left edge (review of
+    WP-S18: three max-content columns gave three edges -- and the row's grid had never been in effect,
+    `.buttons li { display: flex }` outranking `.buttons__group`, so the selector is li.buttons__group); an
+    engine without subgrid gets the widest label's width as every label's minimum instead. A row keeps
+    whole on paper."""
     card, html = SITE["research"][0], html_of("research/")
     assert [u["key"] for u in card["uses"]] == ["read", "reproduce", "watch"]
     assert '<ul class="buttons buttons--grouped" role="list" aria-label="Resources">' in html
@@ -732,8 +743,10 @@ def test_the_links_are_grouped_by_what_a_reader_does_with_them():
     css = _css()
     assert re.search(r"\.paper \{[^}]*container-type: inline-size;", css)          # the card, for a phone
     assert ".paper__body { grid-column: 2; container-type: inline-size; }" in css   # the body column, from 45rem up
-    assert ".buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }" in css
-    assert "@container (min-width: 16rem) {\n  .buttons__group { grid-template-columns: max-content minmax(0, 1fr); }" in css
+    assert "li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }" in css   # outranks .buttons li
+    assert ("@container (min-width: 16rem) {\n  .buttons--grouped { grid-template-columns: max-content minmax(0, 1fr); column-gap: 0.75rem; }\n"
+            "  li.buttons__group { grid-column: 1 / -1; grid-template-columns: max-content minmax(0, 1fr); grid-template-columns: subgrid; }") in css
+    assert "@supports not (grid-template-columns: subgrid) {\n  @container (min-width: 16rem) { .buttons__use { min-width: 4.33rem; } }" in css
     assert ".buttons__group { break-inside: avoid; }" in css.partition("@media print {")[2]
 
 

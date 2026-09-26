@@ -29,7 +29,10 @@ COLOPHON = [page["colophon"] for page in SITE["pages"] if page.get("colophon")]
 # The CV chip's accessible name: the visible "CV" and then, hidden, what opens -- "CV (PDF, 2 pages)".
 CV_LINK = next(l for l in SITE["links"] if l["label"] == "CV")
 CV_NAME = f'{CV_LINK["label"]} ({CV_LINK["format"]})'
-WIDTHS = [320, 400, 768, 1280]                                   # 320px is the narrowest viewport supported
+WIDTHS = [320, 400, 720, 768, 1280]                              # 320px is the narrowest viewport supported
+# 720 is where the two-column layout begins (45rem). With the text at 200% the research card's strip ran
+# 4-19px past the viewport at 720-750px until the review of WP-S18 (2026-09-26), and the widths either side
+# of it never saw it; the suite looks there now.
 # The reader's own text size, as a root font size in px: 16 is the browser default, 32 is 200%. This axis is
 # here because it was missing -- the overflow test below only ever ran at the default size, and so it passed
 # on a site that ran 231px past a 320px viewport as soon as anyone enlarged the text. That is WCAG 1.4.4
@@ -461,7 +464,10 @@ def test_the_resource_rows_keep_their_label_with_their_first_link(browser, width
     same line at every width, and the list wraps inside its own cell, so a row never opens with a label and
     nothing after it. With the text at 200% the card is asked, not the viewport (a container query): where
     the widest label and the widest link no longer fit side by side, the label stands above its list, and
-    nothing runs past the card. Every link is a 24px target either way (WCAG 2.2 SC 2.5.8)."""
+    nothing runs past the card. Every link is a 24px target either way (WCAG 2.2 SC 2.5.8). The three
+    first links share one left edge at both text sizes: the rows lay label and list into one pair of
+    columns (subgrid), so the label column is as wide as "Reproduce" for all three (review of WP-S18,
+    2026-09-26: three separate grids gave "Paper", "Code" and "NeurIPS 2025 video" three edges)."""
     page, _, _ = _page(browser, width, slug="research/")
     rows_js = """() => [...document.querySelectorAll('.buttons__group')].map(g => {
       const l = g.querySelector('.buttons__use').getBoundingClientRect(), a = g.querySelector('a').getBoundingClientRect();
@@ -470,6 +476,9 @@ def test_the_resource_rows_keep_their_label_with_their_first_link(browser, width
     rows = page.evaluate(rows_js)
     assert [r["label"] for r in rows] == ["Read", "Reproduce", "Watch"] and all(r["beside"] for r in rows), rows
     assert rows[0]["top"] < rows[1]["top"] < rows[2]["top"]
+    edges_js = "() => [...document.querySelectorAll('.buttons__group')].map(g => g.querySelector('a').getBoundingClientRect().left)"
+    edges = page.evaluate(edges_js)
+    assert max(edges) - min(edges) <= 0.5, (width, 16, edges)                 # one left edge for the three rows
     links = page.evaluate(HIT_TEST_JS, ".buttons--grouped a")
     assert [l["label"].split(" ")[0] for l in links] == ["Paper", "arXiv", "Code", "Data", "NeurIPS", "CCN"]
     assert [l for l in links if l["height"] < 24 or l["width"] < 24 or not l["covered"]] == []
@@ -477,6 +486,8 @@ def test_the_resource_rows_keep_their_label_with_their_first_link(browser, width
     page.wait_for_timeout(50)
     rows = page.evaluate(rows_js)
     assert all(r["beside"] or r["above"] for r in rows), (width, rows)
+    edges = page.evaluate(edges_js)
+    assert max(edges) - min(edges) <= 0.5, (width, 32, edges)
     assert page.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0, width
     card = page.evaluate("""() => { const c = document.querySelector('.paper').getBoundingClientRect();
       return [...document.querySelectorAll('.buttons--grouped a')].every(a => a.getBoundingClientRect().right <= c.right + 0.5); }""")
@@ -646,7 +657,9 @@ def test_no_page_is_anywhere_near_as_long_as_the_old_single_page(browser, slug):
     (WP-S3, with the diagram and Figure 1D on the card): 3370px at 1280 and 4822px at 400; after WP-S18
     (the card as an argument, the links in three rows, one more sentence in the intro): 3545px at 1280 and
     5041px at 400 -- the closed-set caveat left the Scope block for the second open question and two
-    captions lost a line each to get there from 3626px."""
+    captions lost a line each to get there from 3626px; after the review of WP-S18 (the strip's captions
+    cut to stage names, so the procedure is stated once): 3498px at 1280 and 4925px at 400 (WebKit 3499
+    and 4969)."""
     for width, ceiling in CEILINGS.get(slug, DEFAULT_CEILINGS):
         page, _, _ = _page(browser, width, slug=slug)
         height = page.evaluate("document.documentElement.scrollHeight")

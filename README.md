@@ -133,11 +133,12 @@ directions. A test holds both.
 
 **The paper card reads as an argument** (controller decision C4 under the owner's delegation of 2026-09-25;
 record kept privately): five run-in blocks, `argument` in `site.yaml` — Question, Setup, Test, Result,
-Scope — with the owner's four-mark diagram under Test, captioned by the four stages in `how`, then the
+Scope — with the owner's four-mark diagram under Test, captioned by the four stages in `how` (stage names,
+not sentences: Test states the procedure once), then the
 paper's own open questions and the BibTeX behind an expander. Every clause of the five blocks is traced to
 its section of the paper in the note over `argument`; the Scope block is what keeps the result to the task,
 the model set, the noise calibration and the linear transformation family the paper evaluated, so that
-nobody reads it as a claim about every flexible comparison. The card's links stand in three rows by what a
+nobody reads it as a claim about every flexible evaluation. The card's links stand in three rows by what a
 reader does with them — Read (the paper, the preprint), Reproduce (code, data), Watch (the NeurIPS video and
 the CCN talk's recording) — `uses` names the rows and each button its row, and `build.py` refuses a button
 that names no row. The CCN recording's address is written once, on that button, and the CCN talk row refers

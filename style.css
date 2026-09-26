@@ -845,9 +845,12 @@ main.opens-with-h1 { margin-top: 2.25rem; }
    150% or more, or the ten-rem body column of a 720px window at 200% -- the label stands above its buttons,
    so nothing ever runs past the card. A container query, not a media query, because the failing case is the
    text size, which a media query cannot see; the container is the body column from 45rem up and the card
-   on a phone (see the note over .paper). */
+   on a phone (see the note over .paper). The label column is one column for the three rows: see below. */
 .buttons--grouped { display: grid; }   /* the rows' own padding is their air; a gap cost the page 8px it did not have */
-.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
+/* li.buttons__group, not .buttons__group: `.buttons li { display: flex }` above outranks a lone class, and
+   until the review of WP-S18 (2026-09-26) each row was that flex line -- the label beside its list because
+   a flex row puts it there, the grid below never in effect, the label column never sized. */
+li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
 .buttons__group .buttons { margin-top: 0; min-width: 0; }
 .buttons__use {
   padding-block: 0.5625rem;
@@ -856,8 +859,20 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   text-transform: uppercase;
   color: var(--muted);
 }
+/* The three rows share one label column, so their first links stand on one left edge (review of WP-S18,
+   2026-09-26: as three separate grids, each with its own max-content column, "Paper", "Code" and "NeurIPS
+   2025 video" started at three x positions at every width from 320 to 1440, a ragged edge that read as
+   unintended). The outer list holds the two columns and each row lays its label and list into them by
+   subgrid (Chromium 117, Safari 16, Firefox 71). An engine without subgrid keeps each row's own two
+   columns, the first declaration below, and gives the label the widest label's width as its minimum:
+   4.33rem is "Reproduce" at 0.75rem Fira Mono with its letter-spacing (69.13px at a 16px root, measured
+   in Chromium and WebKit) and a hair over, so the edge is one there too, and scales with the text. */
 @container (min-width: 16rem) {
-  .buttons__group { grid-template-columns: max-content minmax(0, 1fr); }
+  .buttons--grouped { grid-template-columns: max-content minmax(0, 1fr); column-gap: 0.75rem; }
+  li.buttons__group { grid-column: 1 / -1; grid-template-columns: max-content minmax(0, 1fr); grid-template-columns: subgrid; }
+}
+@supports not (grid-template-columns: subgrid) {
+  @container (min-width: 16rem) { .buttons__use { min-width: 4.33rem; } }
 }
 /* The diagram under the card's Test block (deep review 2026-09-25, WP-S3; under Test since WP-S18). A strip of four marks,
    each captioned by one stage with a visible counter: four columns of 8.5rem in the card body at laptop width

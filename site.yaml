@@ -75,8 +75,10 @@ pages:
   # bare noun "identifiability" here: its only definition on this site was the sentence that was cut, and the
   # plain verb needs no setup. The space before the em dash is a no-break space (U+00A0), as in the identity
   # line and the commonplace intro: measured with the third sentence in, the dash opened a line at 330-550px
-  # in Chromium and 360-410px in WebKit.
-  intro: Neural networks can predict human visual judgments, such as which of three images is the odd one out. I ask when that accuracy means a network represents images the way people do — the question of representational alignment. It is one instance of a larger question, how to compare models with minds so that competing ideas can be told apart. Our results argue for comparisons built to identify the right model, not only the best-fitting one.
+  # in Chromium and 360-410px in WebKit. "I ask" is tied the same way: at 320 and 460 in Chromium the "I"
+  # stood alone at a line's end. The colon before "how" (review of WP-S18): the clause is what the question
+  # is, not an aside on it.
+  intro: 'Neural networks can predict human visual judgments, such as which of three images is the odd one out. I ask when that accuracy means a network represents images the way people do — the question of representational alignment. It is one instance of a larger question: how to compare models with minds so that competing ideas can be told apart. Our results argue for comparisons built to identify the right model, not only the best-fitting one.'
   # True of every item on the page: all three talk and poster titles are literally on representational
   # alignment, and the two projects are neurotechnology, not model identification (CS-08).
   description: Itamar Avitan’s paper, talks and posters on representational alignment between neural networks and human vision, and two neurotechnology team projects.
@@ -463,7 +465,10 @@ research:
   #   setup     §2.2: "a set of 20 ANNs of diverse architectures and training tasks", each "aligned ... to the
   #             THINGS odd-one-out training dataset (4.5 million triplets)"; the calibration is §2.1's, the
   #             temperature adjusted "to ensure that the variability of simulated responses matches that of
-  #             human judgments".
+  #             human judgments". The space in "4.5 million" is a no-break space (U+00A0): the number stood
+  #             at a line's end and its unit opened the next at every width from 1030 to 1440 in Chromium,
+  #             and at 380 and 670-710 (WebKit: 400 and 710) -- the laptop view most readers get (review of
+  #             WP-S18, 2026-09-26).
   #   test      the abstract: "For each model in turn, we sampled synthetic responses from its probabilistic
   #             predictions, fitted all candidate models to the synthetic data"; §2.2: "all 20 models ... were
   #             independently fitted to the synthetic training data from scratch", and "prediction accuracy
@@ -472,8 +477,11 @@ research:
   #             even at millions of simulated trials" (§3.2: "even with 4.2 million training triplets, it did
   #             not reach 80%"); the chance baseline is §2.2's chance level 1/|M|, one in twenty for 20 models;
   #             "Regression analyses linked misidentification primarily to shifts in representational geometry
-  #             induced by the linear transformation" (the abstract; "mainly" is its "primarily": the
-  #             effective-dimensionality predictor of §3.3 is the lesser one). The number is printed once on
+  #             induced by the linear transformation" (the abstract; "mainly" is its "primarily" and rests on
+  #             that word alone: two of §3.3's three significant predictors are shift magnitudes, the
+  #             candidate's, β = 0.495, and the generator's, β = -0.251; the third, the generator's
+  #             post-alignment effective dimensionality, β = -0.455, is not the smaller of them, and the
+  #             abstract names it "as well"). The number is printed once on
   #             this card, here; "simulated" keeps the millions apart from the human judgments of Setup.
   #   scope     the sentence of decision C4, checked clause by clause. The task: Limitations, "limited to
   #             behavioral data, and specifically, to the THINGS odd-one-out task". The model set: "the
@@ -498,25 +506,27 @@ research:
   #   the ceiling test records the heights.
   argument:
     question: 'When a comparison fits a flexible linear mapping from each model’s features to behavioral data (linear probing), can it still identify the model that generated the data, or only the one that fits it best?'
-    setup: 'We fitted 20 vision models of diverse architectures and training tasks to 4.5 million human odd-one-out judgments from the THINGS dataset, and calibrated each so that its simulated answers vary as much as people’s do.'
+    setup: 'We fitted 20 vision models of diverse architectures and training tasks to 4.5 million human odd-one-out judgments from the THINGS dataset, and calibrated each so that its simulated answers vary as much as people’s do.'
     test: 'Each fitted model in turn generates synthetic judgments; all 20 are refitted to those from scratch and compared on held-out judgments.'
     result: 'Recovery improved as the simulated experiment grew, then leveled off below 80%: far above the one in twenty of guessing, but wrong more than one time in five, even with millions of simulated trials. Regression analyses linked the misidentifications mainly to how much the fitted linear mapping reshapes a model’s representational geometry.'
     scope: 'This holds for the task, model set, noise calibration and linear transformation family we evaluated; it is not a claim that every flexible evaluation fails. It means a comparison can predict well and still be unreliable for identification, so the comparison itself needs a recovery test.'
   # The strip's captions, the open questions and the citation (deep review 2026-09-25, WP-S3; the diagram is
   # the owner's ruling 3).
   #   how    the four stages of the model-recovery test, in the order of his diagram (known generating model ->
-  #          simulated judgments -> fitted candidates -> the wrong winner); every clause is the abstract: "For
-  #          each model in turn, we sampled synthetic responses ... fitted all candidate models ... re-emerge
-  #          as the best predictor". Each step is printed as the caption of one mark of the diagram, with a
-  #          visible counter 1-4, so the captions are the diagram's labels in the page's own font: the marks
-  #          themselves hold no text and no numeral (templates/macros.html.j2, recovery_mark). Since 2026-09-26
-  #          (WP-S18) the strip stands under the Test block, which states the procedure in one sentence and
-  #          hands over to the four stages; "models", as the argument says it, where the captions said
-  #          "networks" until then (the home page's own block keeps its word). The first and third captions
-  #          lost a word or two the same day ("already"; "simulated ... fitted"), because at 1280 each ran
-  #          to a sixth line and set the strip's height, and the page was over its ceiling. "to people's" in
-  #          the third is tied with a no-break space (U+00A0): at 1280 and 1440 "people's." stood alone on the
-  #          caption's last line (a caption is a <p>, but `text-wrap: pretty` did not reach it there).
+  #          simulated judgments -> fitted candidates -> the wrong winner); the abstract: "For each model in
+  #          turn, we sampled synthetic responses ... fitted all candidate models ... re-emerge as the best
+  #          predictor". Each stage is printed as the caption of one mark of the diagram, with a visible
+  #          counter 1-4, so the captions are the diagram's labels in the page's own font: the marks
+  #          themselves hold no text and no numeral (templates/macros.html.j2, recovery_mark). Since
+  #          2026-09-26 (WP-S18) the strip stands under the Test block, which states the procedure in one
+  #          sentence; the captions are stage names -- a short phrase each, no full stop, as the home page's
+  #          one-word captions are -- and not sentences, because as sentences they said the procedure a
+  #          second time straight after Test, about 900px of scroll on a phone saying one thing twice, the
+  #          fault PLAN WP-S3 had removed once before (review of WP-S18, 2026-09-26). The first names the
+  #          generator among the 20 (the mark's one filled square), the fourth what the ranking is asked --
+  #          whether the generator is on top -- under a mark that draws it second, ruling 3's wrong winner.
+  #          "models", as the argument says it, never "networks" here (the home page's block keeps its
+  #          word). A test holds the captions to eight words and no full stop.
   #   open   questions the paper itself raises; each comment names its section of arXiv 2510.23321. Not a
   #          statement of current work, and not framed as his directions: the owner ruled on 2026-09-25 that
   #          they stay the paper's own, under the run-in "Questions the paper leaves open" (ruling 16, WP-S11;
@@ -528,10 +538,10 @@ research:
   #   cite   the BibTeX entry, behind a "Cite (BibTeX)" expander. Every field is FACTS PUB-CITATION plus the
   #          DOI of PUB-DOI; no `pages`, because the two published paginations disagree.
   how:
-  - Each of the 20 models, fitted to the human judgments, takes a turn as the generator.
-  - It answers millions of odd-one-out questions as if it were a participant.
-  - All 20 models are then fitted to those answers, as they would be to people’s.
-  - The comparison ranks them. One that can be trusted puts the generator on top.
+  - One of the 20 as the generator
+  - Its simulated judgments
+  - All 20 refitted to them
+  - 'The ranking: is the generator on top?'
   open:
   - How much freedom should an evaluation give the mapping, given what we want the comparison to identify?   # §3.4 and Discussion, the accuracy–identifiability trade-off
   - How should a recovery test be built when the true system — in a real experiment, a brain — is outside the candidate set?   # Discussion, Limitations: recovery within a closed set is "a necessary but insufficient criterion"; the true model, "the biological representations", is absent from the candidate set
@@ -559,7 +569,7 @@ research:
   #             task, model set, noise calibration and transformation family, and not a claim about every
   #             flexible evaluation -- the paper's own term for the mapping. "Noise calibration" in full, as
   #             the research page says it: bare "calibration" had no referent on this page (review of WP-S17).
-  #   stages    one-word captions for the four marks (`how` above has the full sentences for the card): the
+  #   stages    one-word captions for the four marks (`how` above has the card's own short phrases): the
   #             generator, its judgments, the candidates all fitted to them, the ranking -- whose winner the
   #             fourth mark draws as the wrong one. The last caption is "ranking", not "winner": under a
   #             drawing of the wrong winner, "winner" alone read as if the generator had won (review of
