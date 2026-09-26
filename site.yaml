@@ -65,10 +65,18 @@ pages:
   # chance baseline and the mechanism are stated once, better, in the paper card -- saying them here too put
   # the same argument on one screen twice in the same order. The second sentence names the field's own term,
   # "representational alignment", which is the noun the talk titles below and a search use (deep review
-  # 2026-09-25, CS-08 and PR-06). The closing phrase deliberately echoes the paper title printed just beneath
-  # it. Do not reintroduce the bare noun "identifiability" here: its only definition on this site was the
-  # sentence that was cut, and the plain verb needs no setup.
-  intro: Neural networks can predict human visual judgments, such as which of three images is the odd one out. I ask when that accuracy means a network represents the world as people do — the question of representational alignment. Our results argue for comparisons built to identify the right model, not only the best-fitting one.
+  # 2026-09-25, CS-08 and PR-06); "images", not "the world", since 2026-09-26: the judgments the paper tests
+  # are about images, and "the world" claimed more than the task (external review 3 §22). The third sentence
+  # (WP-S18, 2026-09-26, at the owner's request of 2026-09-25 that his broader interests be stated; record
+  # kept privately) frames the paper as one instance of the larger question, at the level a researcher
+  # states on a homepage -- an interest, not a plan: no study, no dataset, no method, no verb of future
+  # work -- and in the words the home page's About already uses for it, so the site has one way of saying
+  # it. The closing phrase deliberately echoes the paper title printed just beneath it. Do not reintroduce the
+  # bare noun "identifiability" here: its only definition on this site was the sentence that was cut, and the
+  # plain verb needs no setup. The space before the em dash is a no-break space (U+00A0), as in the identity
+  # line and the commonplace intro: measured with the third sentence in, the dash opened a line at 330-550px
+  # in Chromium and 360-410px in WebKit.
+  intro: Neural networks can predict human visual judgments, such as which of three images is the odd one out. I ask when that accuracy means a network represents images the way people do — the question of representational alignment. It is one instance of a larger question, how to compare models with minds so that competing ideas can be told apart. Our results argue for comparisons built to identify the right model, not only the best-fitting one.
   # True of every item on the page: all three talk and poster titles are literally on representational
   # alignment, and the two projects are neurotechnology, not model identification (CS-08).
   description: Itamar Avitan’s paper, talks and posters on representational alignment between neural networks and human vision, and two neurotechnology team projects.
@@ -137,6 +145,8 @@ nobreak:
 # Chromium broke the BCI4ALS row's "real-time" at its hyphen ("...the real- / time system.") at 36 of 225 widths
 # from 320 to 1440, 360 and 412 among them; WebKit did not (review of WP-S10, 2026-09-26; same defect as CS-08).
 - real-time
+# "held-out" (the Test block of the paper card, WP-S18): a hyphen Chromium may break at, as with "real-time".
+- held-out
 - 1733–34
 # "Negev, Israel" (the role line) is NOT here: the label ties it with a no-break space instead, because WebKit lets
 # a nowrap span that holds a space run past the column by up to a space width (see the note over `role`).
@@ -439,22 +449,74 @@ research:
   # academic CVs print it, and the BibTeX block below carries the same one (build.py refuses a disagreement).
   published: {periodical: Advances in Neural Information Processing Systems, volume: '38', year: '2025'}
   doi: 10.52202/085713-0404
-  # Every clause is the arXiv 2510.23321 abstract (the W source of FACTS RES-DESC, RES-PLATEAU and PUB-NUM):
-  # the method, named by the paper's own term "linear probing", and the number with its chance baseline, one
-  # in twenty being the paper's 1/|M| with |M| = 20 models. The mechanism, the abstract's regression sentence,
-  # is said once, in `found` below (deep review 2026-09-25, WP-S3), not here as well. "millions of simulated
-  # trials" is the abstract's phrase: without "simulated", the millions read as the human data named a few
-  # words earlier (CS-07 with PR-01's calibration clause).
-  tldr: To test whether a vision model represents images the way people do, researchers often fit a flexible linear mapping from the model’s features to human judgments (linear probing) and compare how well each model predicts. We fitted 20 vision models to 4.5 million odd-one-out judgments from the THINGS dataset, calibrated each to human response variability, let each one in turn generate simulated judgments, and asked whether the comparison would pick out the model that had generated them. It did so less than 80% of the time, even with millions of simulated trials — far above chance (one in twenty), but wrong more than one time in five.
-  # The depth blocks under the Summary (deep review 2026-09-25, WP-S3; the diagram is the owner's ruling 3).
+  # THE CARD AS AN ARGUMENT (controller decision C4 under owner ruling 18, 2026-09-26, built by WP-S18; the
+  # shape is external review 3 §23's table). Five run-in blocks -- Question, Setup, Test, Result, Scope -- in
+  # place of the Summary, the "How the test works" heading and the "What we found" paragraph of WP-S3: the
+  # diagram strip stands under Test and illustrates Setup and Test (its captions are `how`, below), and what
+  # was found is Result. Every clause was checked against arXiv 2510.23321v2 (abstract, §1-3, §4 with its
+  # Limitations) on 2026-09-26 before it was printed; the register's rows are FACTS RES-DESC, RES-PLATEAU
+  # and PUB-NUM (W: the same abstract).
+  #   question  the abstract's "does the test accuracy of such predictions identify genuine representational
+  #             alignment?" and §1's "does predictive accuracy correctly recover the data-generating model?";
+  #             "linear probing" is the paper's term for the fitted linear mapping (§2.1), "fits it best" its
+  #             title's best-fitting model.
+  #   setup     §2.2: "a set of 20 ANNs of diverse architectures and training tasks", each "aligned ... to the
+  #             THINGS odd-one-out training dataset (4.5 million triplets)"; the calibration is §2.1's, the
+  #             temperature adjusted "to ensure that the variability of simulated responses matches that of
+  #             human judgments".
+  #   test      the abstract: "For each model in turn, we sampled synthetic responses from its probabilistic
+  #             predictions, fitted all candidate models to the synthetic data"; §2.2: "all 20 models ... were
+  #             independently fitted to the synthetic training data from scratch", and "prediction accuracy
+  #             was evaluated on the test triplets" -- the held-out judgments.
+  #   result    the abstract: "Model recovery accuracy improved with training-set size but plateaued below 80%,
+  #             even at millions of simulated trials" (§3.2: "even with 4.2 million training triplets, it did
+  #             not reach 80%"); the chance baseline is §2.2's chance level 1/|M|, one in twenty for 20 models;
+  #             "Regression analyses linked misidentification primarily to shifts in representational geometry
+  #             induced by the linear transformation" (the abstract; "mainly" is its "primarily": the
+  #             effective-dimensionality predictor of §3.3 is the lesser one). The number is printed once on
+  #             this card, here; "simulated" keeps the millions apart from the human judgments of Setup.
+  #   scope     the sentence of decision C4, checked clause by clause. The task: Limitations, "limited to
+  #             behavioral data, and specifically, to the THINGS odd-one-out task". The model set: "the
+  #             quantitative model recovery accuracy levels reported are specific to the candidate model set
+  #             used". The noise calibration: the noise-calibrated simulation of §2.1-2.2. The linear
+  #             transformation family: the p x p linear probing of §3.2, which §3.4 varies from zero-shot to
+  #             full. "Not a claim that every flexible evaluation fails": the abstract's own hedge, "overly
+  #             flexible alignment metrics may fail", and Limitations, "the severity of this trade-off for
+  #             neural data cannot be inferred from our findings". "Predict well and still be unreliable for
+  #             identification": §3.1 (several models near the noise ceiling, none significantly better) with
+  #             §3.2, and §3.4's trade-off. "Needs a recovery test": the Discussion, "the pursuit of predictive
+  #             performance must be tempered ... through noise-calibrated model recovery simulations".
+  #             "Flexible evaluation" is the paper's own term (its title), as the home page's block says it;
+  #             C4's draft had "flexible comparison". The paper's "more fundamental limitation" -- recovery
+  #             within a closed set is "a necessary but insufficient criterion", because the true model, "the
+  #             biological representations", is absent from the candidate set -- stood here as a third
+  #             sentence and moved into the second open question, which now names the brain: measured with
+  #             it, the page was 3626px at 1280 against its 3600px ceiling (tests/test_browser.py), and prose
+  #             is tightened before anything else.
+  #   "12" appears nowhere (a private number, see the note over `projects`). "held-out" is in `nobreak`.
+  #   Measured after the tightening (Chromium, 2026-09-26): see the FINISH note in the review's progress file;
+  #   the ceiling test records the heights.
+  argument:
+    question: 'When a comparison fits a flexible linear mapping from each model’s features to behavioral data (linear probing), can it still identify the model that generated the data, or only the one that fits it best?'
+    setup: 'We fitted 20 vision models of diverse architectures and training tasks to 4.5 million human odd-one-out judgments from the THINGS dataset, and calibrated each so that its simulated answers vary as much as people’s do.'
+    test: 'Each fitted model in turn generates synthetic judgments; all 20 are refitted to those from scratch and compared on held-out judgments.'
+    result: 'Recovery improved as the simulated experiment grew, then leveled off below 80%: far above the one in twenty of guessing, but wrong more than one time in five, even with millions of simulated trials. Regression analyses linked the misidentifications mainly to how much the fitted linear mapping reshapes a model’s representational geometry.'
+    scope: 'This holds for the task, model set, noise calibration and linear transformation family we evaluated; it is not a claim that every flexible evaluation fails. It means a comparison can predict well and still be unreliable for identification, so the comparison itself needs a recovery test.'
+  # The strip's captions, the open questions and the citation (deep review 2026-09-25, WP-S3; the diagram is
+  # the owner's ruling 3).
   #   how    the four stages of the model-recovery test, in the order of his diagram (known generating model ->
   #          simulated judgments -> fitted candidates -> the wrong winner); every clause is the abstract: "For
   #          each model in turn, we sampled synthetic responses ... fitted all candidate models ... re-emerge
   #          as the best predictor". Each step is printed as the caption of one mark of the diagram, with a
   #          visible counter 1-4, so the captions are the diagram's labels in the page's own font: the marks
-  #          themselves hold no text and no numeral (templates/macros.html.j2, recovery_mark).
-  #   found  the plateau, the geometry-shift mechanism (the abstract's regression sentence, moved here from
-  #          the Summary), the accuracy-identifiability trade-off, and the paper's own closed-set caveat.
+  #          themselves hold no text and no numeral (templates/macros.html.j2, recovery_mark). Since 2026-09-26
+  #          (WP-S18) the strip stands under the Test block, which states the procedure in one sentence and
+  #          hands over to the four stages; "models", as the argument says it, where the captions said
+  #          "networks" until then (the home page's own block keeps its word). The first and third captions
+  #          lost a word or two the same day ("already"; "simulated ... fitted"), because at 1280 each ran
+  #          to a sixth line and set the strip's height, and the page was over its ceiling. "to people's" in
+  #          the third is tied with a no-break space (U+00A0): at 1280 and 1440 "people's." stood alone on the
+  #          caption's last line (a caption is a <p>, but `text-wrap: pretty` did not reach it there).
   #   open   questions the paper itself raises; each comment names its section of arXiv 2510.23321. Not a
   #          statement of current work, and not framed as his directions: the owner ruled on 2026-09-25 that
   #          they stay the paper's own, under the run-in "Questions the paper leaves open" (ruling 16, WP-S11;
@@ -466,14 +528,13 @@ research:
   #   cite   the BibTeX entry, behind a "Cite (BibTeX)" expander. Every field is FACTS PUB-CITATION plus the
   #          DOI of PUB-DOI; no `pages`, because the two published paginations disagree.
   how:
-  - Each of the 20 networks, already fitted to the human judgments, takes a turn as the generator.
+  - Each of the 20 models, fitted to the human judgments, takes a turn as the generator.
   - It answers millions of odd-one-out questions as if it were a participant.
-  - All 20 networks are fitted to those simulated answers, the way they would be fitted to people’s.
+  - All 20 models are then fitted to those answers, as they would be to people’s.
   - The comparison ranks them. One that can be trusted puts the generator on top.
-  found: 'Not reliably, and not for lack of data: recovery improved as the simulated experiment grew, then leveled off. Regression analyses linked the misidentifications mainly to how much the fitted linear mapping reshapes a network’s representational geometry. The flexibility that buys predictive accuracy costs the ability to tell the models apart. And recovering the right model from a closed set is only a necessary condition: in a real experiment the system that made the data — a brain — is not one of the candidates.'
   open:
   - How much freedom should an evaluation give the mapping, given what we want the comparison to identify?   # §3.4 and Discussion, the accuracy–identifiability trade-off
-  - How should a recovery test be built when the true system is outside the candidate set?   # Discussion, Limitations
+  - How should a recovery test be built when the true system — in a real experiment, a brain — is outside the candidate set?   # Discussion, Limitations: recovery within a closed set is "a necessary but insufficient criterion"; the true model, "the biological representations", is absent from the candidate set
   - How should a comparison treat the variability of responses within and between people?   # Introduction; Discussion, "Change the metrics"
   cite: |-
     @inproceedings{avitan2025modelbehavior,
@@ -528,27 +589,54 @@ research:
   # the NeurIPS paper, and the ruling keeps CCN a preliminary version. The home page's Paper and Code links
   # of the featured Research block carry the same contexts (templates/pages/home.html.j2), "Video" for the
   # poster video among them.
+  # GROUPED BY USE (controller decision C4, 2026-09-26, WP-S18; external review 3 §23): the card prints its
+  # links as three labelled rows in the order a research reader takes them -- Read, Reproduce, Watch -- rather
+  # than as one flat string. `uses` names the groups and their order; each button says which it belongs to
+  # in `use`, and build.py refuses a button whose `use` is not one of the keys, since it would otherwise be
+  # dropped without a word. The group labels are content, so they live here; the template draws the groups
+  # and the same button styles. A card without `uses` prints its buttons in one row, as before.
+  uses:
+  - {key: read, label: Read}
+  - {key: reproduce, label: Reproduce}
+  - {key: watch, label: Watch}
   buttons:
   - label: Paper
     url: https://proceedings.neurips.cc/paper_files/paper/2025/hash/11e1900e680f5fe1893a8e27362dbe2c-Abstract-Conference.html
     context: (NeurIPS 2025)
+    use: read
   - label: arXiv
     url: https://arxiv.org/abs/2510.23321
     context: preprint of the NeurIPS 2025 paper
+    use: read
   - label: Code
     url: https://github.com/brainsandmachines/oddoneout_model_recovery
     context: for the NeurIPS 2025 paper
+    use: reproduce
   - label: Data
     url: https://doi.org/10.6084/m9.figshare.30542690.v1
     context: for the NeurIPS 2025 paper
+    use: reproduce
   # The paper's own recording, filed where cv.pdf files it (FACTS PUB-LINK-TALK). Fetched 2026-09-25: the
   # paper's 4:57 poster video, presenters Itamar Avitan and Tal Golan. "video", not "talk video": it is a
-  # poster video. The CCN session recording is on the CCN row below, as on the CV (deep review PR-04, CS-14).
-  # Its context does not name the venue again: the label already does, and "NeurIPS 2025 video poster
-  # presentation of the NeurIPS 2025 paper" said it twice in one breath.
+  # poster video. Its context does not name the venue again: the label already does, and "NeurIPS 2025 video
+  # poster presentation of the NeurIPS 2025 paper" said it twice in one breath.
   - label: NeurIPS 2025 video
     url: https://slideslive.com/39047290
     context: of the poster presentation of the paper
+    use: watch
+  # The CCN talk's recording, in the Watch group since 2026-09-26 (decision C4 puts "Watch" on the card with
+  # both recordings; until then it stood on the CCN row alone, deep review PR-04, CS-14, and the row keeps its
+  # own link). The address is written ONCE, here, and the row below refers to it (`*ccn_recording`), so the
+  # start time cannot drift between the two. The recording is one five-talk session with no chapter markers,
+  # so the address carries the start of his own talk: t=715s is 11:55, confirmed by the owner on 2026-09-21,
+  # the same timestamp as on his CV. The "&" before it is a literal ampersand here; the template escapes it
+  # to "&amp;" in the HTML, which is how an address with two query parameters is written in a document. Do
+  # not "fix" it to &amp; in this file. The label names the venue and the kind, and the context says what the
+  # ruling requires of everything CCN on this site: a preliminary version of the paper, never the paper.
+  - label: CCN 2025 talk
+    url: &ccn_recording 'https://www.youtube.com/watch?v=vT-3kV89Rhk&t=715s'
+    context: recording of a preliminary version of the paper, from 11:55
+    use: watch
 # A talk or project row may carry `links`, a list of {label, url} rendered under the row in the paper card's
 # own button style: a recording, a repository. One mechanism for both lists (deep review 2026-09-25, DP-08).
 talks:
@@ -588,13 +676,12 @@ talks:
   # is the paper's own equivalence (its Fig. 1 caption: model recovery under linear probing) (PR-06).
   note: Preliminary version of the NeurIPS 2025 paper above, where linear probing is the “flexible evaluation” of the title.
   url: https://2025.ccneuro.org/contributed-talk/?id=65
-  # The recording is one five-talk session with no chapter markers, so the address carries the start of his
-  # own talk: t=715s is 11:55, confirmed by the owner on 2026-09-21. The same timestamp is on his CV. The "&"
-  # before it is a literal ampersand here; the template escapes it to "&amp;" in the HTML, which is how an
-  # address with two query parameters is written in a document. Do not "fix" it to &amp; in this file.
+  # The recording, with the start of his own talk (11:55): the address is written once, on the paper card's
+  # "CCN 2025 talk" button (the Watch group, WP-S18), and referred to here by its anchor, so the two never
+  # disagree. The note over that button says why the start time is what it is.
   links:
   - label: Recording (starts at 11:55)
-    url: https://www.youtube.com/watch?v=vT-3kV89Rhk&t=715s
+    url: *ccn_recording
 # THE PRACTICUM ENTRY. The owner ruled on this twice on 2026-09-21 (the second ruling, programme-first, is the
 # one the entry is built on) and once more on 2026-09-25 (one clause on his own part, see RULINGS below).
 #

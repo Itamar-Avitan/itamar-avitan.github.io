@@ -659,7 +659,7 @@ main.opens-with-h1 { margin-top: 2.25rem; }
 .log--kind .kind { min-height: 1.5rem; }
 .log--kind .what { clear: left; }
 /* The kind is a label, not a badge: small uppercase mono in the muted colour of the dates, the register of
-   the card's "Summary" run-in. Boxed, twelve of the site's fourteen boxes were not venues, the teaching
+   the card's run-in labels. Boxed, twelve of the site's fourteen boxes were not venues, the teaching
    gutter was a column of form fields, and "Contributed talk and poster" wrapped inside its box into a
    two-line 192x41px block (DS-03). Unboxed it wraps as two right-aligned lines of text. Muted on the page is
    5.79:1 light and 7.38:1 dark, which the contrast suite checks. */
@@ -765,11 +765,18 @@ main.opens-with-h1 { margin-top: 2.25rem; }
 .older > .log { margin-top: 0.625rem; }
 
 /* ---------- Paper card ---------- */
+/* container-type: on a phone the card answers the container query of its resource rows below (there the
+   body is display: contents and has no box to ask; the card's content box is the column the rows have). From
+   45rem up the body is a box of its own and is the container instead (the desktop block), as the home
+   page's .feature__body is for its strip: asked of the whole card, gutter included, the query said "wide
+   enough" at 720-750px with the text at 200%, where the body column is ten rem, and the rows ran 4-19px
+   past the viewport in both engines (WP-S18's own sweep). */
 .paper {
   padding: 1.25rem 1rem 1.375rem;
   background: var(--surface);
   border: 1px solid var(--rule-strong);
   border-radius: 4px;
+  container-type: inline-size;
 }
 .paper + .paper { margin-top: 1.5rem; }
 .paper__badges { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-bottom: 0.75rem; }
@@ -827,7 +834,32 @@ main.opens-with-h1 { margin-top: 2.25rem; }
 }
 .buttons { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 1.125rem; margin-top: 1.125rem; }
 .buttons li { display: flex; }
-/* The depth blocks under the Summary (deep review 2026-09-25, WP-S3). The diagram is a strip of four marks,
+/* The card's links grouped by what a reader does with them (controller decision C4 under owner ruling 18,
+   2026-09-26; external review 3 §23): three rows, Read / Reproduce / Watch, each a small mono label and its
+   buttons -- the route through the paper's resources read top to bottom, where one string of five links
+   read as none in particular. The label takes the run-in's face and size in the muted grey of the gutter
+   labels, so the accent stays with the links and the argument's own labels below; the buttons keep their one
+   style. Each row is a grid of label and list when the card is wide enough for the widest label beside the
+   widest button (the query below: "Reproduce" and "NeurIPS 2025 video" need about 14rem at the phone's 13px
+   mono), and the list wraps inside its cell; narrower than that -- a 320px phone with the reader's text at
+   150% or more, or the ten-rem body column of a 720px window at 200% -- the label stands above its buttons,
+   so nothing ever runs past the card. A container query, not a media query, because the failing case is the
+   text size, which a media query cannot see; the container is the body column from 45rem up and the card
+   on a phone (see the note over .paper). */
+.buttons--grouped { display: grid; }   /* the rows' own padding is their air; a gap cost the page 8px it did not have */
+.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
+.buttons__group .buttons { margin-top: 0; min-width: 0; }
+.buttons__use {
+  padding-block: 0.5625rem;
+  font: 500 0.75rem/1 var(--mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+@container (min-width: 16rem) {
+  .buttons__group { grid-template-columns: max-content minmax(0, 1fr); }
+}
+/* The diagram under the card's Test block (deep review 2026-09-25, WP-S3; under Test since WP-S18). A strip of four marks,
    each captioned by one stage with a visible counter: four columns of 8.5rem in the card body at laptop width
    (4 x 136 + 3 x 24 = 616px in a 672px body), two rows of two on a phone, one column once the reader's text
    is large enough that a column would not fit. The auto-fit form with min(..., 100%) is the one grid that
@@ -1092,8 +1124,8 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   .paper .buttons { order: 4; }
   .paper__fig { order: 5; float: none; width: 13rem; max-width: 100%; margin: 1.125rem 0 0; }
   .paper .tldr { order: 6; }
-  /* the depth blocks share the summary's slot, so DOM order keeps Summary -> How -> the diagram -> What we
-     found -> the open questions; the citation closes the card */
+  /* the argument's blocks and the strip share one slot, so DOM order keeps Question -> Setup -> Test -> the
+     diagram -> Result -> Scope -> the open questions; the citation closes the card */
   .paper .recovery-diagram, .paper .open { order: 6; }
   .paper .cite { order: 7; }
 }
@@ -1310,7 +1342,7 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   .paper__fig { margin: 0.875rem 0 0; }
   /* in the gutter every label is set against the margin rule, the caption under its plate included */
   .paper__fig figcaption { text-align: right; }
-  .paper__body { grid-column: 2; }
+  .paper__body { grid-column: 2; container-type: inline-size; }   /* the resource rows ask the body, not the card: see .paper */
 
   /* The quotations are the reason the commonplace page exists, so on anything wider than a phone they take
      one step up from the prose they are set among: 20px against the 17px of the note under them and of the
@@ -1480,6 +1512,7 @@ main.opens-with-h1 { margin-top: 2.25rem; }
      diagram with its mark, the open questions -- and a list stays with the label over it. A row of a log and
      a quotation never break inside. */
   .paper__aside, .paper .tldr, .recovery-diagram li, .paper .open, .log > .row, .quote { break-inside: avoid; }
+  .buttons__group { break-inside: avoid; }
   .paper .recovery-diagram, .paper .open { break-before: avoid; }
   h2, h3 { break-after: avoid; }
 }

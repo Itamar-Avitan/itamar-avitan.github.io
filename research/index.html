@@ -190,7 +190,7 @@
 
     <section id="research" aria-labelledby="research-h">
       <h1 id="research-h" class="inset">Research</h1>
-      <p class="page-intro inset">Neural networks can predict human visual judgments, such as which of three images is the odd one out. I ask when that accuracy means a network represents the world as people do — the question of representational alignment. Our results argue for comparisons built to identify the right model, not only the <span class="nb">best-fitting</span> one.</p>
+      <p class="page-intro inset">Neural networks can predict human visual judgments, such as which of three images is the odd one out. I ask when that accuracy means a network represents images the way people do — the question of representational alignment. It is one instance of a larger question, how to compare models with minds so that competing ideas can be told apart. Our results argue for comparisons built to identify the right model, not only the <span class="nb">best-fitting</span> one.</p>
     </section>
 
     <section id="papers" aria-labelledby="papers-h">
@@ -212,24 +212,39 @@
           <h3><a href="https://proceedings.neurips.cc/paper_files/paper/2025/hash/11e1900e680f5fe1893a8e27362dbe2c-Abstract-Conference.html">Model–Behavior Alignment under Flexible Evaluation: When the <span class="nb">Best-Fitting</span> Model Isn’t the Right One</a></h3>
           <p class="authors"><span class="me">Itamar Avitan</span>, Tal Golan</p>
           <p class="venue paper__venue">Advances in Neural Information Processing Systems 38 (NeurIPS 2025), main track</p>
-          <ul class="buttons" role="list">
-            <li><a class="btn btn--primary" href="https://proceedings.neurips.cc/paper_files/paper/2025/hash/11e1900e680f5fe1893a8e27362dbe2c-Abstract-Conference.html">Paper<span class="vh"> (NeurIPS 2025)</span></a></li>
-            <li><a class="btn" href="https://arxiv.org/abs/2510.23321">arXiv<span class="vh"> preprint of the NeurIPS 2025 paper</span></a></li>
-            <li><a class="btn" href="https://github.com/brainsandmachines/oddoneout_model_recovery">Code<span class="vh"> for the NeurIPS 2025 paper</span></a></li>
-            <li><a class="btn" href="https://doi.org/10.6084/m9.figshare.30542690.v1">Data<span class="vh"> for the NeurIPS 2025 paper</span></a></li>
-            <li><a class="btn" href="https://slideslive.com/39047290">NeurIPS 2025 video<span class="vh"> of the poster presentation of the paper</span></a></li>
+          <ul class="buttons buttons--grouped" role="list" aria-label="Resources">
+            <li class="buttons__group"><span class="buttons__use">Read</span>
+              <ul class="buttons" role="list">
+                <li><a class="btn btn--primary" href="https://proceedings.neurips.cc/paper_files/paper/2025/hash/11e1900e680f5fe1893a8e27362dbe2c-Abstract-Conference.html">Paper<span class="vh"> (NeurIPS 2025)</span></a></li>
+                <li><a class="btn" href="https://arxiv.org/abs/2510.23321">arXiv<span class="vh"> preprint of the NeurIPS 2025 paper</span></a></li>
+              </ul>
+            </li>
+            <li class="buttons__group"><span class="buttons__use">Reproduce</span>
+              <ul class="buttons" role="list">
+                <li><a class="btn" href="https://github.com/brainsandmachines/oddoneout_model_recovery">Code<span class="vh"> for the NeurIPS 2025 paper</span></a></li>
+                <li><a class="btn" href="https://doi.org/10.6084/m9.figshare.30542690.v1">Data<span class="vh"> for the NeurIPS 2025 paper</span></a></li>
+              </ul>
+            </li>
+            <li class="buttons__group"><span class="buttons__use">Watch</span>
+              <ul class="buttons" role="list">
+                <li><a class="btn" href="https://slideslive.com/39047290">NeurIPS 2025 video<span class="vh"> of the poster presentation of the paper</span></a></li>
+                <li><a class="btn" href="https://www.youtube.com/watch?v=vT-3kV89Rhk&amp;t=715s">CCN 2025 talk<span class="vh"> recording of a preliminary version of the paper, from 11:55</span></a></li>
+              </ul>
+            </li>
           </ul>
-          <p class="tldr"><span class="runin">Summary</span> To test whether a vision model represents images the way people do, researchers often fit a flexible linear mapping from the model’s features to human judgments (linear probing) and compare how well each model predicts. We fitted 20 vision models to 4.5 million <span class="nb">odd-one-out</span> judgments from the THINGS dataset, calibrated each to human response variability, let each one in turn generate simulated judgments, and asked whether the comparison would pick out the model that had generated them. It did so less than 80% of the time, even with millions of simulated trials — far above chance (one in twenty), but wrong more than one time in five.</p>
-          <p class="tldr"><span class="runin">How the test works</span></p>
+          <p class="tldr"><span class="runin">Question</span> When a comparison fits a flexible linear mapping from each model’s features to behavioral data (linear probing), can it still identify the model that generated the data, or only the one that fits it best?</p>
+          <p class="tldr"><span class="runin">Setup</span> We fitted 20 vision models of diverse architectures and training tasks to 4.5 million human <span class="nb">odd-one-out</span> judgments from the THINGS dataset, and calibrated each so that its simulated answers vary as much as people’s do.</p>
+          <p class="tldr"><span class="runin">Test</span> Each fitted model in turn generates synthetic judgments; all 20 are refitted to those from scratch and compared on <span class="nb">held-out</span> judgments.</p>
           <ol class="recovery-diagram" role="list" aria-label="How the model-recovery test works">
-            <li><svg aria-hidden="true" viewBox="0 0 120 64"><path d="M1 12h9v9h-9zM14 12h9v9h-9zM27 12h9v9h-9zM40 12h9v9h-9zM53 12h9v9h-9zM1 25h9v9h-9zM14 25h9v9h-9zM27 25h9v9h-9zM53 25h9v9h-9zM1 38h9v9h-9zM14 38h9v9h-9zM27 38h9v9h-9zM40 38h9v9h-9zM53 38h9v9h-9zM1 51h9v9h-9zM14 51h9v9h-9zM27 51h9v9h-9zM40 51h9v9h-9zM53 51h9v9h-9z" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="40" y="25" width="9" height="9" style="fill:var(--accent)"/></svg><p>Each of the 20 networks, already fitted to the human judgments, takes a turn as the generator.</p></li>
+            <li><svg aria-hidden="true" viewBox="0 0 120 64"><path d="M1 12h9v9h-9zM14 12h9v9h-9zM27 12h9v9h-9zM40 12h9v9h-9zM53 12h9v9h-9zM1 25h9v9h-9zM14 25h9v9h-9zM27 25h9v9h-9zM53 25h9v9h-9zM1 38h9v9h-9zM14 38h9v9h-9zM27 38h9v9h-9zM40 38h9v9h-9zM53 38h9v9h-9zM1 51h9v9h-9zM14 51h9v9h-9zM27 51h9v9h-9zM40 51h9v9h-9zM53 51h9v9h-9z" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="40" y="25" width="9" height="9" style="fill:var(--accent)"/></svg><p>Each of the 20 models, fitted to the human judgments, takes a turn as the generator.</p></li>
             <li><svg aria-hidden="true" viewBox="0 0 120 64"><g fill="currentColor"><circle cx="5.5" cy="12.5" r="4.5"/><circle cx="20.5" cy="12.5" r="4.5"/><circle cx="5.5" cy="28.5" r="4.5"/><circle cx="20.5" cy="28.5" r="4.5"/><circle cx="5.5" cy="44.5" r="4.5"/><circle cx="20.5" cy="44.5" r="4.5"/></g><path d="M31 8h9v9h-9zM31 24h9v9h-9zM31 40h9v9h-9z" style="fill:var(--accent)"/><path d="M8.5 56h24M12.5 60.5h16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><p>It answers millions of <span class="nb">odd-one-out</span> questions as if it were a participant.</p></li>
-            <li><svg aria-hidden="true" viewBox="0 0 120 64"><path d="M29 12h9v9h-9zM42 12h9v9h-9zM55 12h9v9h-9zM68 12h9v9h-9zM81 12h9v9h-9zM29 25h9v9h-9zM42 25h9v9h-9zM55 25h9v9h-9zM68 25h9v9h-9zM81 25h9v9h-9zM29 38h9v9h-9zM42 38h9v9h-9zM55 38h9v9h-9zM68 38h9v9h-9zM81 38h9v9h-9zM29 51h9v9h-9zM42 51h9v9h-9zM55 51h9v9h-9zM68 51h9v9h-9zM81 51h9v9h-9z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M29 8.5V5h61v3.5M1 36h20M16 31l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><p>All 20 networks are fitted to those simulated answers, the way they would be fitted to people’s.</p></li>
+            <li><svg aria-hidden="true" viewBox="0 0 120 64"><path d="M29 12h9v9h-9zM42 12h9v9h-9zM55 12h9v9h-9zM68 12h9v9h-9zM81 12h9v9h-9zM29 25h9v9h-9zM42 25h9v9h-9zM55 25h9v9h-9zM68 25h9v9h-9zM81 25h9v9h-9zM29 38h9v9h-9zM42 38h9v9h-9zM55 38h9v9h-9zM68 38h9v9h-9zM81 38h9v9h-9zM29 51h9v9h-9zM42 51h9v9h-9zM55 51h9v9h-9zM68 51h9v9h-9zM81 51h9v9h-9z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M29 8.5V5h61v3.5M1 36h20M16 31l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><p>All 20 models are then fitted to those answers, as they would be to people’s.</p></li>
             <li><svg aria-hidden="true" viewBox="0 0 120 64"><path d="M1 12h9v9h-9zM1 38h9v9h-9zM1 51h9v9h-9z" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="1" y="25" width="9" height="9" style="fill:var(--accent)"/><path d="M15 15h62v3H15zM15 28h46v3H15zM15 41h30v3H15zM15 54h16v3H15z" fill="currentColor"/></svg><p>The comparison ranks them. One that can be trusted puts the generator on top.</p></li>
           </ol>
-          <p class="tldr"><span class="runin">What we found</span> Not reliably, and not for lack of data: recovery improved as the simulated experiment grew, then leveled off. Regression analyses linked the misidentifications mainly to how much the fitted linear mapping reshapes a network’s representational geometry. The flexibility that buys predictive accuracy costs the ability to tell the models apart. And recovering the right model from a closed set is only a necessary condition: in a real experiment the system that made the data — a brain — is not one of the candidates.</p>
+          <p class="tldr"><span class="runin">Result</span> Recovery improved as the simulated experiment grew, then leveled off below 80%: far above the one in twenty of guessing, but wrong more than one time in five, even with millions of simulated trials. Regression analyses linked the misidentifications mainly to how much the fitted linear mapping reshapes a model’s representational geometry.</p>
+          <p class="tldr"><span class="runin">Scope</span> This holds for the task, model set, noise calibration and linear transformation family we evaluated; it is not a claim that every flexible evaluation fails. It means a comparison can predict well and still be unreliable for identification, so the comparison itself needs a recovery test.</p>
           <p class="tldr"><span class="runin">Questions the paper leaves open</span></p>
-          <ul class="open" role="list"><li>How much freedom should an evaluation give the mapping, given what we want the comparison to identify?</li><li>How should a recovery test be built when the true system is outside the candidate set?</li><li>How should a comparison treat the variability of responses within and between people?</li></ul>
+          <ul class="open" role="list"><li>How much freedom should an evaluation give the mapping, given what we want the comparison to identify?</li><li>How should a recovery test be built when the true system — in a real experiment, a brain — is outside the candidate set?</li><li>How should a comparison treat the variability of responses within and between people?</li></ul>
           <details class="cite"><summary>Cite (BibTeX)</summary><pre>@inproceedings{avitan2025modelbehavior,
   title     = {Model--Behavior Alignment under Flexible Evaluation: When the Best-Fitting Model Isn&#39;t the Right One},
   author    = {Avitan, Itamar and Golan, Tal},

@@ -632,19 +632,24 @@ def test_section_ids_and_script_hooks():
 def test_research_card_shows_every_field():
     html = html_of("research/")
     text, card = _visible_text(html), SITE["research"][0]
-    shown = [card["title"], card["tldr"], *filter(None, [card["figure"].get("caption")]), *card["authors"],
-             card["venue"], *card["badges"], *(b["label"] for b in card["buttons"]),
-             *card["how"], card["found"], *card["open"]]
+    shown = [card["title"], *card["argument"].values(), *filter(None, [card["figure"].get("caption")]),
+             *card["authors"], card["venue"], *card["badges"], *(b["label"] for b in card["buttons"]),
+             *(u["label"] for u in card["uses"]), *card["how"], *card["open"]]
     assert [s for s in shown if " ".join(s.split()) not in text] == []
-    # the depth blocks (deep review 2026-09-25, WP-S3): four stages under "How the test works", each the
-    # caption of one mark of the diagram; what was found; the paper's open questions; the citation last
+    # the card as an argument (controller decision C4 under owner ruling 18, 2026-09-26; WP-S18): five run-in
+    # blocks in this order, the four stages of the diagram under Test, then the paper's own open questions
+    # and the citation last; the Summary, "How the test works" and "What we found" of WP-S3 are gone
+    assert list(card["argument"]) == ["question", "setup", "test", "result", "scope"]
     assert len(card["how"]) == 4 and len(card["open"]) == 3
     assert '<ol class="recovery-diagram" role="list" aria-label="How the model-recovery test works">' in html
-    for runin in ("Summary", "How the test works", "What we found", "Questions the paper leaves open"):
+    for runin in ("Question", "Setup", "Test", "Result", "Scope", "Questions the paper leaves open"):
         assert f'<span class="runin">{runin}</span>' in html, runin
+    for gone in ("Summary", "How the test works", "What we found"):
+        assert f'<span class="runin">{gone}</span>' not in html, gone
     body = html.partition('<div class="paper__body">')[2].partition("</article>")[0]
-    assert (body.index('class="tldr"') < body.index("How the test works") < body.index('class="recovery-diagram"')
-            < body.index("What we found") < body.index('class="open"') < body.index('<details class="cite">'))
+    assert (body.index(">Question<") < body.index(">Setup<") < body.index(">Test<") < body.index('class="recovery-diagram"')
+            < body.index(">Result<") < body.index(">Scope<") < body.index('class="open"') < body.index('<details class="cite">'))
+    assert body.count('class="tldr"') == 6                          # the five blocks and the open questions' label
     # unescaped, because an address with two query parameters carries "&", which a document writes "&amp;"
     assert all(f'href="{b["url"]}"' in unescape(html) for b in card["buttons"])
     assert f'<img src="../{card["figure"]["src"]}" alt="{card["figure"]["alt"]}"' in html
@@ -657,6 +662,79 @@ def test_research_card_shows_every_field():
     body = html.partition('<div class="paper__body">')[2].partition("</article>")[0]
     assert body.index('class="authors"') < body.index('class="venue paper__venue"') < body.index('class="buttons"') < body.index('class="tldr"')
     assert '<span class="tag tag--venue">NeurIPS 2025</span>' in html and '<span class="tag">CCN 2025 · Talk</span>' in html
+
+
+def test_the_card_reads_as_an_argument_traced_to_the_paper():
+    """The paper card is a small argument, not a summary beside a picture (controller decision C4 under owner
+    ruling 18, 2026-09-26; external review 3 §23; WP-S18): Question, Setup, Test, Result, Scope, each one
+    paragraph, the owner's diagram (ruling 3) under Test as the illustration of Setup and Test, the paper's
+    own open questions after Scope (owner ruling 16: they stay the paper's, never his directions). Every
+    clause was checked against arXiv 2510.23321 before it was printed (the note over `argument` in site.yaml
+    traces each to its section); this pins the facts a reader is given -- the twenty models, the 4.5 million
+    judgments, the held-out test, the number with its chance baseline, the mechanism -- and the scope
+    sentence's own words, which are what keep a non-specialist from hearing "linear probing is invalid" and
+    a specialist from hearing a claim about every flexible comparison. The number is printed once on the
+    card; the private number "12" nowhere on the page (the note over `projects`)."""
+    card, html = SITE["research"][0], html_of("research/")
+    a = card["argument"]
+    assert "linear probing" in a["question"] and "fits it best" in a["question"]
+    assert all(w in a["setup"] for w in ("20 vision models", "4.5 million", "odd-one-out", "THINGS", "calibrated"))
+    assert "in turn" in a["test"] and "from scratch" in a["test"] and "held-out" in a["test"]
+    assert all(w in a["result"] for w in ("below 80%", "one in twenty", "one time in five", "millions of simulated trials",
+                                          "representational geometry"))
+    assert a["scope"] == ("This holds for the task, model set, noise calibration and linear transformation family we "
+                          "evaluated; it is not a claim that every flexible evaluation fails. It means a comparison can "
+                          "predict well and still be unreliable for identification, so the comparison itself needs a "
+                          "recovery test.")
+    text = _visible_text(html.partition('<article class="paper">')[2].partition("</article>")[0])
+    assert text.count("80%") == 1 and "12" not in _visible_text(html)
+    assert all(" ".join(step.split()) in text for step in card["how"]) and "networks" not in text.partition("Talks")[0]
+    assert "a brain" in card["open"][1] and "candidate\u00a0set?" in card["open"][1]    # the closed-set caveat, tied
+    assert '<span class="nb">held-out</span>' in html                          # the hyphen never breaks
+    # the strip illustrates Setup and Test: it stands between the Test block and the Result block
+    body = html.partition('<div class="paper__body">')[2]
+    assert body.index(">Test<") < body.index('<ol class="recovery-diagram"') < body.index(">Result<")
+    # the intro frames the paper as one instance of the larger question (ADDENDUM Part 3 item 19, at the owner's
+    # request of 2026-09-25; record kept privately): one sentence, an interest and not a plan
+    intro = page("research/")["intro"]
+    assert "It is one instance of a larger question, how to compare models with minds so that competing ideas can be told apart." in intro
+    assert intro.count(". ") == 3 and "the world" not in intro and "images the way people do" in intro
+    assert not re.search(r"\b(will|plan|planning|developing|ongoing|next|preparation)\b", intro)
+
+
+def test_the_links_are_grouped_by_what_a_reader_does_with_them():
+    """Read, Reproduce, Watch (controller decision C4, 2026-09-26; external review 3 §23; WP-S18): the card's
+    links print as three labelled rows in that order rather than as one string of five, `uses` in site.yaml
+    naming the groups and each button its group. The paper's own link is still the one filled button, the
+    CCN recording joins the Watch row, and build.py refuses a button whose `use` names no group -- it would
+    otherwise be drawn nowhere -- and a group key named twice. The label stands beside its first link when
+    the card is wide enough for the widest label beside the widest link and above it when it is not (a 320px
+    phone at 150% text or more): a container query on the card, because the failing case is the reader's
+    text size; tests/test_browser.py measures both. A row keeps whole on paper."""
+    card, html = SITE["research"][0], html_of("research/")
+    assert [u["key"] for u in card["uses"]] == ["read", "reproduce", "watch"]
+    assert '<ul class="buttons buttons--grouped" role="list" aria-label="Resources">' in html
+    block = html.partition('<ul class="buttons buttons--grouped"')[2].partition('<p class="tldr">')[0]
+    groups = re.findall(r'<li class="buttons__group"><span class="buttons__use">([^<]+)</span>\s*<ul class="buttons" role="list">(.*?)</ul>', block, flags=re.S)
+    assert [(label, re.findall(r'<a class="btn[^"]*" href="[^"]+">([^<]+)', links)) for label, links in groups] == [
+        ("Read", ["Paper", "arXiv"]), ("Reproduce", ["Code", "Data"]), ("Watch", ["NeurIPS 2025 video", "CCN 2025 talk"])]
+    assert [b["label"] for b in card["buttons"] if b["use"] == "read"][0] == "Paper" and block.count("btn btn--primary") == 1
+    assert all(f'href="{b["url"]}"' in unescape(block) for b in card["buttons"])
+    bad = copy.deepcopy(SITE)
+    bad["research"][0]["buttons"][2]["use"] = "elsewhere"
+    assert any("Code" in p and "elsewhere" in p for p in build.validate(bad))
+    bad = copy.deepcopy(SITE)
+    del bad["research"][0]["buttons"][2]["use"]
+    assert any("Code" in p and "None" in p for p in build.validate(bad))
+    bad = copy.deepcopy(SITE)
+    bad["research"][0]["uses"].append({"key": "read", "label": "Read again"})
+    assert any("repeated" in p for p in build.validate(bad))
+    css = _css()
+    assert re.search(r"\.paper \{[^}]*container-type: inline-size;", css)          # the card, for a phone
+    assert ".paper__body { grid-column: 2; container-type: inline-size; }" in css   # the body column, from 45rem up
+    assert ".buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }" in css
+    assert "@container (min-width: 16rem) {\n  .buttons__group { grid-template-columns: max-content minmax(0, 1fr); }" in css
+    assert ".buttons__group { break-inside: avoid; }" in css.partition("@media print {")[2]
 
 
 def test_the_card_figure_is_swapped_by_one_line_and_only_a_plot_is_marked_as_one():
@@ -1014,8 +1092,9 @@ def test_optional_keys_may_be_absent():
                 continue                                # a news item's sentence is required; its link is not
             entry.pop(key, None)
     for entry in site["research"]:
-        for key in ("venue", "how", "found", "open", "cite", "published", "doi", "feature"):    # the card's citation
-            entry.pop(key, None)                    # line, depth blocks, record and home block are optional; a talk's venue is not
+        for key in ("venue", "how", "argument", "open", "cite", "published", "doi", "feature", "uses"):
+            entry.pop(key, None)                    # the card's citation line, argument, strip, questions, record,
+                                                    # home block and link groups are optional; a talk's venue is not
     for entry in site["links"]:
         entry.pop("format", None)
     for entry in site["pages"]:
@@ -1034,8 +1113,16 @@ def test_optional_keys_may_be_absent():
         for gone in ('<p class="venue"><a', 'class="venue paper__venue"', 'class="note"', "<figure",
                      'class="authors"', 'class="role"', 'class="nb"', 'rel="me"', 'id="email"',
                      'class="tag tag--venue"', 'class="btn', 'class="page-intro', 'class="recovery-diagram"',
-                     'class="open"', 'class="cite"', 'class="work"', 'class="feature'):
+                     'class="open"', 'class="cite"', 'class="work"', 'class="feature', 'class="runin"',
+                     'class="buttons'):
             assert gone not in html, (slug, gone)
+    # the buttons back without their groups (a copy: the home checks below want them absent): one flat row,
+    # the first link filled, no group and no label
+    flat_site = copy.deepcopy(site)
+    flat_site["research"][0]["buttons"] = copy.deepcopy(SITE["research"][0]["buttons"])
+    flat = html_of("research/", flat_site)
+    assert '<ul class="buttons" role="list">' in flat and "buttons__" not in flat and 'aria-label="Resources"' not in flat
+    assert flat.count('<a class="btn') == len(SITE["research"][0]["buttons"]) and flat.count("btn btn--primary") == 1   # the CV chip has no url here
     assert 'id="research"' not in pages[""]                     # no `feature`, no featured block on the front door
     site["research"][0]["feature"] = SITE["research"][0]["feature"]     # the block back, without its badge or its buttons
     home = html_of("", site)
@@ -1474,14 +1561,20 @@ def test_the_talk_video_opens_where_his_own_talk_starts():
     assert link["url"] == "https://www.youtube.com/watch?v=vT-3kV89Rhk&t=715s"
     assert link["label"] == "Recording (starts at 11:55)"
     html = html_of("research/")
-    assert 'href="https://www.youtube.com/watch?v=vT-3kV89Rhk&amp;t=715s"' in html
+    # Printed twice since WP-S18 -- on the card, in its Watch group (controller decision C4), and on the CCN
+    # row, the talk's own record -- from ONE address in site.yaml: the card's button carries it and the row
+    # refers to it by anchor, so the start time cannot drift between the two.
+    assert html.count('href="https://www.youtube.com/watch?v=vT-3kV89Rhk&amp;t=715s"') == 2
     assert "&t=715s" not in html                                            # never the bare ampersand
-    assert unescape(re.search(r'href="([^"]*vT-3kV89Rhk[^"]*)"', html).group(1)) == link["url"]
+    assert {unescape(u) for u in re.findall(r'href="([^"]*vT-3kV89Rhk[^"]*)"', html)} == {link["url"]}
+    assert (build.ROOT / "site.yaml").read_text(encoding="utf-8").count("vT-3kV89Rhk") == 1
+    by = {b["label"]: b for b in SITE["research"][0]["buttons"]}
+    assert by["CCN 2025 talk"]["url"] == link["url"] and by["CCN 2025 talk"]["use"] == "watch"
     # and the card carries the paper's own NeurIPS video, the one cv.pdf prints (FACTS PUB-LINK-TALK)
-    video = SITE["research"][0]["buttons"][-1]
-    assert (video["label"], video["url"]) == ("NeurIPS 2025 video", "https://slideslive.com/39047290")
+    video = by["NeurIPS 2025 video"]
+    assert video["url"] == "https://slideslive.com/39047290" and video["use"] == "watch"
     assert "talk" not in video["context"]                                   # a poster video, not a talk
-    assert "CCN 2025 talk video" not in html
+    assert "CCN 2025 talk video" not in html and "video" not in by["CCN 2025 talk"]["label"]
 
 
 def _css() -> str:
@@ -1528,16 +1621,20 @@ def test_a_link_says_where_it_leads_to_a_reader_who_cannot_see_the_card():
     contexts = {b["label"]: b.get("context") for b in card["buttons"]}
     assert contexts == {"Paper": "(NeurIPS 2025)", "arXiv": "preprint of the NeurIPS 2025 paper",
                         "Code": "for the NeurIPS 2025 paper", "Data": "for the NeurIPS 2025 paper",
-                        "NeurIPS 2025 video": "of the poster presentation of the paper"}
+                        "NeurIPS 2025 video": "of the poster presentation of the paper",
+                        "CCN 2025 talk": "recording of a preliminary version of the paper, from 11:55"}
     for label, context in contexts.items():
         assert f'>{label}<span class="vh"> {context}</span></a></li>' in research, label
-    assert "CCN" not in " ".join(contexts.values())                       # a preliminary version, never the paper
-    buttons = research.partition('<ul class="buttons" role="list">')[2].partition("</ul>")[0]
-    assert buttons.count('<span class="vh">') == len(card["buttons"])
+    # the CCN recording stands on the card since WP-S18 (the Watch group), and nothing calls it the paper:
+    # the paper's own five links never say CCN, and the CCN link says "preliminary version", the ruled words
+    assert all("CCN" not in context for label, context in contexts.items() if not label.startswith("CCN"))
+    assert contexts["CCN 2025 talk"].startswith("recording of a preliminary version") and "NeurIPS" not in contexts["CCN 2025 talk"]
+    block = research.partition('<ul class="buttons buttons--grouped"')[2].partition('<p class="tldr">')[0]
+    assert block.count('<span class="vh">') == len(card["buttons"])
     site = copy.deepcopy(SITE)
     for button in site["research"][0]["buttons"]:
         button.pop("context", None)
-    bare = html_of("research/", site).partition('<ul class="buttons" role="list">')[2].partition("</ul>")[0]
+    bare = html_of("research/", site).partition('<ul class="buttons buttons--grouped"')[2].partition('<p class="tldr">')[0]
     assert 'class="vh"' not in bare                                        # the key is optional
     home = html_of("")
     section = home.partition('<section id="elsewhere"')[2].partition("</section>")[0]

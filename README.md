@@ -39,7 +39,7 @@ CV (owner ruling, 2026-09-21; record kept privately). Nothing was dropped in the
 | Page | Address | What is on it |
 | --- | --- | --- |
 | Home | `/` | the masthead, `about`, the featured paper (drawn from the first `research` card), `now`, the news feed, and the two invitations (`elsewhere`) |
-| Research | `/research/` | Papers, Talks and presentations, Projects |
+| Research | `/research/` | Papers (the paper card, as an argument), Talks and presentations, Projects |
 | Teaching | `/teaching/` | Courses and Students |
 | Commonplace | `/commonplace/` | the quotations, in the owner's order |
 
@@ -130,6 +130,20 @@ things `now` leaves out on purpose (owner rulings, 2026-09-25): it says nothing 
 for, and nothing about the NEAT 2026 flash talk beyond a pointer to it. On this site that talk is a title,
 its co-authors, a place and a date, and the questions on the research card are the paper's own, not his
 directions. A test holds both.
+
+**The paper card reads as an argument** (controller decision C4 under the owner's delegation of 2026-09-25;
+record kept privately): five run-in blocks, `argument` in `site.yaml` — Question, Setup, Test, Result,
+Scope — with the owner's four-mark diagram under Test, captioned by the four stages in `how`, then the
+paper's own open questions and the BibTeX behind an expander. Every clause of the five blocks is traced to
+its section of the paper in the note over `argument`; the Scope block is what keeps the result to the task,
+the model set, the noise calibration and the linear transformation family the paper evaluated, so that
+nobody reads it as a claim about every flexible comparison. The card's links stand in three rows by what a
+reader does with them — Read (the paper, the preprint), Reproduce (code, data), Watch (the NeurIPS video and
+the CCN talk's recording) — `uses` names the rows and each button its row, and `build.py` refuses a button
+that names no row. The CCN recording's address is written once, on that button, and the CCN talk row refers
+to it by a YAML anchor. The page's intro carries one sentence on the larger question the paper is an instance
+of, at the level of an interest and not of a plan. The page is the one allowed to run long (a test holds it
+under 3600px at 1280 and 5200px at 400; measured 3545 and 5041).
 
 The research card's thumbnail is chosen by one line. `site.yaml` holds both pictures under `figure_options`,
 and the card points at one of them:

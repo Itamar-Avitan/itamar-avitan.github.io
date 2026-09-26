@@ -46,8 +46,8 @@
   {% endif %}
         </div>
 {# The body runs in a citation's order: what it is, who wrote it, where it appeared, where to get it, then
-   what it found. The title is the card's primary link, to the first button's address (the paper): a title that
-   is not a link is the one thing on the card a reader tries first. The links stand above the summary on every
+   the argument. The title is the card's primary link, to the first button's address (the paper): a title that
+   is not a link is the one thing on the card a reader tries first. The links stand above the argument on every
    width because they are why most readers arrive; below it they sat under the fold on the commonest laptop. #}
         <div class="paper__body">
           <h3>{% if card.get("buttons") %}<a href="{{ card.buttons[0].url }}">{{ m.nb(card.title) }}</a>{% else %}{{ m.nb(card.title) }}{% endif %}</h3>
@@ -60,29 +60,58 @@
 {# A button's optional `context` (site.yaml) follows its label in a hidden span, so a screen reader's list of
    links says "Paper (NeurIPS 2025)" and "Code for the NeurIPS 2025 paper" where the eye reads the card
    around the word (deep review 2026-09-25, PA-05). Per button, from site.yaml, because one suffix for all of
-   them would call the CCN recording part of the NeurIPS paper, which the ruling forbids. #}
-          <ul class="buttons" role="list">
-  {% for button in card.get("buttons") or [] %}
-            <li><a class="btn{{ " btn--primary" if loop.first else "" }}" href="{{ button.url }}">{{ button.label }}{% if button.get("context") %}<span class="vh"> {{ button.context }}</span>{% endif %}</a></li>
-  {% endfor %}
+   them would call the CCN recording part of the NeurIPS paper, which the ruling forbids.
+   The links are grouped by what a reader does with them (controller decision C4 under owner ruling 18,
+   2026-09-26; external review 3 §23): `uses` in site.yaml names the groups in order -- Read, Reproduce,
+   Watch -- and each button its group, so the card prints three labelled rows rather than one string of
+   five. The label of each row is plain text before its list, in the register of the run-in labels below;
+   the buttons keep their one style, the first of the card filled as the primary link. The outer list is
+   labelled "Resources" for a reader moving by lists; the whole is one macro-less block because only this
+   card carries it. A card without `uses` prints the flat row it used to. build.py refuses a button whose
+   `use` names no group; a card without buttons draws no list at all. #}
+  {% if card.get("uses") and card.get("buttons") %}
+          <ul class="buttons buttons--grouped" role="list" aria-label="Resources">
+    {% for use in card.uses %}
+      {% set group = (card.get("buttons") or []) | selectattr("use", "defined") | selectattr("use", "equalto", use.key) | list %}
+      {% if group %}
+            <li class="buttons__group"><span class="buttons__use">{{ use.label }}</span>
+              <ul class="buttons" role="list">
+        {% for button in group %}
+                <li><a class="btn{{ " btn--primary" if button is sameas card.buttons[0] else "" }}" href="{{ button.url }}">{{ button.label }}{% if button.get("context") %}<span class="vh"> {{ button.context }}</span>{% endif %}</a></li>
+        {% endfor %}
+              </ul>
+            </li>
+      {% endif %}
+    {% endfor %}
           </ul>
-          <p class="tldr"><span class="runin">Summary</span> {{ m.nb(card.tldr) }}</p>
-{# The depth blocks, in the order a reader who stayed wants them: how the test works (the owner's diagram --
-   four marks, each captioned by one of `how`'s steps with a visible counter, so the captions are the labels),
-   what it found, what the paper leaves open, and the citation behind an expander. Only the paper card carries
-   them; a card without the keys renders as it did. The list of stages is an ordered list with role="list",
-   as every list on the site declares itself once its markers are gone. #}
+  {% elif card.get("buttons") %}
+          <ul class="buttons" role="list">
+    {% for button in card.buttons %}
+            <li><a class="btn{{ " btn--primary" if loop.first else "" }}" href="{{ button.url }}">{{ button.label }}{% if button.get("context") %}<span class="vh"> {{ button.context }}</span>{% endif %}</a></li>
+    {% endfor %}
+          </ul>
+  {% endif %}
+{# The card as an argument (controller decision C4 under owner ruling 18, 2026-09-26; external review 3 §23):
+   five run-in blocks -- Question, Setup, Test, Result, Scope -- each one paragraph of `argument` in
+   site.yaml, where every clause is traced to the paper. The owner's diagram (ruling 3) stands under Test and
+   illustrates Setup and Test: four marks, each captioned by one of `how`'s stages with a visible counter, so
+   the captions are the labels. Then what the paper leaves open, and the citation behind an expander. Only
+   the paper card carries these keys; a card without them renders as it did. The list of stages is an
+   ordered list with role="list", as every list on the site declares itself once its markers are gone. #}
+  {% set argument = card.get("argument") or {} %}
+  {% for key, label in [("question", "Question"), ("setup", "Setup"), ("test", "Test")] if argument.get(key) %}
+          <p class="tldr"><span class="runin">{{ label }}</span> {{ m.nb(argument[key]) }}</p>
+  {% endfor %}
   {% if card.get("how") %}
-          <p class="tldr"><span class="runin">How the test works</span></p>
           <ol class="recovery-diagram" role="list" aria-label="How the model-recovery test works">
     {% for step in card.how %}
             <li>{{ m.recovery_mark(loop.index) }}<p>{{ m.nb(step) }}</p></li>
     {% endfor %}
           </ol>
   {% endif %}
-  {% if card.get("found") %}
-          <p class="tldr"><span class="runin">What we found</span> {{ m.nb(card.found) }}</p>
-  {% endif %}
+  {% for key, label in [("result", "Result"), ("scope", "Scope")] if argument.get(key) %}
+          <p class="tldr"><span class="runin">{{ label }}</span> {{ m.nb(argument[key]) }}</p>
+  {% endfor %}
   {% if card.get("open") %}
           <p class="tldr"><span class="runin">Questions the paper leaves open</span></p>
           <ul class="open" role="list">{% for q in card.open %}<li>{{ m.nb(q) }}</li>{% endfor %}</ul>

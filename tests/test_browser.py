@@ -454,6 +454,35 @@ def test_the_featured_papers_links_are_24px_targets_and_its_strip_keeps_its_orde
     _separators_are_never_bare(page, (width, 32))
 
 
+@pytest.mark.parametrize("width", WIDTHS)
+def test_the_resource_rows_keep_their_label_with_their_first_link(browser, width):
+    """The card's links stand in three rows, Read / Reproduce / Watch (controller decision C4, WP-S18), each
+    a label and its list. At the reader's default text size the label sits beside its first link on the
+    same line at every width, and the list wraps inside its own cell, so a row never opens with a label and
+    nothing after it. With the text at 200% the card is asked, not the viewport (a container query): where
+    the widest label and the widest link no longer fit side by side, the label stands above its list, and
+    nothing runs past the card. Every link is a 24px target either way (WCAG 2.2 SC 2.5.8)."""
+    page, _, _ = _page(browser, width, slug="research/")
+    rows_js = """() => [...document.querySelectorAll('.buttons__group')].map(g => {
+      const l = g.querySelector('.buttons__use').getBoundingClientRect(), a = g.querySelector('a').getBoundingClientRect();
+      return {label: g.querySelector('.buttons__use').textContent, top: l.top + scrollY,
+              beside: l.right <= a.left && l.top < a.bottom && a.top < l.bottom, above: l.bottom <= a.top && Math.abs(l.left - a.left) < 1}; })"""
+    rows = page.evaluate(rows_js)
+    assert [r["label"] for r in rows] == ["Read", "Reproduce", "Watch"] and all(r["beside"] for r in rows), rows
+    assert rows[0]["top"] < rows[1]["top"] < rows[2]["top"]
+    links = page.evaluate(HIT_TEST_JS, ".buttons--grouped a")
+    assert [l["label"].split(" ")[0] for l in links] == ["Paper", "arXiv", "Code", "Data", "NeurIPS", "CCN"]
+    assert [l for l in links if l["height"] < 24 or l["width"] < 24 or not l["covered"]] == []
+    page.evaluate("document.documentElement.style.fontSize = '32px'")
+    page.wait_for_timeout(50)
+    rows = page.evaluate(rows_js)
+    assert all(r["beside"] or r["above"] for r in rows), (width, rows)
+    assert page.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0, width
+    card = page.evaluate("""() => { const c = document.querySelector('.paper').getBoundingClientRect();
+      return [...document.querySelectorAll('.buttons--grouped a')].every(a => a.getBoundingClientRect().right <= c.right + 0.5); }""")
+    assert card, width                                                    # nothing runs past the card's edge
+
+
 @pytest.mark.parametrize("width", [1280, 1440])
 def test_the_front_doors_rule_starts_at_now_and_runs_unbroken_to_last_updated(browser, width):
     """The home page opens on plain paper (controller decision C5 item 17 under owner ruling 18, 2026-09-26;
@@ -614,7 +643,10 @@ def test_no_page_is_anywhere_near_as_long_as_the_old_single_page(browser, slug):
     objecting to. Splitting it is only worth doing if the pieces stay short. The research page is the one
     page allowed to run long: it exists to go deep, which is the owner's first priority for the site, and
     even so it stays 18-21% under the single page he objected to. Measured after the 2026-09 polish
-    (WP-S3, with the diagram and Figure 1D on the card): 3370px at 1280 and 4822px at 400."""
+    (WP-S3, with the diagram and Figure 1D on the card): 3370px at 1280 and 4822px at 400; after WP-S18
+    (the card as an argument, the links in three rows, one more sentence in the intro): 3545px at 1280 and
+    5041px at 400 -- the closed-set caveat left the Scope block for the second open question and two
+    captions lost a line each to get there from 3626px."""
     for width, ceiling in CEILINGS.get(slug, DEFAULT_CEILINGS):
         page, _, _ = _page(browser, width, slug=slug)
         height = page.evaluate("document.documentElement.scrollHeight")
@@ -631,6 +663,7 @@ CONTRAST_TARGETS = {
     "muted date": ".log .when, .log .when time",
     "badge": ".tag",
     "filled button": ".btn--primary",
+    "resource row label": ".buttons__use",
 }
 
 # Every element of the body that holds text of its own: its colour, the first background that is not transparent

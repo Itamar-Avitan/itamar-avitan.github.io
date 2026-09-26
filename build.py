@@ -125,6 +125,16 @@ def validate(site: dict) -> list[str]:
     for card in site.get("research") or []:
         if card.get("doi") and card.get("cite") and card["doi"] not in card["cite"]:
             problems.append(f"research card {card.get('title', '')[:40]!r}: doi {card['doi']!r} is not in its cite block")
+        # A card that groups its links by use (`uses`, in order: Read, Reproduce, Watch) names each button's
+        # group in `use`. A button whose `use` is not one of the keys would be drawn in no group and vanish
+        # without a word, and a key named twice would draw its group twice, so the build refuses both.
+        keys = [u.get("key") for u in card.get("uses") or []]
+        if len(keys) != len(set(keys)):
+            problems.append(f"research card {card.get('title', '')[:40]!r}: a key in `uses` is repeated")
+        for button in card.get("buttons") or [] if keys else []:
+            if button.get("use") not in keys:
+                problems.append(f"research card {card.get('title', '')[:40]!r}: button {button.get('label')!r} "
+                                f"has use {button.get('use')!r}, which is not one of {keys}")
     for page in site.get("pages") or []:
         if not template_path(page).exists():
             problems.append(f"page {page['slug']!r} has no template at {template_path(page).relative_to(ROOT)}")
