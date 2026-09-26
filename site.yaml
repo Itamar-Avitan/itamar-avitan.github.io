@@ -201,7 +201,10 @@ identity_line: I study human vision with computational models. I’m interested 
 # sentence names interests and not studies (owner request, 2026-09-25, that his broader interests be stated
 # without revealing future work; the same two interests close the academic CVs' Research-interests line,
 # FACTS INT-BROADER); it carries no verb of future work, no dataset, no method beyond "model recovery", and
-# nothing about the NEAT 2026 work (owner ruling 16). Do not grow it into a programme. The second paragraph is
+# nothing about the NEAT 2026 work (owner ruling 16). Do not grow it into a programme. It opens "The larger
+# question is", not "Behind it is a broader question": the lede a screen above already ends on "the
+# representation behind it", and the paragraph had three "it"s with three referents (review of WP-S17,
+# 2026-09-26). The second paragraph is
 # the rest of the person: the teaching by subject (the titles and the years are the teaching page's and the
 # Now line's -- said there, not here as well), the mentoring in the past tense (MENT-YEARS is 2025-2026), the
 # two things built with other people, and the commonplace. "And I collect lines about the mind." stays as
@@ -218,23 +221,26 @@ identity_line: I study human vision with computational models. I’m interested 
 # project row alone. The ALS expansion is this page's first use of the acronym. Do not add to this clause.
 #
 # Ties: the space before the em dash in the first paragraph is a no-break space (U+00A0), so the dash never
-# opens a line. Word count 81 + 67 = 148 of the 80-150 the test allows (str.split() counts the dash and the
+# opens a line. Word count 79 + 67 = 146 of the 80-150 the test allows (str.split() counts the dash and the
 # colon-less "with"); nothing may be added without a cut, and if the count ever trips, cut "on courses" first.
 about:
-- 'I work in NeuroAI and computational cognitive neuroscience, with Dr. Tal Golan in the Brains and Machines Lab at Ben-Gurion University of the Negev. I came to it from psychology and cognitive and brain sciences, and my work combines human behavioral data, machine learning and model-recovery simulations. Behind it is a broader question: how to compare models with minds so that competing ideas can be told apart — which experiments separate them, and how people differ in the way they see.'
+- 'I work in NeuroAI and computational cognitive neuroscience, with Dr. Tal Golan in the Brains and Machines Lab at Ben-Gurion University of the Negev. I came to it from psychology and cognitive and brain sciences, and my work combines human behavioral data, machine learning and model-recovery simulations. The larger question is how to compare models with minds so that competing ideas can be told apart — which experiments separate them, and how people differ in the way they see.'
 - 'I have been a teaching assistant on courses in computation and cognition, neuroimaging and deep learning, and have mentored two undergraduates in the lab. I like building things with other people: a brain–computer interface that let a person with amyotrophic lateral sclerosis (ALS) answer yes or no, and a headphone add-on designed to filter the sounds that set anxiety off. And I collect lines about the mind.'
 # DRAFT, as above. Short enough to keep true: rewrite it whenever it stops being what you are doing.
 # One dated line since 2026-09-26 (WP-S17; astra's wireframe, controller decision C1 under owner ruling 18):
 # the current activity, not a list, and not the paper's question again -- that lives in the featured Research
-# block above. The line is his teaching in 2026/27, said once: he is the teaching assistant for Introduction
-# to Computation and Cognition again that year (owner ruling 11, 2026-09-25; the fourth year on the course row
-# under `teaching`) and, from the same year, for Academic Writing (owner ruling 13, 2026-09-25: the course's
-# title and his role; record kept privately -- the CV register, FACTS TEACH-TA-MAIN and TEACH-WRITING). The
-# course title is printed in its official order (ruling 19). Two no-break spaces: one ties "from" to its
-# year, because at 320px the line opened on "2026/27" (review of WP-S12), and one keeps the title's two words
-# together, because tied at "from" alone the line ended on "Writing." by itself -- the last pair is kept whole,
-# as "wrong winner" is in the figure's caption. The template prints one line as a paragraph and two or more as
-# the dotted list, so the block can grow back into a list without a template change.
+# block above. The line is the one new thing in his teaching: from 2026/27 he is the teaching assistant for
+# Academic Writing (owner ruling 13, 2026-09-25: the course's title and his role; record kept privately -- the
+# CV register, FACTS TEACH-WRITING). "Also", because he is the teaching assistant for Introduction to
+# Computation and Cognition again that year (owner ruling 11, 2026-09-25) -- a fact this line carried by name
+# until the review of WP-S17 (2026-09-26), when the front door named that course three times in two screens
+# (About, here, the Teaching invitation); it stands now as the fourth year on the course row under `teaching`
+# and behind the invitation's label, and the wireframe's "or" (the TA-again fact or Academic Writing) took
+# the writing course as the current activity. Two no-break spaces: one ties "From" to its year, because at
+# 320px the line once opened on "2026/27" (review of WP-S12), and one keeps the title's two words together,
+# so the line never ends on "Writing." by itself -- the last pair is kept whole, as "wrong winner" is in the
+# figure's caption. The template prints one line as a paragraph and two or more as the dotted list, so the
+# block can grow back into a list without a template change.
 # The research line that stood here from 2026-09-25 ("Carrying the NeurIPS 2025 work forward: ...") went with
 # the wireframe: it repeated the paper's question under a heading meant for what he is doing this term. What
 # it kept out still holds -- the NEAT 2026 flash talk stands on this site as title, co-authors, place and date
@@ -244,7 +250,7 @@ about:
 # words.)
 now_as_of: Sep 2026
 now:
-- Teaching assistant again for Introduction to Computation and Cognition, and from 2026/27 for Academic Writing.
+- From 2026/27, also teaching assistant for Academic Writing.
 
 # The two invitations at the foot of the front door (astra's wireframe: "small invitations: Teaching ·
 # Commonplace"; controller decision C1 under owner ruling 18, 2026-09-26; record kept privately). Until then this
@@ -260,24 +266,27 @@ now:
 #          DS-03); the box belongs to the venue badges alone.
 #   label  the link itself, and it must be a real thing on that page -- the course, the line -- never "read
 #          more" or the page's own name a second time.
-#   text   what else is there, in one clause, and no count in it: a number in a teaser is a maintenance
-#          trap (external review 2 §4) -- the course list has changed twice with his answers, and "four lines"
+#   text   what else is there, in one clause short enough that label, dash and clause are one line at
+#          1280 (the wireframe's "small ... one line each, plain"; the rows were two lines each until the
+#          review of WP-S17, 2026-09-26), and no count in it: a number in a teaser is a maintenance trap
+#          (external review 2 §4) -- the course list has changed twice with his answers, and "four lines"
 #          used to be pinned to the length of the quotes list. The template sets the em dash between the two,
 #          tied to the label by a no-break space so that it never opens a line.
 # The commonplace row deliberately does not quote the Snape passage again: the novel is in copyright, the
 # house rule keeps such an extract to the page that argued for it, and the full passage is printed there at
 # the owner's ruling. Naming the speaker and the subject gets a reader there without a second reproduction.
 # The Teaching label is the course he has helped teach longest (four academic years with 2026/27: owner
-# ruling 11), printed in its official order (ruling 19).
+# ruling 11), printed in its official order (ruling 19); the clause no longer says so, because the Now line
+# said "again" a screen above it and the two read as one fact told twice (review of WP-S17).
 elsewhere:
 - page: Teaching
   label: Introduction to Computation and Cognition
   url: teaching/
-  text: the course I have helped teach longest, and the others beside it.
+  text: and the other courses beside it.
 - page: Commonplace
   label: Severus Snape on what a mind is not
   url: commonplace/
-  text: the first of the lines I keep coming back to, each with where it comes from.
+  text: and the other lines I keep coming back to.
 
 # icon: which mark the template draws before the label. The template now holds three, and only three:
 # mail, github, bluesky. The owner ruled on 2026-09-21 that LinkedIn, ORCID, Google Scholar and X carry no
@@ -336,18 +345,20 @@ news:
 # full) and kept, because it already obeyed it: the programme leads the sentence, EarBetter is named in a
 # clause, and nothing here says who did what. One word of repetition went -- the line named Brown University
 # twice in twenty words, once in the programme's name and once as the place -- and nothing else changed.
-# Since 2026-09-26 the add-on is named by its purpose, "designed to filter" (owner ruling 15 of 2026-09-25;
-# WP-S13): the line no longer says that it filters, and claims no result. Why, and the row's fuller form,
-# are under RULINGS in the note over `projects`. The clause is the ruled one for News, word for word; the
-# verb list before it, "built and pitched", is the practicum row's and the six CVs' (WP-S13 review fix,
-# 2026-09-26: the earlier "designed, built and pitched" put "designed" twice in one sentence, a line apart on
-# a laptop, and no ruling covers that list), so "designed" belongs to the ruled clause alone.
+# The item ends on the name and says nothing about what EarBetter is (review of WP-S17, 2026-09-26): About,
+# one screen up on the same page, carries the ruled purpose clause -- "a headphone add-on designed to filter
+# the sounds that set anxiety off" (owner ruling 15 of 2026-09-25; the rule and the row's fuller form are
+# under RULINGS in the note over `projects`) -- and from 2026-09-26 until that review this line carried the
+# same ten words, so the front door described the add-on twice a screen apart. News answers "what changed";
+# the link on the programme leads to the row that describes the add-on. The verb list, "built and pitched",
+# is the practicum row's and the six CVs' (WP-S13 review fix, 2026-09-26: "designed, built and pitched" put
+# "designed" twice in one sentence, and no ruling covers that list). Do not put a description back here.
 # US spelling, here and everywhere the site speaks in its own words ("program", "behavior", "color"): the
 # paper's title is US and cannot change, so US is the one consistent choice (deep review 2026-09-25, RN-04).
 # Quoted text keeps its own spelling -- "skilful" in the commonplace evidence -- and comments and test names
 # that say "programme-first" keep the ruling's name.
 - date: Aug 2026
-  text: Completed the Embodied Brain Technology Practicum, a joint Brown University–Ben-Gurion University program held at Brown, where our team of five built and pitched EarBetter, a headphone add-on designed to filter the sounds that set a person’s anxiety off.
+  text: Completed the Embodied Brain Technology Practicum, a joint Brown University–Ben-Gurion University program held at Brown, where our team of five built and pitched EarBetter.
   # The link (since 2026-09-26, WP-S17: every visible news item links the thing it names) leads to the
   # practicum's own row under Projects on the research page, not to the programme's page or the repository.
   link: Embodied Brain Technology Practicum
@@ -476,21 +487,24 @@ research:
   #             (WP-S1): one in twenty is the paper's 1/|M| with |M| = 20 models; "simulated" keeps the
   #             millions of trials apart from the human judgments named a sentence earlier.
   #   scope     the result's reach, as the research page states it (controller decision C4): the evaluated
-  #             task, model set, calibration and transformation family, and not a claim about every flexible
-  #             evaluation -- the paper's own term for the mapping.
+  #             task, model set, noise calibration and transformation family, and not a claim about every
+  #             flexible evaluation -- the paper's own term for the mapping. "Noise calibration" in full, as
+  #             the research page says it: bare "calibration" had no referent on this page (review of WP-S17).
   #   stages    one-word captions for the four marks (`how` above has the full sentences for the card): the
-  #             generator, its judgments, the candidates all fitted to them, the winner -- which the fourth
-  #             mark draws as the wrong one. The marks are aria-hidden, so these four words are all a screen
-  #             reader hears of the strip; the sentences above it say the rest.
-  # 90 words in the four sentences (the block's budget is 40-90). No numeral in the captions; "12" nowhere
+  #             generator, its judgments, the candidates all fitted to them, the ranking -- whose winner the
+  #             fourth mark draws as the wrong one. The last caption is "ranking", not "winner": under a
+  #             drawing of the wrong winner, "winner" alone read as if the generator had won (review of
+  #             WP-S17, 2026-09-26; for the owner's eye). The marks are aria-hidden, so these four words are
+  #             all a screen reader hears of the strip; the sentences above it say the rest.
+  # 90 words in the four sentences (the block's budget is 40-90; the test holds the line at 90). No numeral in the captions; "12" nowhere
   # (a private number, see the note over `projects`). The tie in "one in twenty" is not needed: the
   # paragraph is a <p>, so `text-wrap: pretty` looks after its last line.
   feature:
     question: Is the network that predicts human judgments best also the right one?
-    test: We fitted 20 networks to 4.5 million human odd-one-out judgments, let each generate its own judgments, and asked whether the comparison would pick it out.
+    test: We fitted 20 networks to 4.5 million human odd-one-out judgments, let each generate judgments, and asked whether the comparison would pick it out.
     result: 'It picked the right one less than 80% of the time: far above the one in twenty of guessing, but wrong more than one time in five, even with millions of simulated trials.'
-    scope: That is a result for the task, models, calibration and mappings we tested, not a claim that every flexible evaluation fails.
-    stages: [generator, judgments, candidates, winner]
+    scope: That is a result for the task, models, noise calibration and mappings we tested, not a claim that every flexible evaluation fails.
+    stages: [generator, judgments, candidates, ranking]
   # The citation's venue line, under the authors, as academic cards carry it: FACTS PUB-CITATION's compact
   # wording. The badge above stays "NeurIPS 2025", a venue tag; the track belongs here, not in the badge, where
   # a " · " would turn it into a neutral presentation tag (PR-08). No rank and no acceptance rate (ruling).
@@ -593,12 +607,13 @@ talks:
 # privately). Do not grow it into a list of what he did; do not restore the sensors or the business plan; do
 # not put it in News or About. 2026-09-25, ruling 15 (built 2026-09-26, WP-S13): EarBetter is described by
 # what it was designed to do, never as a working filter -- on this row "an add-on for any headphones,
-# designed to read biosignals and filter out the sounds that set a person’s anxiety off", in News "a
-# headphone add-on designed to filter the sounds that set a person’s anxiety off" -- superseding, for this
-# clause alone, the ruling of 2026-09-21 that the entry say the system worked. The README the Code link
-# opens calls the selective path experimental and says anxiety inference was not evaluated or claimed, so
-# the printed claim and the evidence it links agree. About names the add-on the same way -- "a headphone
-# add-on designed to filter the sounds that set anxiety off" (WP-S17). The comma after "headphones" is the site's own (the
+# designed to read biosignals and filter out the sounds that set a person’s anxiety off", and in About on
+# the home page "a headphone add-on designed to filter the sounds that set anxiety off" (WP-S17) --
+# superseding, for this clause alone, the ruling of 2026-09-21 that the entry say the system worked. The
+# README the Code link opens calls the selective path experimental and says anxiety inference was not
+# evaluated or claimed, so the printed claim and the evidence it links agree. The Aug 2026 news item, a screen
+# under About, names EarBetter and links this row rather than describe it a second time (review of WP-S17,
+# 2026-09-26; until then it carried the ruled clause word for word). The comma after "headphones" is the site's own (the
 # plan's site wording has none; the CVs' long form has it): without it, "headphones designed to read
 # biosignals" reads as the headphones' design, not the add-on's. (The wordings retired by these rulings are
 # not kept here, and neither are the owner's own messages: a sentence retired from the page but kept word for

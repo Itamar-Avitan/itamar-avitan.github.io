@@ -301,6 +301,11 @@ def test_the_home_title_and_description_say_who_he_is():
     home = page("")
     assert home["title"].startswith(SITE["name"] + " ") and "Amram" not in home["title"]
     assert home["description"].endswith(SITE["identity_line"])
+    # the identity line is the owner's own sentence, word for word (ruling 17, 2026-09-25; record kept privately);
+    # the one tie before its dash is a no-break space, read as a space here so that the pin is the wording alone
+    assert SITE["identity_line"].replace(" ", " ") == (
+        "I study human vision with computational models. I’m interested in when a model’s success at predicting "
+        "behavior tells us something about the representation behind it — and when it does not.")
     for words in ("NeuroAI", "PhD candidate", "Ben-Gurion University"):
         assert words in home["title"] and words in home["description"], words
     assert build.page_title(SITE, home) == home["title"]
@@ -411,8 +416,9 @@ def test_home_hands_the_visitor_on_to_the_two_pages_about_the_person():
 def test_the_front_door_features_the_paper():
     """Between About and Now the home page carries the paper (WP-S17, controller decision C1 under owner
     ruling 18; record kept privately): the first research card's own venue badge -- the one outlined box
-    outside the card -- its short title linked to the card, one paragraph that opens on the question in bold
-    and runs question, test, result with its chance baseline, scope (`feature` in site.yaml), the four marks
+    outside the card -- its short title linked to the card, one paragraph that runs question, test, result
+    with its chance baseline, scope (`feature` in site.yaml; the question stood in bold until the review of
+    WP-S17: the title had just said the same thing, so the bold was a third statement of it), the four marks
     of the card's diagram captioned by one word each, and the card's Paper, Code and video addresses with a
     link to the page. Everything is read off the card, so nothing here can drift from the research page;
     a card without the keys draws no block, no badge or no links, as the optional-keys test shows."""
@@ -428,15 +434,16 @@ def test_the_front_door_features_the_paper():
     short = card["title"].split(": ", 1)[-1]
     assert f'<h3><a href="research/#papers">{short}'.replace("Best-Fitting", '<span class="nb">Best-Fitting</span>') in section
     assert '<span class="vh"> (Research page)</span></a></h3>' in section
-    # the four sentences, in order, the question in bold; the result is the wording verified for the site
+    # the four sentences, in order, in one plain paragraph; the result is the wording verified for the site
     feature = card["feature"]
     text = _visible_text(section)
-    assert f'<strong class="lead">{feature["question"]}</strong>' in section
+    assert f'<p class="feature__text">{feature["question"]} ' in section and "<strong" not in section
     for key in ("question", "test", "result", "scope"):
         assert " ".join(feature[key].split()) in text, key
     assert text.index(feature["question"]) < text.index(feature["test"]) < text.index(feature["result"][:30]) < text.index(feature["scope"])
     assert "picked the right one less than 80% of the time: far above the one in twenty of guessing" in feature["result"]
-    assert 40 <= sum(len(feature[k].split()) for k in ("question", "test", "result", "scope")) <= 95
+    assert "noise calibration" in feature["scope"]                         # the research page's term, whole: bare "calibration" had no referent here
+    assert 40 <= sum(len(feature[k].split()) for k in ("question", "test", "result", "scope")) <= 90   # the block's budget
     assert "12" not in text                                                # the private number stays off the page
     # the strip: the card's four marks, one word under each, no numeral in a caption
     strip = section.partition('<ol class="recovery-diagram recovery-diagram--small"')[2].partition("</ol>")[0]
@@ -869,10 +876,13 @@ def test_the_practicum_leads_with_the_programme_and_ends_on_his_one_clause():
     "...says_nothing_about_who_did_what" and forbade the first person in the blurb, which those rulings
     supersede. The sensor inventory and the business-plan detail stay deleted. Ruling 15 of the same day
     (built by WP-S13, 2026-09-26) settled the claim itself: EarBetter is described by what it was designed
-    to do -- "designed to read biosignals and filter out" on the row, "designed to filter" in News -- and
+    to do -- "designed to read biosignals and filter out" on the row, "designed to filter" in About -- and
     never as a filter that works, because the README the row's Code link opens calls the selective path
-    experimental; About's clause was purpose-phrased already. See the note over `projects` in site.yaml,
-    and shared/projects.tex in the CV repository, which carries the same shape."""
+    experimental. The news item carried the same clause until the review of WP-S17 (2026-09-26): About and
+    News stood a screen apart on the home page with ten words in common, so the item now ends on the name
+    and links the row that describes the add-on (the front door's repetition rule: each section answers one
+    question, and News answers "what changed"). See the note over `projects` in site.yaml, and
+    shared/projects.tex in the CV repository, which carries the same shape."""
     entry = next(p for p in SITE["projects"] if "Practicum" in p["title"])
     bci = next(p for p in SITE["projects"] if p["title"] == "BCI4ALS")
     news = next(n for n in SITE["news"] if "Practicum" in n["text"])
@@ -887,14 +897,17 @@ def test_the_practicum_leads_with_the_programme_and_ends_on_his_one_clause():
     # EarBetter is named, in a clause, and briefly
     for phrase in ("EarBetter", "add-on", "any headphones", "biosignals", "anxiety"):
         assert phrase in entry["blurb"], phrase
-    assert "headphone add-on" in news["text"] and "our team of five built and pitched EarBetter" in news["text"]
-    # the verb list is the row's and the CVs'; "designed" belongs to the ruled clause alone (WP-S13 review fix)
-    assert news["text"].count("designed") == 1
+    # the news item ends on the name: the verb list is the row's and the CVs', and no description follows,
+    # because About on the same page carries the ruled clause and the link leads to the row (WP-S17 review fix)
+    assert news["text"].endswith("where our team of five built and pitched EarBetter.")
+    assert "designed" not in news["text"] and "add-on" not in news["text"]
+    assert news["link"] == "Embodied Brain Technology Practicum" and news["url"] == "research/#projects"
     # and by its purpose, in the ruled wording (ruling 15): what it was designed to do, not that it does it
     assert "an add-on for any headphones, designed to read biosignals and filter out the sounds" in entry["blurb"]
-    assert "a headphone add-on designed to filter the sounds" in news["text"]
     about_clause = next(p for p in SITE["about"] if "add-on" in p)
     assert "a headphone add-on designed to filter the sounds that set anxiety off" in about_clause
+    home = _visible_text(html_of(""))
+    assert home.count("designed to filter") == 1 and home.count("headphone add-on") == 1   # once on the front door
     for text in (entry["blurb"], news["text"], about_clause):
         for claim in ("filters", "reads biosignals", "works with"):
             assert claim not in text, (claim, text)
@@ -1133,10 +1146,11 @@ def test_the_teaching_page_carries_the_course_home_announces():
     "Academic Writing", teaching assistant, from 2026/27 (owner ruling 13, 2026-09-25; record kept privately --
     the CV register, FACTS TEACH-WRITING); until that ruling it was described, not titled (deep review
     2026-09-25, AK-03 and CS-17; WP-S12). The same year he is the teaching assistant for Introduction to
-    Computation and Cognition again (owner ruling 11, 2026-09-25), so that row's date gains 2026/27 and the
-    Now line says both, once. The list runs newest first like every list on the site (FL-08): it was the one
-    list that ran the other way, so the gutter changed direction between Courses and Students. The order is
-    the CV's."""
+    Computation and Cognition again (owner ruling 11, 2026-09-25), so that row's date gains 2026/27; the Now
+    line names the writing course alone and says "also" for the rest (WP-S17 review fix: with the course in
+    Now too, the front door named it three times in two screens -- About, Now, the Teaching invitation). The
+    list runs newest first like every list on the site (FL-08): it was the one list that ran the other way,
+    so the gutter changed direction between Courses and Students. The order is the CV's."""
     courses = SITE["teaching"]["courses"]
     titles = [c["title"] for c in courses]
     assert "Academic Writing" in titles
@@ -1148,13 +1162,13 @@ def test_the_teaching_page_carries_the_course_home_announces():
                       "Deep Learning for Neuroscience and Cognition", "Computational Approaches to Neuroimaging"]
     # the fourth year on the course he has helped teach longest, listed in full, not as a range
     assert courses[1]["when"] == "2023/24, 2024/25, 2025/26 and 2026/27"
-    # Now says the 2026/27 teaching in one line: the course again, and the writing course from that year.
-    # Neither fact appears in a second Now line, and the writing course is named by its title, not described.
-    teaching_lines = [line for line in SITE["now"] if "Teaching assistant" in line or "2026/27" in line]
+    # Now says the 2026/27 teaching in one line: the writing course from that year, by its title, not
+    # described, with "also" for the course row's fourth year. No second Now line carries either fact.
+    teaching_lines = [line for line in SITE["now"] if "teaching assistant" in line.lower() or "2026/27" in line]
     assert teaching_lines == [SITE["now"][-1]]
-    assert SITE["now"][-1] == ("Teaching assistant again for Introduction to Computation and Cognition, "
-                               "and from 2026/27 for Academic Writing.")     # the year tied to its preposition, the title whole
+    assert SITE["now"][-1] == "From 2026/27, also teaching assistant for Academic Writing."   # the year tied to its preposition, the title whole
     assert not any("writing course" in line for line in SITE["now"])
+    assert not any("Introduction to Computation and Cognition" in line for line in SITE["now"])
     # the gutter reads one direction down the whole page: the years of the six rows, in page order
     html = html_of("teaching/")
     whens = re.findall(r'<p class="when">(.*?)</p>', html)
@@ -1166,22 +1180,23 @@ def test_the_course_prints_under_its_official_title():
     """The course's English title in the BGU course catalogue is "Introduction to Computation and Cognition",
     and the site and the six CVs print it in that order (owner ruling 19, 2026-09-26, superseding the word
     order ruled on 2026-09-21; WP-X1; record kept privately -- the CV register, FACTS TEACH-TA-MAIN, holds the
-    catalogue URL and the history). The title stands in four places: the course row on the teaching page,
-    the Elsewhere Teaching label on the home page, the Now line on his 2026/27 teaching (WP-S12, owner
-    ruling 11) and, in lower case, the About paragraph on his teaching. The old order must not come back in
-    any of them in either case, so the refusal is case-insensitive and runs over the visible text of every
-    page and over every content string in site.yaml: a lower-case mention is caught with a title. The CV
-    repository pins the same title in its own checks."""
+    catalogue URL and the history). The title stands in three places: the course row on the teaching page,
+    the Teaching invitation's label on the home page and, in lower case, the About paragraph on his teaching.
+    The Now line carried it too from WP-S12 (owner ruling 11) until the review of WP-S17, when the front door
+    named the course three times in two screens; the fourth year stands on the row and behind the label. The
+    old order must not come back in any of them in either case, so the refusal is case-insensitive and runs
+    over the visible text of every page and over every content string in site.yaml: a lower-case mention is
+    caught with a title. The CV repository pins the same title in its own checks."""
     official = "Introduction to Computation and Cognition"
     titles = [c["title"] for c in SITE["teaching"]["courses"]]
     assert official in titles
     assert SITE["teaching"]["courses"][titles.index(official)]["kind"] == "Teaching assistant"
     assert [r["label"] for r in SITE["elsewhere"] if r["page"] == "Teaching"] == [official]
     assert sum("computation and cognition" in p for p in SITE["about"]) == 1
-    assert sum(official in line for line in SITE["now"]) == 1
+    assert sum(official in line for line in SITE["now"]) == 0            # the Now line names the writing course alone
     assert official in _visible_text(html_of("teaching/")) and official in _visible_text(html_of(""))
     everywhere = " ".join(_visible_text(h) for h in every_page().values()).lower()
-    assert everywhere.count("computation and cognition") == 4            # the row, the label, the Now line, the About mention
+    assert everywhere.count("computation and cognition") == 3            # the row, the label, the About mention
     assert "cognition and computation" not in everywhere
     assert not any("cognition and computation" in s.lower() for s in _values(SITE))
 

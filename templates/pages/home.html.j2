@@ -64,7 +64,7 @@
 {% endif %}
         <div class="feature__body">
           <h3><a href="{{ 'research/#papers'|local(base) }}">{{ m.nb(card.title.split(": ", 1)[-1]) }}<span class="vh"> (Research page)</span></a></h3>
-          <p class="feature__text"><strong class="lead">{{ m.nb(feature.question) }}</strong> {{ m.nb(feature.test) }} {{ m.nb(feature.result) }} {{ m.nb(feature.scope) }}</p>
+          <p class="feature__text">{{ m.nb(feature.question) }} {{ m.nb(feature.test) }} {{ m.nb(feature.result) }} {{ m.nb(feature.scope) }}</p>
 {% if feature.get("stages") %}
           <ol class="recovery-diagram recovery-diagram--small" role="list" aria-label="The model-recovery test in four stages">
 {% for stage in feature.stages %}

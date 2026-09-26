@@ -411,14 +411,21 @@ def test_the_featured_papers_links_are_24px_targets_and_its_strip_keeps_its_orde
     """The front door's "Paper · Code · Video · More on the research page" is set like the card's mono labels
     in a line of prose, and each link's box is padded to the 24px a target needs (WCAG 2.2 SC 2.5.8) without
     moving the line (WP-S17). The four marks under the paragraph read in order: one row of four from 45rem
-    up, two rows of two below it -- never three and a stranded fourth."""
+    up, two rows of two below it -- never three and a stranded fourth. The row of four is asked of the text
+    column, not the viewport (a container query; WP-S17 review fix): with the reader's text at 200% the
+    column is 21rem at 1280, where four columns broke every caption under its counter and at 720-730px put
+    the last one past the viewport, so the strip keeps the two rows of two there at every width."""
     page, _, _ = _page(browser, width)
     links = page.evaluate(HIT_TEST_JS, ".feature__links a")
     assert [l["label"].split(" ")[0] for l in links] == ["Paper", "Code", "Video", "More"]
     assert [l for l in links if l["height"] < 24 or not l["covered"]] == []
-    tops = page.evaluate("[...document.querySelectorAll('.recovery-diagram--small li')].map(l => Math.round(l.getBoundingClientRect().top))")
-    rows = sorted(set(tops))
-    assert [tops.count(r) for r in rows] == ([4] if width >= 720 else [2, 2]), (width, tops)
+    rows_js = """() => { const t = [...document.querySelectorAll('.recovery-diagram--small li')].map(l => Math.round(l.getBoundingClientRect().top));
+      return [...new Set(t)].sort((a, b) => a - b).map(r => t.filter(x => x === r).length); }"""
+    assert page.evaluate(rows_js) == ([4] if width >= 720 else [2, 2]), width
+    page.evaluate("document.documentElement.style.fontSize = '32px'")
+    page.wait_for_timeout(50)
+    assert page.evaluate(rows_js) == [2, 2], width
+    assert page.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0, width
 
 
 @pytest.mark.parametrize("scheme", ["light", "dark"])

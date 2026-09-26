@@ -691,17 +691,18 @@ main.opens-with-h1 { margin-top: 2.25rem; }
 
 /* ---------- The featured paper on the home page (WP-S17) ----------
    The first research card, in the front door's register: the venue badge in the gutter -- the one outlined box
-   outside the card (DS-09) -- and in the text column the paper's short title as a linked h3, one paragraph
-   that opens on the question in bold ink and runs question, test, result, scope, the four marks of the card's
-   diagram at three-quarters of their size with one-word captions, and the links in the mono of the card's
-   labels. On a phone the badge stands above the title, as the card's badges do. The links row is the quiet
+   outside the card (DS-09) -- and in the text column the paper's short title as a linked h3, one plain
+   paragraph that runs question, test, result, scope (the question opened it in bold until the review of
+   WP-S17: after the lede and the title it was the third statement of the idea in half a screen, so the
+   title carries the weight alone), the four marks of the card's diagram at three-quarters of their size
+   with one-word captions, and the links in the mono of the card's labels. On a phone the badge stands above
+   the title, as the card's badges do. The links row is the quiet
    "Paper · Code" line the Research hand-off used to carry, one link longer; each link's box is padded to the
    24px a target needs (WCAG 2.2 SC 2.5.8) without moving the line -- padding on an inline box widens what
    can be pointed at and leaves the line's height alone. */
 .feature__venue { line-height: 1; margin-bottom: 0.75rem; }
 .feature h3 { font-size: 1.25rem; line-height: 1.3; letter-spacing: -0.008em; text-wrap: balance; }
 .feature__text { margin-top: 0.75rem; }
-.feature .lead { font-weight: 600; color: var(--ink); }
 .feature__links { margin-top: 1rem; font: 500 0.8125rem/1.6 var(--mono); }
 .feature__links a { position: relative; display: inline-block; padding-block: 0.3125rem; }
 
@@ -826,7 +827,8 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   .recovery-diagram { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 /* The same four marks on the home page's featured paper (WP-S17), smaller and captioned by one word each: two
-   rows of two on a phone, one row of four from 45rem up (the desktop block). The marks are capped at 7rem (the
+   rows of two on a phone, one row of four from 45rem up when the text column is at least 28rem wide (the
+   desktop block; a container query, so that text set at 200% keeps the two rows). The marks are capped at 7rem (the
    card's are 8.5rem) so the strip reads as a figure under the paragraph rather than a second card, and their
    strokes, 1.5 units of 120, still print at over a pixel. The captions are labels, not sentences: the
    gutter's mono at the dates' size, the counter in the accent before each, no full stop after it. These rules
@@ -1209,7 +1211,7 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   .log--go > .row > .kind { grid-row: 1; margin-top: 0.125rem; }
 
   /* The featured paper on the grid: the badge in the gutter against the rule, on the title's first line, the
-     rest in the text column; the strip one row of four. */
+     rest in the text column; the strip one row of four when the column is wide enough for four captions. */
   .feature {
     display: grid;
     grid-template-columns: var(--gutter) minmax(0, 1fr);
@@ -1217,8 +1219,16 @@ main.opens-with-h1 { margin-top: 2.25rem; }
     align-items: start;
   }
   .feature__venue { grid-column: 1; justify-self: end; margin: 0.1875rem 0 0; }
-  .feature__body { grid-column: 2; }
-  .recovery-diagram--small { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .feature__body { grid-column: 2; container-type: inline-size; }
+  /* The row of four is asked of the text column, not the viewport: at the default text size the column is
+     30.5rem at 720px and 42rem on a laptop, so this is every width of the block above; with the reader's text
+     at 200% it is 8rem at 720px and 21rem at 1280, where four columns put "ranking" past the viewport at
+     720-730px and broke every caption under its counter (review of WP-S17, 2026-09-26), so the strip keeps
+     the phone's two rows of two there. A rem in a media query is the browser's default size; a rem in a
+     container query is the page root's, so it follows the root set larger. */
+  @container (min-width: 28rem) {
+    .recovery-diagram--small { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
 
   /* expander sits on the rule */
   .older > summary {

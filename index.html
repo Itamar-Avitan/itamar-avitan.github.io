@@ -179,7 +179,7 @@
     <section id="about" aria-labelledby="about-h">
       <h2 id="about-h" class="inset">About</h2>
       <div class="prose inset">
-        <p>I work in NeuroAI and computational cognitive neuroscience, with Dr. Tal Golan in the Brains and Machines Lab at <span class="nb">Ben-Gurion</span> University of the Negev. I came to it from psychology and cognitive and brain sciences, and my work combines human behavioral data, machine learning and model-recovery simulations. Behind it is a broader question: how to compare models with minds so that competing ideas can be told apart — which experiments separate them, and how people differ in the way they see.</p>
+        <p>I work in NeuroAI and computational cognitive neuroscience, with Dr. Tal Golan in the Brains and Machines Lab at <span class="nb">Ben-Gurion</span> University of the Negev. I came to it from psychology and cognitive and brain sciences, and my work combines human behavioral data, machine learning and model-recovery simulations. The larger question is how to compare models with minds so that competing ideas can be told apart — which experiments separate them, and how people differ in the way they see.</p>
         <p>I have been a teaching assistant on courses in computation and cognition, neuroimaging and deep learning, and have mentored two undergraduates in the lab. I like building things with other people: a <span class="nb">brain–computer</span> interface that let a person with amyotrophic lateral sclerosis (ALS) answer yes or no, and a headphone <span class="nb">add-on</span> designed to filter the sounds that set anxiety off. And I collect lines about the mind.</p>
       </div>
     </section>
@@ -190,12 +190,12 @@
         <p class="feature__venue"><span class="tag tag--venue">NeurIPS 2025</span></p>
         <div class="feature__body">
           <h3><a href="research/#papers">When the <span class="nb">Best-Fitting</span> Model Isn’t the Right One<span class="vh"> (Research page)</span></a></h3>
-          <p class="feature__text"><strong class="lead">Is the network that predicts human judgments best also the right one?</strong> We fitted 20 networks to 4.5 million human <span class="nb">odd-one-out</span> judgments, let each generate its own judgments, and asked whether the comparison would pick it out. It picked the right one less than 80% of the time: far above the one in twenty of guessing, but wrong more than one time in five, even with millions of simulated trials. That is a result for the task, models, calibration and mappings we tested, not a claim that every flexible evaluation fails.</p>
+          <p class="feature__text">Is the network that predicts human judgments best also the right one? We fitted 20 networks to 4.5 million human <span class="nb">odd-one-out</span> judgments, let each generate judgments, and asked whether the comparison would pick it out. It picked the right one less than 80% of the time: far above the one in twenty of guessing, but wrong more than one time in five, even with millions of simulated trials. That is a result for the task, models, noise calibration and mappings we tested, not a claim that every flexible evaluation fails.</p>
           <ol class="recovery-diagram recovery-diagram--small" role="list" aria-label="The model-recovery test in four stages">
             <li><svg aria-hidden="true" viewBox="0 0 120 64"><path d="M1 12h9v9h-9zM14 12h9v9h-9zM27 12h9v9h-9zM40 12h9v9h-9zM53 12h9v9h-9zM1 25h9v9h-9zM14 25h9v9h-9zM27 25h9v9h-9zM53 25h9v9h-9zM1 38h9v9h-9zM14 38h9v9h-9zM27 38h9v9h-9zM40 38h9v9h-9zM53 38h9v9h-9zM1 51h9v9h-9zM14 51h9v9h-9zM27 51h9v9h-9zM40 51h9v9h-9zM53 51h9v9h-9z" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="40" y="25" width="9" height="9" style="fill:var(--accent)"/></svg><p>generator</p></li>
             <li><svg aria-hidden="true" viewBox="0 0 120 64"><g fill="currentColor"><circle cx="5.5" cy="12.5" r="4.5"/><circle cx="20.5" cy="12.5" r="4.5"/><circle cx="5.5" cy="28.5" r="4.5"/><circle cx="20.5" cy="28.5" r="4.5"/><circle cx="5.5" cy="44.5" r="4.5"/><circle cx="20.5" cy="44.5" r="4.5"/></g><path d="M31 8h9v9h-9zM31 24h9v9h-9zM31 40h9v9h-9z" style="fill:var(--accent)"/><path d="M8.5 56h24M12.5 60.5h16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><p>judgments</p></li>
             <li><svg aria-hidden="true" viewBox="0 0 120 64"><path d="M29 12h9v9h-9zM42 12h9v9h-9zM55 12h9v9h-9zM68 12h9v9h-9zM81 12h9v9h-9zM29 25h9v9h-9zM42 25h9v9h-9zM55 25h9v9h-9zM68 25h9v9h-9zM81 25h9v9h-9zM29 38h9v9h-9zM42 38h9v9h-9zM55 38h9v9h-9zM68 38h9v9h-9zM81 38h9v9h-9zM29 51h9v9h-9zM42 51h9v9h-9zM55 51h9v9h-9zM68 51h9v9h-9zM81 51h9v9h-9z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M29 8.5V5h61v3.5M1 36h20M16 31l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><p>candidates</p></li>
-            <li><svg aria-hidden="true" viewBox="0 0 120 64"><path d="M1 12h9v9h-9zM1 38h9v9h-9zM1 51h9v9h-9z" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="1" y="25" width="9" height="9" style="fill:var(--accent)"/><path d="M15 15h62v3H15zM15 28h46v3H15zM15 41h30v3H15zM15 54h16v3H15z" fill="currentColor"/></svg><p>winner</p></li>
+            <li><svg aria-hidden="true" viewBox="0 0 120 64"><path d="M1 12h9v9h-9zM1 38h9v9h-9zM1 51h9v9h-9z" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="1" y="25" width="9" height="9" style="fill:var(--accent)"/><path d="M15 15h62v3H15zM15 28h46v3H15zM15 41h30v3H15zM15 54h16v3H15z" fill="currentColor"/></svg><p>ranking</p></li>
           </ol>
           <p class="feature__links">
             <a href="https://proceedings.neurips.cc/paper_files/paper/2025/hash/11e1900e680f5fe1893a8e27362dbe2c-Abstract-Conference.html">Paper<span class="vh"> (NeurIPS 2025)</span></a> ·
@@ -212,7 +212,7 @@
       <ul class="log" role="list">
         <li class="row">
           <time class="when" datetime="2026-09">Sep 2026</time>
-          <p class="what">Teaching assistant again for Introduction to Computation and Cognition, and from 2026/27 for Academic Writing.</p>
+          <p class="what">From 2026/27, also teaching assistant for Academic Writing.</p>
         </li>
       </ul>
     </section>
@@ -226,7 +226,7 @@
         </li>
         <li class="row">
           <time class="when" datetime="2026-08">Aug 2026</time>
-          <p class="what">Completed the <a href="research/#projects">Embodied Brain Technology Practicum</a>, a joint Brown University–<span class="nb">Ben-Gurion</span> University program held at Brown, where our team of five built and pitched EarBetter, a headphone <span class="nb">add-on</span> designed to filter the sounds that set a person’s anxiety off.</p>
+          <p class="what">Completed the <a href="research/#projects">Embodied Brain Technology Practicum</a>, a joint Brown University–<span class="nb">Ben-Gurion</span> University program held at Brown, where our team of five built and pitched EarBetter.</p>
         </li>
         <li class="row">
           <time class="when" datetime="2025-12">Dec 2025</time>
@@ -260,11 +260,11 @@
       <ul class="log log--tight log--go" role="list">
         <li class="row">
           <p class="kind"><span class="tag">Teaching</span></p>
-          <p class="what"><a href="teaching/">Introduction to Computation and Cognition<span class="vh"> (Teaching page)</span></a>&nbsp;— the course I have helped teach longest, and the others beside it.</p>
+          <p class="what"><a href="teaching/">Introduction to Computation and Cognition<span class="vh"> (Teaching page)</span></a>&nbsp;— and the other courses beside it.</p>
         </li>
         <li class="row">
           <p class="kind"><span class="tag">Commonplace</span></p>
-          <p class="what"><a href="commonplace/">Severus Snape on what a mind is not<span class="vh"> (Commonplace page)</span></a>&nbsp;— the first of the lines I keep coming back to, each with where it comes from.</p>
+          <p class="what"><a href="commonplace/">Severus Snape on what a mind is not<span class="vh"> (Commonplace page)</span></a>&nbsp;— and the other lines I keep coming back to.</p>
         </li>
       </ul>
     </section>
