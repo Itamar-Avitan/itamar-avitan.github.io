@@ -110,7 +110,11 @@ in `teaching` are drafts of the same kind: they say what each course is about, d
 say nothing about what he does inside it beyond the role in its `kind` tag, because nothing on record does.
 The Academic Writing row carries no sentence at all: its title and his role are the owner's (owner ruling,
 2026-09-25), and nothing on record says what the course covers. The two rows under Students carry the
-register's own sentences (the mentoring topics, the tutoring subjects), which the CV already prints.
+register's own sentences (the mentoring topics, the tutoring subjects), which the CV already prints. Two
+things `now` leaves out on purpose (owner rulings, 2026-09-25): it says nothing about what he is looking
+for, and nothing about the NEAT 2026 flash talk beyond a pointer to it. On this site that talk is a title,
+its co-authors, a place and a date, and the questions on the research card are the paper's own, not his
+directions. A test holds both.
 
 The research card's thumbnail is chosen by one line. `site.yaml` holds both pictures under `figure_options`,
 and the card points at one of them:

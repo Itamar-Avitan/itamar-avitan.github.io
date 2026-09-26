@@ -214,8 +214,12 @@ about:
 - I work in NeuroAI and computational cognitive neuroscience. I started my PhD with Dr. Tal Golan in 2024, coming from cognitive and brain sciences and psychology, and expect to finish in 2029.
 - I have been a teaching assistant on courses in computation and cognition, neuroimaging and deep learning, and have mentored two undergraduates in the lab. I like building things with other people — a brain–computer interface that let a person with amyotrophic lateral sclerosis (ALS) answer yes or no, and a headphone add-on for the noises that set anxiety off. And I collect lines about the mind.
 # DRAFT, as above. Short enough to keep true: rewrite it whenever it stops being what you are doing.
-# Two lines since 2026-09-25 (WP-S1). Line 1 repeats the lede's question on purpose: it is the interim until
-# the owner says what may be said about the current work (Q-H). The mentoring line went because MENT-YEARS is
+# Two lines since 2026-09-25 (WP-S1). Line 1 is the paper's own question, a public fact, and it stays the
+# research line under the owner's ruling of 2026-09-25 on what comes next (ruling 16, WP-S11; record kept
+# privately -- the review's rulings file): the NEAT 2026 flash talk stands on this site as title, co-authors,
+# place and date only, and this line must not describe that work -- not its framing, not a direction, not a
+# result -- until both co-authors agree to more, which is his to say. Before that ruling the line was an
+# interim that repeated the lede on purpose. The mentoring line went because MENT-YEARS is
 # 2025-2026 by his own account, so it is not "now". Line 2 is his teaching in 2026/27, said once: he is the
 # teaching assistant for Introduction to Computation and Cognition again that year (owner ruling 11,
 # 2026-09-25; the fourth year on the course row under `teaching`) and, from the same year, for Academic
@@ -227,6 +231,10 @@ about:
 # spaces: one ties "from" to its year, because at 320px the line opened on "2026/27" (review of WP-S12), and
 # one keeps the title's two words together, because tied at "from" alone the line ended on "Writing." by
 # itself -- the last pair is kept whole, as "wrong winner" is in the figure's caption.
+# Owner ruling 2026-09-25: the site says nothing about what he is looking for; the résumés carry the
+# availability line. Do not add one. (Ruling 14, WP-S11; record kept privately. Three reviews proposed a dated
+# line on an internship, or an invitation to write, in this block; neither is built, and the block's test
+# refuses the words.)
 now_as_of: Sep 2026
 now:
 - 'Carrying the NeurIPS 2025 work forward: can an alignment measure identify the right model of human vision, or only the best-fitting one?'
@@ -426,7 +434,10 @@ research:
   #   found  the plateau, the geometry-shift mechanism (the abstract's regression sentence, moved here from
   #          the Summary), the accuracy-identifiability trade-off, and the paper's own closed-set caveat.
   #   open   questions the paper itself raises; each comment names its section of arXiv 2510.23321. Not a
-  #          statement of current work (that is Q-H, the owner's). The last two words of the second and third
+  #          statement of current work, and not framed as his directions: the owner ruled on 2026-09-25 that
+  #          they stay the paper's own, under the run-in "Questions the paper leaves open", until both
+  #          co-authors of the NEAT 2026 talk agree to more (ruling 16, WP-S11; record kept privately). The
+  #          last two words of the second and third
   #          are tied with a no-break space (U+00A0): `.open li` is not a <p>, so the page's `p { text-wrap:
   #          pretty }` does not reach it, and "set?" (at 390) and "people?" (at 1280 and 1440) stood alone on
   #          their last line in Chromium, Firefox and WebKit (deep review, WP-S3 second review). The words do
