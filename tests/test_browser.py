@@ -534,7 +534,7 @@ def _separators_are_never_bare(page, where):
     before the link, where its dot would land, is bare paper -- or follows another on the same line, and
     then the strip carries the dot. Read from the pixels, as the hung dot of the kind tags is."""
     items = page.evaluate(FEATURE_ROW_JS)
-    assert [i["label"] for i in items] == ["Paper", "Code", "Video", "More"] and all("·" in i["dot"] for i in items)
+    assert [i["label"] for i in items] == ["Paper", "Code", "Talk", "More"] and all("·" in i["dot"] for i in items)
     for i in items:
         strip = _colours(page, i["left"] + 0.5, i["top"] + 1, i["linkLeft"] - 0.5, i["bottom"] - 1)
         assert (len(strip) == 1) == i["opens"], (where, i["label"], i["opens"], len(strip))
@@ -542,7 +542,7 @@ def _separators_are_never_bare(page, where):
 
 @pytest.mark.parametrize("width", WIDTHS)
 def test_the_featured_papers_links_are_24px_targets_and_its_strip_keeps_its_order(browser, width):
-    """The front door's "Paper · Code · Video · More on the research page" is a list set like the card's mono
+    """The front door's "Paper · Code · Talk · More on the research page" is a list set like the card's mono
     labels, and each link's box is padded to the 24px a target needs (WCAG 2.2 SC 2.5.8) (WP-S17). The dot
     between two items is drawn in each item's left padding and clipped where an item opens a line, as on the
     role line, so the row never ends a line on a bare dot or opens one with it: until the review of WP-S17
@@ -555,7 +555,7 @@ def test_the_featured_papers_links_are_24px_targets_and_its_strip_keeps_its_orde
     the two rows of two there at every width."""
     page, _, _ = _page(browser, width)
     links = page.evaluate(HIT_TEST_JS, ".feature__links a")
-    assert [l["label"].split(" ")[0] for l in links] == ["Paper", "Code", "Video", "More"]
+    assert [l["label"].split(" ")[0] for l in links] == ["Paper", "Code", "Talk", "More"]
     assert [l for l in links if l["height"] < 24 or not l["covered"]] == []
     rows_js = """() => { const t = [...document.querySelectorAll('.recovery-diagram--small li')].map(l => Math.round(l.getBoundingClientRect().top));
       return [...new Set(t)].sort((a, b) => a - b).map(r => t.filter(x => x === r).length); }"""

@@ -456,7 +456,7 @@ def test_the_front_door_features_the_paper():
     outside the card -- its short title linked to the card, one paragraph that runs question, test, result
     with its chance baseline, scope (`feature` in site.yaml; the question stood in bold until the review of
     WP-S17: the title had just said the same thing, so the bold was a third statement of it), the four marks
-    of the card's diagram captioned by one word each, and the card's Paper, Code and video addresses with a
+    of the card's diagram captioned by one word each, and the card's Paper, Code and talk addresses with a
     link to the page. Everything is read off the card, so nothing here can drift from the research page;
     a card without the keys draws no block, no badge or no links, as the optional-keys test shows."""
     html = html_of("")
@@ -493,7 +493,7 @@ def test_the_front_door_features_the_paper():
     links = re.findall(r'<a href="([^"]+)">([^<]+)(?:<span class="vh"> ([^<]+)</span>)?</a>', unescape(section.partition('class="feature__links"')[2]))
     assert links == [(by["Paper"]["url"], "Paper", by["Paper"]["context"]),
                      (by["Code"]["url"], "Code", by["Code"]["context"]),
-                     (by["NeurIPS 2025 video"]["url"], "Video", by["NeurIPS 2025 video"]["context"]),
+                     (by["NeurIPS 2025 talk"]["url"], "Talk", by["NeurIPS 2025 talk"]["context"]),
                      ("research/", "More on the research page", "")]
     assert "CCN" not in section                       # the preliminary version is never the paper's link
     # A list, one link to an item, and no dot typed between them: the separator is the stylesheet's, drawn in
@@ -760,7 +760,7 @@ def test_the_links_are_grouped_by_what_a_reader_does_with_them():
     block = html.partition('<ul class="buttons buttons--grouped"')[2].partition('<p class="tldr">')[0]
     groups = re.findall(r'<li class="buttons__group"><span class="buttons__use">([^<]+)</span>\s*<ul class="buttons" role="list">(.*?)</ul>', block, flags=re.S)
     assert [(label, re.findall(r'<a class="btn[^"]*" href="[^"]+">([^<]+)', links)) for label, links in groups] == [
-        ("Read", ["Paper", "arXiv"]), ("Reproduce", ["Code", "Data"]), ("Watch", ["NeurIPS 2025 video", "CCN 2025 talk"])]
+        ("Read", ["Paper", "arXiv"]), ("Reproduce", ["Code", "Data"]), ("Watch", ["NeurIPS 2025 talk", "CCN 2025 talk"])]
     assert [b["label"] for b in card["buttons"] if b["use"] == "read"][0] == "Paper" and block.count("btn btn--primary") == 1
     assert all(f'href="{b["url"]}"' in unescape(block) for b in card["buttons"])
     bad = copy.deepcopy(SITE)
@@ -791,7 +791,7 @@ def test_the_card_figure_is_swapped_by_one_line_and_only_a_plot_is_marked_as_one
     assert f'<img src="../{plot["src"]}" alt="{plot["alt"]}" width="272" height="272">' in html
     assert '<figure class="paper__fig paper__fig--plot">' in html            # a plot, whose colour is data
     assert "<figcaption>Adapted from Fig.\u00a01D" in html                # a no-break space ties the number
-    assert "is a wrong\u00a0winner.</figcaption>" in html                 # and the last pair, in every engine
+    assert "in the last\u00a0column.</figcaption>" in html               # and the last pair, in every engine (R1, 2026-09-27)
     assert "paper__fig--art" not in html and lab["webp"] not in html and lab["src"] not in html
     site = copy.deepcopy(SITE)
     site["research"][0]["figure"] = site["figure_options"]["lab_illustration"]
@@ -1341,13 +1341,14 @@ def test_the_teaching_page_carries_the_course_home_announces():
                       "Deep Learning for Neuroscience and Cognition", "Computational Approaches to Neuroimaging"]
     # the fourth year on the course he has helped teach longest, listed in full, not as a range
     assert courses[1]["when"] == "2023/24, 2024/25, 2025/26 and 2026/27"
-    # Now says the 2026/27 teaching in one line: the writing course from that year, by its title, not
-    # described, with "also" for the course row's fourth year. No second Now line carries either fact.
+    # Now says the 2026/27 teaching in one line, both roles with their own subject (final site review H2;
+    # owner ruling 20, 2026-09-27): the course again, and Academic Writing from that year, by its title.
     teaching_lines = [line for line in SITE["now"] if "teaching assistant" in line.lower() or "2026/27" in line]
     assert teaching_lines == [SITE["now"][-1]]
-    assert SITE["now"][-1] == "From 2026/27, also teaching assistant for Academic Writing."   # the year tied to its preposition, the title whole
+    assert SITE["now"][-1] == ("Teaching assistant again for Introduction to Computation and Cognition, and for "
+                               "Academic Writing from\u00a02026/27.")   # the year tied to its preposition
     assert not any("writing course" in line for line in SITE["now"])
-    assert not any("Introduction to Computation and Cognition" in line for line in SITE["now"])
+    assert sum("Introduction to Computation and Cognition" in line for line in SITE["now"]) == 1   # named once, in the one line (H2)
     # the gutter reads one direction down the whole page: the years of the six rows, in page order
     html = html_of("teaching/")
     whens = re.findall(r'<p class="when">(.*?)</p>', html)
@@ -1359,7 +1360,7 @@ def test_the_course_prints_under_its_official_title():
     """The course's English title in the BGU course catalogue is "Introduction to Computation and Cognition",
     and the site and the six CVs print it in that order (owner ruling 19, 2026-09-26, superseding the word
     order ruled on 2026-09-21; WP-X1; record kept privately -- the CV register, FACTS TEACH-TA-MAIN, holds the
-    catalogue URL and the history). The title stands in three places: the course row on the teaching page,
+    catalogue URL and the history). The title stands in two places since 2026-09-27 (About names the teaching by role, H4): the course row on the teaching page,
     the Teaching invitation's label on the home page and, in lower case, the About paragraph on his teaching.
     The Now line carried it too from WP-S12 (owner ruling 11) until the review of WP-S17, when the front door
     named the course three times in two screens; the fourth year stands on the row and behind the label. The
@@ -1371,8 +1372,8 @@ def test_the_course_prints_under_its_official_title():
     assert official in titles
     assert SITE["teaching"]["courses"][titles.index(official)]["kind"] == "Teaching assistant"
     assert [r["label"] for r in SITE["elsewhere"] if r["page"] == "Teaching"] == [official]
-    assert sum("computation and cognition" in p for p in SITE["about"]) == 1
-    assert sum(official in line for line in SITE["now"]) == 0            # the Now line names the writing course alone
+    assert not any("computation and cognition" in p.lower() for p in SITE["about"])   # About names the teaching by role since 2026-09-27 (H4)
+    assert sum(official in line for line in SITE["now"]) == 1            # the Now line names both 2026/27 roles (H2, 2026-09-27)
     assert official in _visible_text(html_of("teaching/")) and official in _visible_text(html_of(""))
     everywhere = " ".join(_visible_text(h) for h in every_page().values()).lower()
     assert everywhere.count("computation and cognition") == 3            # the row, the label, the About mention
@@ -1852,10 +1853,15 @@ def test_the_talk_video_opens_where_his_own_talk_starts():
     assert (build.ROOT / "site.yaml").read_text(encoding="utf-8").count("vT-3kV89Rhk") == 1
     by = {b["label"]: b for b in SITE["research"][0]["buttons"]}
     assert by["CCN 2025 talk"]["url"] == link["url"] and by["CCN 2025 talk"]["use"] == "watch"
-    # and the card carries the paper's own NeurIPS video, the one cv.pdf prints (FACTS PUB-LINK-TALK)
-    video = by["NeurIPS 2025 video"]
-    assert video["url"] == "https://slideslive.com/39047290" and video["use"] == "watch"
-    assert "talk" not in video["context"]                                   # a poster video, not a talk
+    # and the card carries the paper's own NeurIPS recording, the one cv.pdf prints (FACTS PUB-LINK-TALK):
+    # his own presentation of the paper, so it is labelled as his talk (owner ruling 22, 2026-09-27; record
+    # kept privately), and the label claims nothing more -- the NeurIPS row in the Talks list stays a poster
+    talk = by["NeurIPS 2025 talk"]
+    assert talk["url"] == "https://slideslive.com/39047290" and talk["use"] == "watch"
+    assert talk["context"] == "recording of my presentation of the paper"
+    assert "NeurIPS 2025 video" not in _visible_text(html) and "NeurIPS 2025 video" not in _visible_text(html_of(""))
+    neurips_row = next(t for t in SITE["talks"] if "(NeurIPS) 2025" in t["venue"])
+    assert neurips_row["kind"] == "Poster" and "links" not in neurips_row
     assert "CCN 2025 talk video" not in html and "video" not in by["CCN 2025 talk"]["label"]
 
 
@@ -1903,7 +1909,7 @@ def test_a_link_says_where_it_leads_to_a_reader_who_cannot_see_the_card():
     contexts = {b["label"]: b.get("context") for b in card["buttons"]}
     assert contexts == {"Paper": "(NeurIPS 2025)", "arXiv": "preprint of the NeurIPS 2025 paper",
                         "Code": "for the NeurIPS 2025 paper", "Data": "for the NeurIPS 2025 paper",
-                        "NeurIPS 2025 video": "of the poster presentation of the paper",
+                        "NeurIPS 2025 talk": "recording of my presentation of the paper",
                         "CCN 2025 talk": "recording of a preliminary version of the paper, from 11:55"}
     for label, context in contexts.items():
         assert f'>{label}<span class="vh"> {context}</span></a></li>' in research, label
@@ -1925,10 +1931,10 @@ def test_a_link_says_where_it_leads_to_a_reader_who_cannot_see_the_card():
         assert section.count(f'<span class="vh"> ({row["page"]} page)</span></a>&nbsp;—') == 1, row["page"]
         assert re.search(rf'<a href="{row["url"]}">(?:(?!</a>).)*{re.escape(row["label"][-12:])}<span class="vh"> \({row["page"]} page\)</span></a>', section), row["page"]
     assert section.count('class="vh"') == len(SITE["elsewhere"])              # the two pages, nothing else
-    # the featured paper: its title names the page, and Paper, Code and Video carry the card's own contexts
+    # the featured paper: its title names the page, and Paper, Code and Talk carry the card's own contexts
     feature = home.partition('<section id="research"')[2].partition("</section>")[0]
     assert feature.count('<span class="vh"> (Research page)</span>') == 1
-    for shown, label in (("Paper", "Paper"), ("Code", "Code"), ("Video", "NeurIPS 2025 video")):
+    for shown, label in (("Paper", "Paper"), ("Code", "Code"), ("Talk", "NeurIPS 2025 talk")):
         assert f'>{shown}<span class="vh"> {contexts[label]}</span></a>' in feature, shown
     assert feature.count('class="vh"') == 4
     css = _css()
@@ -2015,13 +2021,14 @@ def test_the_current_page_tick_is_the_section_tick_and_lands_on_the_strip_rule()
 def test_the_figure_caption_is_set_once_and_turns_with_its_gutter():
     """It was styled twice: right in the base rule, and left again in the phone block under a comment about a
     caption this build does not print at all. The type is set once now and the alignment once, where the rest
-    of the gutter is turned -- labels follow the page's left edge on a phone, the margin rule on a desktop."""
+    of the gutter is turned. Since 2026-09-27 the caption is two sentences, not a label, and is set flush left
+    under its plate at every width (final site review R1), so no block turns it."""
     base, _, rest = _css().partition("Phone: the rule moves")
     phone, _, desktop = rest.partition("Desktop: the gutter")
     caption = re.search(r"\.paper__fig figcaption \{[^}]*\}", base)
     assert base.count(".paper__fig figcaption") == 1 and "text-align" not in caption.group(0)
     assert ".paper__fig figcaption" not in phone                            # the phone keeps the left edge
-    assert ".paper__fig figcaption { text-align: right; }" in desktop
+    assert ".paper__fig figcaption" not in desktop                          # flush left at every width since 2026-09-27 (R1)
     assert "hangs under the left edge" not in _css()                        # and the misleading comment is gone
 
 

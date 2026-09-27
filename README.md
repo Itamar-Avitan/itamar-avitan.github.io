@@ -78,7 +78,7 @@ their own (astra's wireframe, taken under the owner's delegation of 2026-09-25; 
 featured paper is the first `research` card read from the front door: its venue badge in the gutter, the
 title's second half linked to the card, one paragraph of four sentences kept on the card as `feature`
 (question, test, result with its chance baseline, scope), the four marks of the card's diagram with one-word
-captions, and the card's Paper, Code and video addresses with a link to the page. Nothing about the paper is
+captions, and the card's Paper, Code and talk addresses with a link to the page. Nothing about the paper is
 written twice. The invitations' gutter holds the page's name as a tag rather than a date, because these rows
 are addresses and not points in time — the margin rule stays a time axis, and a tag takes no tick. A tag in a
 log's gutter (a page name here, a role or a talk's kind elsewhere) is a small uppercase mono label; the
@@ -149,7 +149,7 @@ paper's own open questions and the BibTeX behind an expander. Every clause of th
 its section of the paper in the note over `argument`; the Scope block is what keeps the result to the task,
 the model set, the noise calibration and the linear transformation family the paper evaluated, so that
 nobody reads it as a claim about every flexible evaluation. The card's links stand in three rows by what a
-reader does with them — Read (the paper, the preprint), Reproduce (code, data), Watch (the NeurIPS video and
+reader does with them — Read (the paper, the preprint), Reproduce (code, data), Watch (his NeurIPS talk and
 the CCN talk's recording) — `uses` names the rows and each button its row, and `build.py` refuses a button
 that names no row. The CCN recording's address is written once, on that button, and the CCN talk row refers
 to it by a YAML anchor. The page's intro carries one sentence on the larger question the paper is an instance

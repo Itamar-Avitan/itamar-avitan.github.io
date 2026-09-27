@@ -232,10 +232,14 @@ identity_line: I study human vision with computational models. I’m interested 
 # question is", not "Behind it is a broader question": the lede a screen above already ends on "the
 # representation behind it", and the paragraph had three "it"s with three referents (review of WP-S17,
 # 2026-09-26). The second paragraph is
-# the rest of the person: the teaching by subject (the titles and the years are the teaching page's and the
-# Now line's -- said there, not here as well), the mentoring in the past tense (MENT-YEARS is 2025-2026), the
-# two things built with other people, and the commonplace. "And I collect lines about the mind." stays as
-# written (external review 3 kept it by name).
+# the rest of the person: the teaching by its role alone, the mentoring in the past tense (MENT-YEARS is
+# 2025-2026), the two things built with other people, and the commonplace. "And I collect lines about the
+# mind." stays as written (external review 3 kept it by name). Until 2026-09-27 the teaching went by subject
+# ("on courses in computation and cognition, in neuroimaging and in deep learning"); the Now line under the
+# paper names the course by its title and the Teaching invitation points to the rest, so the page said the
+# subjects twice, and cutting them lifts the featured Research block a line at every width (final site
+# review 2026-09-26, H1 and H4; owner ruling 20, 2026-09-27; record kept privately). The titles, the years
+# and the subjects are the teaching page's; do not put them back here.
 #
 # Gone since 2026-09-26: the paragraph that argued the paper (the mapping, the twenty networks, the 80%) --
 # that argument is the featured Research block directly under About, drawn from the paper card, and the
@@ -248,28 +252,29 @@ identity_line: I study human vision with computational models. I’m interested 
 # project row alone. The ALS expansion is this page's first use of the acronym. Do not add to this clause.
 #
 # Ties: the space before the em dash in the first paragraph is a no-break space (U+00A0), so the dash never
-# opens a line. Word count 79 + 69 = 148 of the 80-150 the test allows (str.split() counts the dash and the
-# colon-less "with"); nothing may be added without a cut, and if the count ever trips, cut "on courses" first.
-# The three teaching subjects each take their own "in" ("in computation and cognition, in neuroimaging and in
-# deep learning"): without it the list read as two pairs (reviews of WP-X1 and WP-S17).
+# opens a line. Word count 79 + 57 = 136 of the 80-150 the test allows (str.split() counts the dash), inside
+# the 90-140 external review 2 asks of an About; every line added here lowers the paper by a line.
 about:
 - 'I work in NeuroAI and computational cognitive neuroscience, with Dr. Tal Golan in the Brains and Machines Lab at Ben-Gurion University of the Negev. I came to it from psychology and cognitive and brain sciences, and my work combines human behavioral data, machine learning and model-recovery simulations. The larger question is how to compare models with minds so that competing ideas can be told apart — which experiments separate them, and how people differ in the way they see.'
-- 'I have been a teaching assistant on courses in computation and cognition, in neuroimaging and in deep learning, and have mentored two undergraduates in the lab. I like building things with other people: a brain–computer interface that let a person with amyotrophic lateral sclerosis (ALS) answer yes or no, and a headphone add-on designed to filter the sounds that set anxiety off. And I collect lines about the mind.'
+- 'I have been a teaching assistant and have mentored two undergraduates in the lab. I like building things with other people: a brain–computer interface that let a person with amyotrophic lateral sclerosis (ALS) answer yes or no, and a headphone add-on designed to filter the sounds that set anxiety off. And I collect lines about the mind.'
 # DRAFT, as above. Short enough to keep true: rewrite it whenever it stops being what you are doing.
 # One dated line since 2026-09-26 (WP-S17; astra's wireframe, controller decision C1 under owner ruling 18):
 # the current activity, not a list, and not the paper's question again -- that lives in the featured Research
-# block above. The line is the one new thing in his teaching: from 2026/27 he is the teaching assistant for
-# Academic Writing (owner ruling 13, 2026-09-25: the course's title and his role; record kept privately -- the
-# CV register, FACTS TEACH-WRITING). "Also", because he is the teaching assistant for Introduction to
-# Computation and Cognition again that year (owner ruling 11, 2026-09-25) -- a fact this line carried by name
-# until the review of WP-S17 (2026-09-26), when the front door named that course three times in two screens
-# (About, here, the Teaching invitation); it stands now as the fourth year on the course row under `teaching`
-# and behind the invitation's label, and the wireframe's "or" (the TA-again fact or Academic Writing) took
-# the writing course as the current activity. Two no-break spaces: one ties "From" to its year, because at
-# 320px the line once opened on "2026/27" (review of WP-S12), and one keeps the title's two words together,
-# so the line never ends on "Writing." by itself -- the last pair is kept whole, as "wrong winner" is in the
-# figure's caption. The template prints one line as a paragraph and two or more as the dotted list, so the
-# block can grow back into a list without a template change.
+# block above. The line is his teaching in 2026/27, both roles in one sentence with its own subject: the
+# teaching assistant for Introduction to Computation and Cognition again (owner ruling 11, 2026-09-25) and,
+# from that year, for Academic Writing (owner ruling 13, 2026-09-25: the course's title and his role; record
+# kept privately -- the CV register, FACTS TEACH-WRITING, TEACH-TA-MAIN). No future verb: "from 2026/27" dates
+# the new role without promising it. From the review of WP-S17 until 2026-09-27 the line named the writing
+# course alone and said "also" for the rest, which had no antecedent in the block (final site review
+# 2026-09-26, H2; owner ruling 20, 2026-09-27; record kept privately). The course's title is said once on the
+# front door besides the Teaching invitation's label: About names the teaching by its role alone since the
+# same day (H4), so the page still names the course twice, not three times. One no-break space, in "from
+# 2026/27", so no line opens on the year or holds "2026/27." by itself (the last pair kept whole, as "last
+# column." is in the figure's caption). "Academic Writing" is not tied: with the reader's text at 200% on a
+# 320-360px phone the tied pair was wider than the column and broke inside "Writing" (Chromium, 2026-09-27);
+# untied, no line of this sentence holds a single word at 100% text from 320 to 1440px in Chromium, Firefox
+# and WebKit (measured the same day). The template prints one line as a paragraph and two or more as the
+# dotted list, so the block can grow back into a list without a template change.
 # The research line that stood here from 2026-09-25 ("Carrying the NeurIPS 2025 work forward: ...") went with
 # the wireframe: it repeated the paper's question under a heading meant for what he is doing this term. What
 # it kept out still holds -- the NEAT 2026 flash talk stands on this site as title, co-authors, place and date
@@ -279,7 +284,7 @@ about:
 # words.)
 now_as_of: Sep 2026
 now:
-- From 2026/27, also teaching assistant for Academic Writing.
+- Teaching assistant again for Introduction to Computation and Cognition, and for Academic Writing from 2026/27.
 
 # The two invitations at the foot of the front door (astra's wireframe: "small invitations: Teaching ·
 # Commonplace"; controller decision C1 under owner ruling 18, 2026-09-25; record kept privately). Until then this
@@ -405,11 +410,14 @@ news:
   text: Presented our paper with Tal Golan as a poster at the Conference on Neural Information Processing Systems (NeurIPS) 2025 in San Diego.
   link: our paper
   url: 'research/#papers'
-# figshare 10.6084/m9.figshare.30542690 published 2025-11-05.
+# figshare 10.6084/m9.figshare.30542690 published 2025-11-05. The link opens the code repository itself, the
+# card's own "Code" address, not the card (external review 2 §4: an item announcing a resource opens that
+# resource; final site review 2026-09-26, H5). One phrase per item, so "code" is the phrase; the data keeps
+# its own address beside the code, on the card's Reproduce row.
 - date: Nov 2025
   text: Released the code and data for our NeurIPS 2025 paper.
-  link: code and data
-  url: 'research/#papers'
+  link: code
+  url: https://github.com/brainsandmachines/oddoneout_model_recovery
 # arXiv 2510.23321 v1, submitted 27 Oct 2025.
 - date: Oct 2025
   text: Posted the arXiv preprint of the same paper, after its acceptance to the NeurIPS 2025 main track.
@@ -433,15 +441,21 @@ news:
 # explanatory diagram of the recovery test (`how`, below). The running-robots illustration stays here as an
 # option and is not drawn anywhere by default; its one possible home is the link-preview card, and only if he
 # asks for it there.
-#   caption   a gutter label under the plate, in the gutter's own 12px mono, at most four lines at 1280 (the
-#             aside is 192px there, so the label is two short sentences: where the picture comes from and
-#             what a dark cell off the diagonal means). Which axis is which is said by the labels inside the
-#             SVG and by the alt text; a picture inside <img> cannot use the page's webfont, so those labels
-#             only name the axes and stay small. "Fig. 1D" and "wrong winner." are each tied with a no-break
-#             space (U+00A0): the number never opens a line, and the last line never holds "winner." alone.
-#             The figcaption's `text-wrap: pretty` (style.css) does the second of those only in Chromium and
-#             WebKit; Firefox (151) has no `pretty`, so the tie is what keeps the pair together in every
-#             engine (deep review, WP-S3 second review).
+#   caption   a label under the plate, in the gutter's own 12px mono, set flush left under the plate's left
+#             edge at every width (the aside is 192px at 1280; ragged-left mono under a plate read badly --
+#             final site review 2026-09-26, R1). Two short sentences: where the picture comes from, and what
+#             to look at -- a dark cell off the diagonal is a wrong winner, and most of them pile up on one
+#             model, in the last column. That second clause is the alt text's own fact ("seven are mostly or
+#             entirely attributed to one model in the last column"), the pattern the plate is shown for; it
+#             was added on 2026-09-27 (owner ruling 20; record kept privately) and says nothing the alt text
+#             does not. Which axis is which is said by the labels inside the SVG and by the alt text; a
+#             picture inside <img> cannot use the page's webfont, so those labels only name the axes and stay
+#             small. Two no-break spaces (U+00A0): "Fig. 1D", so the number never opens a line, and "last
+#             column.", so the last line never holds "column." alone -- the tie "wrong winner." carried while
+#             it ended the caption; mid-sentence it only forced a short third line ("the diagonal is a") at
+#             1280, so it went with the new clause. The figcaption's `text-wrap: pretty` (style.css) shortens a
+#             last line only in Chromium and WebKit; Firefox (151) has no `pretty`, so the ties are what keep
+#             the pairs together in every engine (deep review, WP-S3 second review).
 figure_options:
   lab_illustration: &lab_illustration
     webp: img/paper-lab.webp
@@ -453,7 +467,7 @@ figure_options:
     alt: 'Figure 1D of the paper, adapted, with both axes labeled: a 20-by-20 matrix of data-generating model
       (rows) against recovered model (columns) at 1.6 million training triplets. Most rows fall on the diagonal,
       but seven are mostly or entirely attributed to one model in the last column.'
-    caption: 'Adapted from Fig. 1D of the paper. A dark cell off the diagonal is a wrong winner.'
+    caption: 'Adapted from Fig. 1D of the paper. A dark cell off the diagonal is a wrong winner; most of them pile up on one model, in the last column.'
     plot: true
 research:
 - title: 'Model–Behavior Alignment under Flexible Evaluation: When the Best-Fitting Model Isn’t the Right One'
@@ -573,7 +587,7 @@ research:
   # The front door's version of this card (WP-S17, 2026-09-26: astra's wireframe, controller decision C1
   # under owner ruling 18; record kept privately). The home page draws the block from here -- the first venue
   # badge, the title's second half, these four sentences, the four marks of the diagram with these captions,
-  # and the Paper, Code and video buttons -- so nothing about the paper is written twice.
+  # and the Paper, Code and talk buttons -- so nothing about the paper is written twice.
   #   question  the paper's question in one sentence, in the words of its own title.
   #   test      what was done, in one sentence: the abstract's 20 models, 4.5 million judgments, each model
   #             generating judgments in turn, and the comparison asked to pick it out.
@@ -612,8 +626,8 @@ research:
   # card around the word (deep review 2026-09-25, PA-05). Per button, and never a suffix the template adds to
   # all of them: one wording for every link would have called the CCN recording, when it stood here, part of
   # the NeurIPS paper, and the ruling keeps CCN a preliminary version. The home page's Paper and Code links
-  # of the featured Research block carry the same contexts (templates/pages/home.html.j2), "Video" for the
-  # poster video among them.
+  # of the featured Research block carry the same contexts (templates/pages/home.html.j2), "Talk" for the
+  # NeurIPS recording among them.
   # GROUPED BY USE (controller decision C4, 2026-09-25, WP-S18; external review 3 §23): the card prints its
   # links as three labelled rows in the order a research reader takes them -- Read, Reproduce, Watch -- rather
   # than as one flat string. `uses` names the groups and their order; each button says which it belongs to
@@ -642,12 +656,15 @@ research:
     context: for the NeurIPS 2025 paper
     use: reproduce
   # The paper's own recording, filed where cv.pdf files it (FACTS PUB-LINK-TALK). Fetched 2026-09-25: the
-  # paper's 4:57 poster video, presenters Itamar Avitan and Tal Golan. "video", not "talk video": it is a
-  # poster video. Its context does not name the venue again: the label already does, and "NeurIPS 2025 video
-  # poster presentation of the NeurIPS 2025 paper" said it twice in one breath.
-  - label: NeurIPS 2025 video
+  # paper's 4:57 video on SlidesLive, presenters Itamar Avitan and Tal Golan. It is his own presentation of
+  # the paper (owner ruling 22, 2026-09-27; record kept privately), so it is labelled as his talk here and
+  # on the home page ("Talk"), as the CCN recording beside it is; until then it was "NeurIPS 2025 video".
+  # The label claims nothing more: the Talks list keeps the NeurIPS row's kind, "Poster". Its context does
+  # not name the venue again: the label already does, and "NeurIPS 2025 talk ... of the NeurIPS 2025 paper"
+  # said it twice in one breath.
+  - label: NeurIPS 2025 talk
     url: https://slideslive.com/39047290
-    context: of the poster presentation of the paper
+    context: recording of my presentation of the paper
     use: watch
   # The CCN talk's recording, in the Watch group since 2026-09-26 (decision C4 puts "Watch" on the card with
   # both recordings; until then it stood on the CCN row alone, deep review PR-04, CS-14, and the row keeps its
