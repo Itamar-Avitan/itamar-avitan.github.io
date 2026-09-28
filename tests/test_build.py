@@ -125,7 +125,7 @@ def test_person_jsonld_is_one_entity_on_every_page_with_his_profile_and_his_pape
         assert all(u.startswith("https://") for u in data["sameAs"]) and "email" not in data
         assert len(data["sameAs"]) == 6 and "cv.pdf" not in data["sameAs"]
         assert not any("hl=" in u for u in data["sameAs"])                # a profile's address, no interface language
-        assert data["jobTitle"] == "PhD candidate" and "NeuroAI" in data["knowsAbout"]
+        assert data["jobTitle"] == "PhD candidate" and "Deep neural networks" in data["knowsAbout"]
         assert data["affiliation"] == data["alumniOf"] == {
             "@type": "CollegeOrUniversity", "name": SITE["affiliation"], "url": SITE["affiliation_url"]}
         assert data["memberOf"] == {"@type": "ResearchOrganization", "name": "Brains and Machines Lab",
@@ -301,11 +301,10 @@ def test_the_home_title_and_description_say_who_he_is():
     home = page("")
     assert home["title"].startswith(SITE["name"] + " ") and "Amram" not in home["title"]
     assert home["description"].endswith(SITE["identity_line"])
-    # the identity line is the owner's own sentence, word for word (ruling 17, 2026-09-25; record kept privately);
-    # the one tie before its dash is a no-break space, read as a space here so that the pin is the wording alone
-    assert SITE["identity_line"].replace(" ", " ") == (
-        "I study human vision with computational models. I’m interested in when a model’s success at predicting "
-        "behavior tells us something about the representation behind it — and when it does not.")
+    # the identity line is the owner's sentence, word for word (owner request 2026-09-28, superseding ruling 17)
+    assert SITE["identity_line"] == (
+        "I use deep neural networks to understand the computations behind biological vision and behavior. "
+        "I test whether our methods can really tell those models apart.")
     for words in ("NeuroAI", "PhD candidate", "Ben-Gurion University"):
         assert words in home["title"] and words in home["description"], words
     assert build.page_title(SITE, home) == home["title"]
@@ -1042,11 +1041,9 @@ def test_the_practicum_leads_with_the_programme_and_ends_on_his_one_clause():
     assert news["link"] == "Embodied Brain Technology Practicum" and news["url"] == "research/#projects"
     # and by its purpose, in the ruled wording (ruling 15): what it was designed to do, not that it does it
     assert "an add-on for any headphones, designed to read biosignals and filter out the sounds" in entry["blurb"]
-    about_clause = next(p for p in SITE["about"] if "add-on" in p)
-    assert "a headphone add-on designed to filter the sounds that set anxiety off" in about_clause
-    home = _visible_text(html_of(""))
-    assert home.count("designed to filter") == 1 and home.count("headphone add-on") == 1   # once on the front door
-    for text in (entry["blurb"], news["text"], about_clause):
+    # About states his interests since 2026-09-28 (owner request) and leaves the projects to their rows
+    assert not any("add-on" in p or "ALS" in p for p in SITE["about"])
+    for text in (entry["blurb"], news["text"]):
         for claim in ("filters", "reads biosignals", "works with"):
             assert claim not in text, (claim, text)
 
@@ -1257,11 +1254,12 @@ def test_now_says_nothing_about_what_he_is_looking_for_or_the_neat_work():
     assert not re.search(r"questions i am|directions i|working on next|what comes next", low)
 
 
-def test_the_about_and_now_drafts_are_marked_as_drafts_in_site_yaml():
+def test_the_now_draft_is_marked_as_a_draft_and_about_is_sized():
     """They are the two pieces of writing the owner asked for and has not yet approved. The file says so, so
     that whoever edits next knows they are standing in for his own words, not recording them."""
     yaml_text = (build.ROOT / "site.yaml").read_text(encoding="utf-8")
-    assert yaml_text.count("DRAFT, awaiting the owner") == 1 and "DRAFT, as above" in yaml_text
+    # About is the owner's own direction since 2026-09-28 and no longer a draft; Now still is
+    assert "DRAFT, awaiting the owner" not in yaml_text and "DRAFT, as above" in yaml_text
     # two short paragraphs since WP-S17 (astra's 90-140 words as the starting range, 80-150 here)
     assert len(SITE["about"]) == 2 and 80 <= sum(len(p.split()) for p in SITE["about"]) <= 150
     assert 1 <= len(SITE["now"]) <= 3

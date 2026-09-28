@@ -10,9 +10,10 @@ affiliation: Ben-Gurion University of the Negev
 # intro's term, the identity line's nouns -- because structured data describes the visible page and must not
 # add to it (deep review 2026-09-25, MR-06 with EM-14's rule; tests/test_build.py checks each term is visible).
 affiliation_url: https://www.bgu.ac.il/
-# "Machine learning" replaced "Neural network models" on 2026-09-26 (WP-S17): the phrase left the identity line
-# with owner ruling 17, and the field word is what About prints (FACTS ID-FIELD, owner ruling 9).
-knows_about: [NeuroAI, Computational cognitive neuroscience, Representational alignment, Human vision, Machine learning]
+# Since 2026-09-28 the terms follow the new identity line and About (deep neural networks, biological vision,
+# Bayesian modeling); every one is printed on a page. NeuroAI left the list with the old About (it stays in
+# the home title, which is not page text).
+knows_about: [Deep neural networks, Biological vision, Bayesian modeling, Representational alignment, Human vision]
 show_cv: true
 # Hiding a card does not make it private: nothing unpublished may be stored in this repository at all, hidden
 # or not (README, public-only policy). This switch only decides whether a card marked `ongoing: true` is drawn
@@ -57,7 +58,7 @@ pages:
   # ends on the identity line and follows it when that line changes (owner ruling 17, built by WP-S17): the
   # two sentences below are that line word for word, tie included.
   title: Itamar Avitan · NeuroAI PhD candidate, Ben-Gurion University
-  description: NeuroAI PhD candidate at Ben-Gurion University. I study human vision with computational models. I’m interested in when a model’s success at predicting behavior tells us something about the representation behind it — and when it does not.
+  description: NeuroAI PhD candidate at Ben-Gurion University. I use deep neural networks to understand the computations behind biological vision and behavior. I test whether our methods can really tell those models apart.
 - slug: research/
   nav: Research
   heading: Research
@@ -199,65 +200,29 @@ role:
 # the interior pages and 2.7px at 340px on home; the no-break space wraps correctly in all three engines.
 # `affiliation:` at the top stays without the country: it feeds the JSON-LD.
 - label: Ben-Gurion University of the Negev, Israel
-# The site's first sentence, the owner's own choice among the wordings put to him (owner ruling 17,
-# 2026-09-25; record kept privately -- the review's rulings file): two sentences, the object of study and
-# then the question, in place of the one-line "right, not just which ones predict best" thesis, which now
-# lives in the paper's own title and on the research page. It is printed once, as the masthead lede -- the
-# template sets the first sentence a step larger than the second -- and reused as it stands by the meta
-# description, the og text, the JSON-LD description and the name card (tools/make_og.py: rerun it when this
-# changes). Typographic apostrophe and em dash, as the ruling asks; the space before the dash is a no-break
-# space (U+00A0), the site's convention for its own dashes (About, the accessibility statement): untied, the
-# lede opened a line on "— and when it does not." at 200% text at twelve widths (460-490, 890-920 and
-# 1060-1090px; Chromium, measured 2026-09-26) and at none at 100%. The description above carries the same tie, so the two stay one string.
-identity_line: I study human vision with computational models. I’m interested in when a model’s success at predicting behavior tells us something about the representation behind it — and when it does not.
+# The site's first sentence (owner request 2026-09-28, which supersedes ruling 17's wording): the site's
+# narrative widened from the one paper to his interests -- deep neural networks as the tool for understanding
+# the computations behind biological vision and behavior, and testing whether our methods can tell those
+# models apart. Two sentences, as the template sets the second a step smaller. Printed once, as the masthead lede, and reused as it stands by the home meta description
+# (the `description` above carries the same sentence), the og text, the JSON-LD description and the name card
+# (tools/make_og.py: rerun it when this changes). No dash, so no tie is needed.
+identity_line: I use deep neural networks to understand the computations behind biological vision and behavior. I test whether our methods can really tell those models apart.
 
-# DRAFT, awaiting the owner's own words. Written on 2026-09-21 because the owner asked for an About section in
-# his own voice and a Now block (owner ruling, 2026-09-21; record kept privately). Every clause below is drawn
-# from facts already on this site, on the CVs (FACTS.md in the cv repository) or ruled by him. Nothing about
-# his life outside that is invented, and nothing should be added here that he has not said.
-#
-# Two paragraphs since 2026-09-26 (WP-S17), on astra's wireframe for the front door (controller decision C1
-# under owner ruling 18; record kept privately): the home page answers "who is he and what question animates
-# his work", and About is the person, not the paper. The first paragraph is who he is and how he got here --
-# the field words every CV prints (FACTS ID-FIELD, "NeuroAI and computational cognitive neuroscience"), the
-# lab and the advisor, the two undergraduate fields (FACTS EDU-UG-DEGREES; the degree line's "(computational
-# track)" is left to the CV: two words the word budget could not carry), and the three things the work combines, which are the paper's
-# (human judgments, models, model-recovery simulations) -- and closes on ONE sentence about the broader
-# question, at the level a researcher states on a homepage: how to compare models with minds so that competing
-# ideas can be told apart, which experiments separate them, and how people differ in how they see. That
-# sentence names interests and not studies (owner request, 2026-09-25, that his broader interests be stated
-# without revealing future work; the same two interests close the academic CVs' Research-interests line,
-# FACTS INT-BROADER); it carries no verb of future work, no dataset, no method beyond "model recovery", and
-# nothing about the NEAT 2026 work (owner ruling 16). Do not grow it into a programme. It opens "The larger
-# question is", not "Behind it is a broader question": the lede a screen above already ends on "the
-# representation behind it", and the paragraph had three "it"s with three referents (review of WP-S17,
-# 2026-09-26). The second paragraph is
-# the rest of the person: the teaching by its role alone, the mentoring in the past tense (MENT-YEARS is
-# 2025-2026), the two things built with other people, and the commonplace. "And I collect lines about the
-# mind." stays as written (external review 3 kept it by name). Until 2026-09-27 the teaching went by subject
-# ("on courses in computation and cognition, in neuroimaging and in deep learning"); the Now line under the
-# paper names the course by its title and the Teaching invitation points to the rest, so the page said the
-# subjects twice, and cutting them lifts the featured Research block a line at every width (final site
-# review 2026-09-26, H1 and H4; owner ruling 20, 2026-09-27; record kept privately). The titles, the years
-# and the subjects are the teaching page's; do not put them back here.
-#
-# Gone since 2026-09-26: the paragraph that argued the paper (the mapping, the twenty networks, the 80%) --
-# that argument is the featured Research block directly under About, drawn from the paper card, and the
-# CV-shaped sentence on the PhD's start and expected end (the CV chip in the strip carries the record; do not
-# put "degrees are in the CV" back either).
-#
-# The practicum clause -- "a headphone add-on designed to filter the sounds that set anxiety off" -- names the
-# add-on by what it was designed to do, never as a working filter (owner ruling 15, 2026-09-25; the note
-# over `projects` has the rule), and says nothing about who did what: the ruled role clause belongs to the
-# project row alone. The ALS expansion is this page's first use of the acronym. Do not add to this clause.
-#
-# Ties: the space before the em dash in the first paragraph is a no-break space (U+00A0), so the dash never
-# opens a line. Word count 79 + 57 = 136 of the 80-150 the test allows (str.split() counts the dash), inside
-# the 90-140 external review 2 asks of an About; every line added here lowers the paper by a line.
+# About, rewritten 2026-09-28 at the owner's request: About states his interests, not where he came from.
+# Paragraph 1 is the question (the computations behind biological vision and the cognition built on it, with
+# deep neural networks as the tool; the networks predict well, the problem now is telling them apart) and his
+# recent work's stance on method (model recovery at realistic signal-to-noise to show what alignment metrics
+# can and cannot reveal). Paragraph 2 is the methods he is drawn to and his hands-on experience, then the lab.
+# Interests are drawn from his PhD research proposal but stated as interests, never as planned studies (owner,
+# 2026-09-28: "not necessarily reveal what I am planning to do"; NEAT 2026 still stays title-only, ruling 16).
+# Left out on purpose, per the owner: the undergraduate background (the CV has it), BCI4ALS and EarBetter
+# (the Projects rows keep them), teaching (the Now line and the Teaching invitation), the commonplace line.
+# "GPU cluster": the paper's code runs on CUDA under Slurm (FACTS SK-TECH in the cv repository).
+# Word count 81 + 59 = 140 of the 80-150 the test allows.
 about:
-- 'I work in NeuroAI and computational cognitive neuroscience, with Dr. Tal Golan in the Brains and Machines Lab at Ben-Gurion University of the Negev. I came to it from psychology and cognitive and brain sciences, and my work combines human behavioral data, machine learning and model-recovery simulations. The larger question is how to compare models with minds so that competing ideas can be told apart — which experiments separate them, and how people differ in the way they see.'
-- 'I have been a teaching assistant and have mentored two undergraduates in the lab. I like building things with other people: a brain–computer interface that let a person with amyotrophic lateral sclerosis (ALS) answer yes or no, and a headphone add-on designed to filter the sounds that set anxiety off. And I collect lines about the mind.'
-# DRAFT, as above. Short enough to keep true: rewrite it whenever it stops being what you are doing.
+- 'I want to understand the computations behind biological vision and the cognition built on it, and I use deep neural networks to look for them. These networks already predict human vision and behavior remarkably well; the harder problem now is telling them apart. My recent work puts our methods to that test: with model-recovery simulations at realistic signal-to-noise, I ask what current alignment metrics can reveal about the model behind the data, where they fail, and how we could measure better.'
+- 'I’m drawn to statistical and Bayesian modeling, and to experiments designed so that competing models disagree. Much of my work is hands-on deep learning: aligning many vision networks to millions of human judgments and running large simulations on a GPU cluster. I work with Dr. Tal Golan in the Brains and Machines Lab at Ben-Gurion University of the Negev.'
+# DRAFT, as above (About is his own since 2026-09-28; Now is still a draft). Short enough to keep true: rewrite it whenever it stops being what you are doing.
 # One dated line since 2026-09-26 (WP-S17; astra's wireframe, controller decision C1 under owner ruling 18):
 # the current activity, not a list, and not the paper's question again -- that lives in the featured Research
 # block above. The line is his teaching in 2026/27, both roles in one sentence with its own subject: the
