@@ -217,7 +217,7 @@ identity_line: I use deep neural networks to understand the computations behind 
 # 2026-09-28: "not necessarily reveal what I am planning to do"; NEAT 2026 still stays title-only, ruling 16).
 # Left out on purpose, per the owner: the undergraduate background (the CV has it), BCI4ALS and EarBetter
 # (the Projects rows keep them), teaching (the Now line and the Teaching invitation), the commonplace line.
-# "GPU cluster": the paper's code runs on CUDA under Slurm (FACTS SK-TECH in the cv repository).
+# "GPU cluster": the paper's code runs on CUDA under Slurm (FACTS SKL-EXTRA, 2026-09-28, in the cv repository).
 # Word count 81 + 59 = 140 of the 80-150 the test allows.
 about:
 - 'I want to understand the computations behind biological vision and the cognition built on it, and I use deep neural networks to look for them. These networks already predict human vision and behavior remarkably well; the harder problem now is telling them apart. My recent work puts our methods to that test: with model-recovery simulations at realistic signal-to-noise, I ask what current alignment metrics can reveal about the model behind the data, where they fail, and how we could measure better.'
