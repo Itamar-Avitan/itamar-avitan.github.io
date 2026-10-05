@@ -52,8 +52,10 @@ portrait: {webp: img/portrait-400.webp, jpg: img/portrait-800.jpg}
 pages:
 - slug: ''
   nav: Home
-  # Every word of the title and the description is printed on the site already: the field words are in About
-  # (FACTS ID-FIELD), the status in the role line, the university in the affiliation. The name leads, exactly
+  # Every word of the description is printed on the site already: its last two sentences are the identity
+  # line word for word, the status in the role line, the university in the affiliation. The title's one
+  # extra word, NeuroAI (FACTS ID-FIELD), stays in the title alone since the 2026-09-28 About rewrite -- a
+  # title is not page text (the knows_about note above says the same). The name leads, exactly
   # as the <h1> prints it (spec 4.5 is a name-form rule: never "Itamar Amram Avitan" here). The description
   # ends on the identity line and follows it when that line changes (owner ruling 17, built by WP-S17): the
   # two sentences below are that line word for word, tie included.
@@ -222,6 +224,9 @@ identity_line: I use deep neural networks to understand the computations behind 
 # Left out on purpose, per the owner: the undergraduate background (the CV has it), BCI4ALS and EarBetter
 # (the Projects rows keep them), teaching (the Now line and the Teaching invitation), the commonplace line.
 # "GPU cluster": the paper's code runs on CUDA under Slurm (FACTS SKL-EXTRA, 2026-09-28, in the cv repository).
+# "GPU" stands unexpanded (owner ruling, 2026-10-05): for this site's readers it is an everyday abbreviation
+# like PhD, CV and PDF, not a departure from the first-use rule that expands fMRI, EEG, BCI, ALS and WCAG --
+# recorded here the way the mark_note comment records the NeurIPS label exemption.
 # "brain responses" since 2026-09-28 (owner): his model-brain recovery code (brain_recovery). Word count 81 + 63 = 144 of the 80-150 the test allows.
 about:
 - 'I want to understand the computations behind biological vision and the cognition built on it, and I use deep neural networks to look for them. These networks already predict human vision and behavior remarkably well; the harder problem now is telling them apart. My recent work puts our methods to that test: with model-recovery simulations at realistic signal-to-noise, I ask what current alignment metrics can reveal about the model behind the data, where they fail, and how we could measure better.'
@@ -236,8 +241,9 @@ about:
 # the new role without promising it. From the review of WP-S17 until 2026-09-27 the line named the writing
 # course alone and said "also" for the rest, which had no antecedent in the block (final site review
 # 2026-09-26, H2; owner ruling 20, 2026-09-27; record kept privately). The course's title is said once on the
-# front door besides the Teaching invitation's label: About names the teaching by its role alone since the
-# same day (H4), so the page still names the course twice, not three times. One no-break space, in "from
+# front door besides the Teaching invitation's label: About named the teaching by its role alone from that
+# day (H4) until the 2026-09-28 rewrite dropped teaching from About altogether, so the page still names the
+# course twice, not three times. One no-break space, in "from
 # 2026/27", so no line opens on the year or holds "2026/27." by itself (the last pair kept whole, as "last
 # column." is in the figure's caption). "Academic Writing" is not tied: with the reader's text at 200% on a
 # 320-360px phone the tied pair was wider than the column and broke inside "Writing" (Chromium, 2026-09-27);
@@ -354,11 +360,12 @@ news:
 # full) and kept, because it already obeyed it: the programme leads the sentence, EarBetter is named in a
 # clause, and nothing here says who did what. One word of repetition went -- the line named Brown University
 # twice in twenty words, once in the programme's name and once as the place -- and nothing else changed.
-# The item ends on the name and says nothing about what EarBetter is (review of WP-S17, 2026-09-26): About,
-# one screen up on the same page, carries the ruled purpose clause -- "a headphone add-on designed to filter
-# the sounds that set anxiety off" (owner ruling 15 of 2026-09-25; the rule and the row's fuller form are
-# under RULINGS in the note over `projects`) -- and from 2026-09-26 until that review this line carried the
-# same ten words, so the front door described the add-on twice a screen apart. News answers "what changed";
+# The item ends on the name and says nothing about what EarBetter is (review of WP-S17, 2026-09-26): from
+# 2026-09-26 until that review this line carried the ruled ten-word purpose clause (owner ruling 15 of
+# 2026-09-25; the rule and the row's fuller form are under RULINGS in the note over `projects`), and About
+# carried it too until the 2026-09-28 rewrite dropped EarBetter from About -- the front door then described
+# the add-on twice a screen apart. Since that rewrite the front door only names it (owner ruling, 2026-10-05:
+# the item stays bare; the linked Projects row keeps the site's one description). News answers "what changed";
 # the link on the programme leads to the row that describes the add-on. The verb list, "built and pitched",
 # is the practicum row's and the six CVs' (WP-S13 review fix, 2026-09-26: "designed, built and pitched" put
 # "designed" twice in one sentence, and no ruling covers that list). Do not put a description back here.
@@ -713,13 +720,15 @@ talks:
 # privately). Do not grow it into a list of what he did; do not restore the sensors or the business plan; do
 # not put it in News or About. 2026-09-25, ruling 15 (built 2026-09-26, WP-S13): EarBetter is described by
 # what it was designed to do, never as a working filter -- on this row "an add-on for any headphones,
-# designed to read biosignals and filter out the sounds that set a person’s anxiety off", and in About on
+# designed to read biosignals and filter out the sounds that set a person’s anxiety off", and, until the
+# 2026-09-28 About rewrite dropped EarBetter from About, in About on
 # the home page "a headphone add-on designed to filter the sounds that set anxiety off" (WP-S17) --
 # superseding, for this clause alone, the ruling of 2026-09-21 that the entry say the system worked. The
 # README the Code link opens calls the selective path experimental and says anxiety inference was not
 # evaluated or claimed, so the printed claim and the evidence it links agree. The Aug 2026 news item, a screen
-# under About, names EarBetter and links this row rather than describe it a second time (review of WP-S17,
-# 2026-09-26; until then it carried the ruled clause word for word). The comma after "headphones" is the site's own (the
+# under About, names EarBetter and links this row, the site's one description of it since the 2026-09-28
+# rewrite (review of WP-S17, 2026-09-26, removed the clause from the item; until then it carried the ruled
+# clause word for word; the owner confirmed the bare item on 2026-10-05). The comma after "headphones" is the site's own (the
 # plan's site wording has none; the CVs' long form has it): without it, "headphones designed to read
 # biosignals" reads as the headphones' design, not the add-on's. (The wordings retired by these rulings are
 # not kept here, and neither are the owner's own messages: a sentence retired from the page but kept word for
@@ -884,7 +893,11 @@ quotes:
     sentence opens ‘“You see,” he explained, “I consider that a man’s brain…”’, so starting the quote at “I
     consider” is a faithful extract. The owner’s “skilful workman” gloss is also confirmed verbatim at lines
     499-501: “Now the skilful workman is very careful indeed as to what he takes into his brain-attic. He will
-    have nothing but the tools which may help him in doing his work…” (British single-l “skilful”).
+    have nothing but the tools which may help him in doing his work…” (British single-l “skilful”). Context of
+    the note: lines 482-486 (Watson finds Holmes ignorant of the Copernican Theory, “that the earth travelled
+    round the sun”), 488-489 (Holmes’s reply; the note’s quoted sentence “Now that I do know it I shall do my
+    best to forget it.” is wholly on line 489, extracted character-for-character), 491 (“To forget it!”), after
+    which the quoted passage follows at 493-495 — re-verified 2026-10-05 against the same 268,777-byte download.
   copyright: public-domain
   note: Holmes says this immediately after learning the earth goes round the sun and replying, “Now that I do know it I shall do my best to forget it.”
 - text: “The proper study of mankind is man.”
