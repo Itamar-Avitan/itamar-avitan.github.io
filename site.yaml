@@ -150,6 +150,10 @@ nobreak:
 # "best-fitting" alone; without this line the intro broke at that hyphen at 1280 (deep review, CS-08).
 - best-fitting
 - Ground-Truth
+# "Level AA" (the accessibility aim, the term's only occurrence): untied it split "Level / AA" and opened a
+# line on "AA" at 320-322px (Chromium, Firefox) and 320-350px (WebKit); the WP-S4 tie binds only the dash
+# to "AA", so the split half-defeated it (review 2026-10-05).
+- Level AA
 - Linear Probing
 - Neuro-AI-Talks
 - (NEAT) 2026
