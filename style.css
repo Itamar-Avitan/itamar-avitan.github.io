@@ -751,6 +751,9 @@ main.opens-with-h1 { margin-top: 2.25rem; }
 .feature__venue { line-height: 1; margin-bottom: 0.75rem; }
 .feature h3 { font-size: 1.25rem; line-height: 1.3; letter-spacing: -0.008em; text-wrap: balance; }
 .feature__text { margin-top: 0.75rem; }
+/* the strip's container at every width, so the row-of-four question is asked of the text column itself
+   (owner ruling, 2026-10-05; the gate lives with the strip's rules below) */
+.feature__body { container-type: inline-size; }
 .feature__links {
   --step: 1.8em;          /* the width of " · " in the mono: three advances of 0.6em, so the row spaces as the typed line did */
   --reach: 0.3125rem;     /* what each link's box is padded by, above and below the text */
@@ -953,8 +956,13 @@ li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
   .recovery-diagram .mark-fit { transform: none; }
 }
 /* The same four marks on the home page's featured paper (WP-S17), smaller and captioned by one word each: two
-   rows of two on a phone, one row of four from 45rem up when the text column is at least 28rem wide (the
-   desktop block; a container query, so that text set at 200% keeps the two rows). The marks are capped at 7rem (the
+   rows of two while the text column is under 28rem -- every real phone, and every width with the reader's
+   text at 200%, since a rem in a container query is the page root's (at 200% the column is 8rem at 720px
+   and 21rem at 1280, where four columns put "ranking" past the viewport at 720-730px and broke every
+   caption under its counter: review of WP-S17, 2026-09-26) -- and one row of four when it is wider,
+   whatever the window is. The gate used to sit inside the 45rem block, so a 540-719px window kept the
+   phone's 2x2 with ~220px of empty paper per cell although one row fit from ~490px; the owner ruled the
+   container gate alone on 2026-10-05 -- it keeps both of WP-S17's stated reasons by itself. The marks are capped at 7rem (the
    card's are 8.5rem) so the strip reads as a figure under the paragraph rather than a second card, and their
    strokes, 1.5 units of 120, still print at over a pixel. The captions are labels, not sentences: the
    gutter's mono at the dates' size, the counter in the accent before each, no full stop after it. These rules
@@ -963,6 +971,12 @@ li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
 .recovery-diagram--small svg { max-width: 7rem; }
 .recovery-diagram--small p { font: 400 0.8125rem/1.5 var(--mono); color: var(--muted); }
 .recovery-diagram--small p::before { content: counter(step) " "; font-weight: 500; color: var(--accent); }
+@container (min-width: 28rem) {
+  .recovery-diagram--small { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  /* one row again, so stage 3's entering arrow returns with it (the wrapped strip hides it; the rule above) */
+  .recovery-diagram--small .mark-arrow { display: inline; }
+  .recovery-diagram--small .mark-fit { transform: none; }
+}
 /* the questions keep their markers: they are a list a reader counts, not a row of links */
 .open { margin: 0.25rem 0 0; padding-left: 1.1rem; list-style: disc; }
 .open li { margin-top: 0.25rem; }
@@ -1405,20 +1419,7 @@ li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
     align-items: start;
   }
   .feature__venue { grid-column: 1; justify-self: end; margin: 0.1875rem 0 0; }
-  .feature__body { grid-column: 2; container-type: inline-size; }
-  /* The row of four is asked of the text column, not the viewport: at the default text size the column is
-     30.5rem at 720px and 42rem on a laptop, so this is every width of the block above; with the reader's text
-     at 200% it is 8rem at 720px and 21rem at 1280, where four columns put "ranking" past the viewport at
-     720-730px and broke every caption under its counter (review of WP-S17, 2026-09-26), so the strip keeps
-     the phone's two rows of two there. A rem in a media query is the browser's default size; a rem in a
-     container query is the page root's, so it follows the root set larger. */
-  @container (min-width: 28rem) {
-    .recovery-diagram--small { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    /* one row again, so stage 3's entering arrow returns with it (the wrapped strip hides it; the rule
-       beside the card's 45-64rem block) */
-    .recovery-diagram--small .mark-arrow { display: inline; }
-    .recovery-diagram--small .mark-fit { transform: none; }
-  }
+  .feature__body { grid-column: 2; }   /* its container-type is base now (owner ruling 2026-10-05): the strip's gate lives with the strip */
 
   /* expander sits on the rule */
   .older > summary {
