@@ -214,7 +214,10 @@ def test_a_wrong_address_gets_the_sites_own_404_page(browser, served, width, sch
     with its own page: 980px wide, no viewport, no way back (deep review 2026-09-25, PA-02, MR-08). The
     site's own page is served here the way the host serves it and asked for two folders deep: the status
     stays 404, the stylesheet and the fonts arrive, nothing overflows at 100% or 200% text, and every link on
-    it leads back to the root."""
+    it leads back to the root. Since 2026-10-05 (owner ruling) the page is also held to the statement's
+    "every page" claims the SLUGS suites cannot reach -- it is deliberately not a member of `pages` -- so the
+    16px floor, the skip link as the first Tab stop, the focus ring on every control and the contrast of
+    every painted text are asserted here, at this test's own widths and themes."""
     ctx = browser.new_context(viewport={"width": width, "height": 900}, color_scheme=scheme)
     page = ctx.new_page()
     requests, failed = [], []
@@ -252,6 +255,33 @@ def test_a_wrong_address_gets_the_sites_own_404_page(browser, served, width, sch
     assert page.request.get(f"{served}/cv.pdf").status == 200               # and the CV is really there
     assert page.request.get(f"{served}/research/").status == 200
     assert page.request.get(f"{served}/favicon.ico").status == 200
+    # the statement's "every page" claims, which the SLUGS suites never ask of this page (owner ruling,
+    # 2026-10-05): the text-size loop above left the root at 32px, so it is reset first
+    page.evaluate("document.documentElement.style.fontSize = ''")
+    page.wait_for_timeout(50)
+    assert page.evaluate("parseFloat(getComputedStyle(document.querySelector('main p')).fontSize)") >= 16
+    page.keyboard.press("Tab")                                              # the first stop is the skip link
+    assert page.evaluate("document.activeElement.className") == "skip"
+    assert parse_px(page.evaluate("getComputedStyle(document.activeElement).outlineWidth")) >= 2
+    page.keyboard.press("Enter")
+    assert page.evaluate("document.activeElement.id") == "content"
+    outlines = page.evaluate("""() => {
+      const out = [];
+      for (const el of [...document.querySelectorAll('a, button')].filter(el => el.checkVisibility())) {
+        el.focus();
+        const s = getComputedStyle(el);
+        out.push({what: el.textContent.trim().slice(0, 24), width: s.outlineWidth, style: s.outlineStyle});
+      }
+      return out;
+    }""")
+    assert outlines and [o for o in outlines if o["style"] == "none" or parse_px(o["width"]) < 2] == []
+    painted = page.evaluate(PAINTED_TEXT_JS, CONTRAST_TARGETS)
+    too_faint = []
+    for t in painted:                       # per-text ratios only: the 404 paints no badge or resource label,
+        ratio, needed = _contrast(t["color"], t["background"]), 4.5 if t["size"] < 24 else 3.0
+        if ratio < needed:                  # so the SLUGS suites' kinds-coverage assert has no place here
+            too_faint.append(f'404 {ratio:.2f} < {needed}: {t["what"]} ({t["color"]} on {t["background"]}, {t["size"]}px)')
+    assert too_faint == []
     ctx.close()
 
 
@@ -355,7 +385,10 @@ def test_no_theme_filters_the_card_figure(browser):
     behind the print, which has to stay light in either theme and has to be told apart from the sheet it is
     pasted on, or there is no mount to see. The light theme's mount used to be 1.18:1 against its white card:
     present in the stylesheet, invisible on the page, which left the figure a mounted print in one theme and
-    a picture lying straight on the sheet in the other. Both themes mount it now."""
+    a picture lying straight on the sheet in the other. Both themes mount it now. The axis labels inside the
+    figure are held to AA here too (owner ruling, 2026-10-05): they arrive via <img>, so the contrast suite's
+    walker can never sample them, and filter: none above is exactly what makes the file's own colours the
+    painted colours."""
     for scheme in ("light", "dark"):
         page, _, _ = _page(browser, 1280, scheme, "research/")
         assert page.evaluate("getComputedStyle(document.querySelector('.paper__fig img')).filter") == "none"
@@ -364,6 +397,12 @@ def test_no_theme_filters_the_card_figure(browser):
             getComputedStyle(document.querySelector('.paper')).backgroundColor]""")
         assert _luminance(mat) > 0.45, (scheme, mat)             # a light mount, not a dark one
         assert _contrast(mat, card) >= 1.3, (scheme, mat, card)  # and seen, not merely declared
+    svg = (ROOT / "img" / "model-recovery.svg").read_text(encoding="utf-8")
+    ink = re.search(r'<g font-family[^>]*fill="#([0-9A-Fa-f]{6})"', svg).group(1)
+    plate = re.search(r'<rect width="232" height="232" fill="#([0-9A-Fa-f]{6})"', svg).group(1)
+    as_css = lambda h: "rgb({}, {}, {})".format(*(int(h[i:i + 2], 16) for i in (0, 2, 4)))
+    # the six labels render at ~12.9-16.4px (a 232 viewBox drawn at 272), so ordinary text's 4.5:1 applies
+    assert _contrast(as_css(ink), as_css(plate)) >= 4.5, (ink, plate)
 
 
 HIT_TEST_JS = """
