@@ -8,9 +8,18 @@ four-page split was that no page comes near the 4383px (laptop) and 6548px (phon
 column left the most empty paper; the phone is shot in both themes because that is where most of it is read.
 The site is rebuilt first, so the pictures always show the current site.yaml, templates and style.css.
 Look at them.
+
+The pages are served over a loopback socket, the way tests/test_browser.py serves them, not opened as
+file:// paths: the 404 page links its assets root-absolute (it is served at every depth, so it must), and
+opened off the disk it renders unstyled -- which is how the review of 2026-10-05 came to judge a page that
+does not exist in production. Nothing leaves the machine; the server lives and dies with this run. The 404
+page is shot with the others now, at the same views.
 """
+import functools
 import subprocess
 import sys
+import threading
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 import yaml
@@ -27,11 +36,15 @@ def main() -> int:
     subprocess.run([sys.executable, str(ROOT / "build.py")], check=True)
     OUT.mkdir(exist_ok=True)
     site = yaml.safe_load((ROOT / "site.yaml").read_text(encoding="utf-8"))
+    srv = ThreadingHTTPServer(("127.0.0.1", 0),
+                              functools.partial(SimpleHTTPRequestHandler, directory=str(ROOT)))
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    base = f"http://127.0.0.1:{srv.server_address[1]}/"
+    targets = [(entry["slug"].strip("/") or "home", base + entry["slug"]) for entry in site["pages"]]
+    targets.append(("404", base + "404.html"))
     with sync_playwright() as p:
         b = p.chromium.launch()
-        for entry in site["pages"]:
-            name = entry["slug"].strip("/") or "home"
-            url = (ROOT / entry["slug"] / "index.html").as_uri()
+        for name, url in targets:
             for view, w, h, scheme in VIEWS:
                 ctx = b.new_context(viewport={"width": w, "height": h}, color_scheme=scheme, device_scale_factor=1)
                 page = ctx.new_page()
@@ -43,6 +56,7 @@ def main() -> int:
                 print(f"shots/{name}-{view}.png: {w}px wide, {height}px tall, horizontal overflow={overflow}")
                 ctx.close()
         b.close()
+    srv.shutdown()
     return 0
 
 
