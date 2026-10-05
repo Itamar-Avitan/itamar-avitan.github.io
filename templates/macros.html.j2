@@ -192,13 +192,18 @@
     ink zig-zagged against the left-aligned captions once the strip wrapped; WP-S3 review), so they read as
     one strip. No arrow is drawn between stages: on a phone the strip wraps
     to two rows, and an arrow glyph in a wrapping grid points the wrong way on the second row -- the counter
-    in the captions keeps the order. aria-hidden: each mark's caption is its accessible text.
+    in the captions keeps the order. Stage 3's own entering arrow obeys the same rule since the review of
+    2026-10-05: it is drawn only where the strip is one row; wrapped, the stylesheet hides it (.mark-arrow)
+    and shifts the grid and bracket (.mark-fit) to the shared x = 1 edge, or marks 1 and 3 stood 28 units
+    misregistered in the very wrap the one-left-edge rule was written for.
+    aria-hidden: each mark's caption is its accessible text.
       1  the generator: the 4x5 grid of 20 candidates, one filled in the accent -- the network whose turn it is
       2  simulated judgments: three odd-one-out triplets, the odd one out in the accent (one path, three
          squares: the same answer, given millions of times), and two shortening lines below for the rest of
          the pile
       3  fitted candidates: the same grid, all outlined, under a thin bracket, with a small arrow entering
-         from the left -- the answers are what they are all fitted to
+         from the left -- the answers are what they are all fitted to (single-row layouts only; wrapped,
+         the arrow is hidden and the grid sits on the strip's left edge)
       4  the wrong winner: four ranked bars, each with a square at its head; the top bar's square is empty,
          and the accent-filled one, the generator, sits on the second bar -#}
 {%- macro recovery_mark(n) -%}
@@ -207,7 +212,7 @@
   {%- elif n == 2 -%}
 <svg aria-hidden="true" viewBox="0 0 120 64"><g fill="currentColor"><circle cx="5.5" cy="12.5" r="4.5"/><circle cx="20.5" cy="12.5" r="4.5"/><circle cx="5.5" cy="28.5" r="4.5"/><circle cx="20.5" cy="28.5" r="4.5"/><circle cx="5.5" cy="44.5" r="4.5"/><circle cx="20.5" cy="44.5" r="4.5"/></g><path d="M31 8h9v9h-9zM31 24h9v9h-9zM31 40h9v9h-9z" style="fill:var(--accent)"/><path d="M8.5 56h24M12.5 60.5h16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
   {%- elif n == 3 -%}
-<svg aria-hidden="true" viewBox="0 0 120 64"><path d="M29 12h9v9h-9zM42 12h9v9h-9zM55 12h9v9h-9zM68 12h9v9h-9zM81 12h9v9h-9zM29 25h9v9h-9zM42 25h9v9h-9zM55 25h9v9h-9zM68 25h9v9h-9zM81 25h9v9h-9zM29 38h9v9h-9zM42 38h9v9h-9zM55 38h9v9h-9zM68 38h9v9h-9zM81 38h9v9h-9zM29 51h9v9h-9zM42 51h9v9h-9zM55 51h9v9h-9zM68 51h9v9h-9zM81 51h9v9h-9z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M29 8.5V5h61v3.5M1 36h20M16 31l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<svg aria-hidden="true" viewBox="0 0 120 64"><g class="mark-fit"><path d="M29 12h9v9h-9zM42 12h9v9h-9zM55 12h9v9h-9zM68 12h9v9h-9zM81 12h9v9h-9zM29 25h9v9h-9zM42 25h9v9h-9zM55 25h9v9h-9zM68 25h9v9h-9zM81 25h9v9h-9zM29 38h9v9h-9zM42 38h9v9h-9zM55 38h9v9h-9zM68 38h9v9h-9zM81 38h9v9h-9zM29 51h9v9h-9zM42 51h9v9h-9zM55 51h9v9h-9zM68 51h9v9h-9zM81 51h9v9h-9z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M29 8.5V5h61v3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g><path class="mark-arrow" d="M1 36h20M16 31l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
   {%- elif n == 4 -%}
 <svg aria-hidden="true" viewBox="0 0 120 64"><path d="M1 12h9v9h-9zM1 38h9v9h-9zM1 51h9v9h-9z" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="1" y="25" width="9" height="9" style="fill:var(--accent)"/><path d="M15 15h62v3H15zM15 28h46v3H15zM15 41h30v3H15zM15 54h16v3H15z" fill="currentColor"/></svg>
   {%- endif -%}
