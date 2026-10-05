@@ -541,6 +541,15 @@ a:focus-visible > .ico { color: var(--accent-strong); }
    they still wrap as whole groups: side by side while both fit, stacking when they do not. */
 .links-row { display: flex; flex-wrap: wrap; column-gap: 1.25rem; }
 .links-row > .links { flex: none; max-width: 100%; }
+/* The plain list is the one group that cannot keep one line at the narrowest phones: its four labels at the
+   1.25rem step need 284.8px against 280px of content at 320, so ORCID fell alone on a second line (320-324px;
+   the same orphan the masthead rule above kills, and the wrap-as-groups rule these lists keep). One step down
+   inside this group only, and only below 20.5rem: 272.8px fits 320 with 7.2px over, and from 329px up the
+   full step fits with 4.2px and rising. 284.8 measured identical in Chromium, Firefox and WebKit (the fonts
+   are self-hosted), so the boundary does not move between engines (review 2026-10-05). */
+@media (max-width: 20.5rem) {
+  .links--plain { column-gap: 1rem; }
+}
 
 .prose p + p { margin-top: 0.875rem; }
 /* the statement's bullets are paragraphs too: without this the reduced-motion bullet ended on "motion." alone
@@ -704,7 +713,7 @@ main.opens-with-h1 { margin-top: 2.25rem; }
   text-transform: uppercase;
   color: var(--muted);
 }
-.log--kind h3 { font-size: 1.0625rem; }   /* the paper card keeps the only large title */
+.log h3 { font-size: 1.0625rem; }   /* the paper card keeps the only large title: every log row's title, kind or not, takes the small size (the projects rows used to fall through to the generic h3, one size up from the talks beside them) */
 .authors { color: var(--ink-2); font-size: 1rem; margin-top: 0.25rem; }
 .me { color: var(--ink); font-weight: 600; }
 .venue { font-size: 1rem; margin-top: 0.125rem; }
@@ -929,6 +938,20 @@ li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
 @media (min-width: 45rem) and (max-width: 63.99rem) {
   .recovery-diagram { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+/* Stage 3's entering arrow is drawn only where the strip is one row (review 2026-10-05). Wrapped, the arrow
+   opened the second row pointing in from empty margin, and the grid behind it stood ~28 units right of the
+   mark above it -- the zig-zag the one-left-edge rule exists to kill (macros.html.j2, WP-S3) -- so the
+   wrapped strip hides the arrow and shifts grid and bracket to the shared x=1 edge. 38.5rem is the exact
+   four-column fit (4 x 8.5rem + 3 x 1.5rem), asked of the same container that sizes the columns (.paper on
+   a phone, .paper__body from 45rem), so the query is true exactly when the card's strip is one row at any
+   root size -- 200% text and print included (a rem in a container query is the page root's). The -28px is
+   viewBox units: the grid's ink starts at x=29 and moves to x=1. */
+.recovery-diagram .mark-arrow { display: none; }
+.recovery-diagram .mark-fit { transform: translate(-28px, 0); }
+@container (min-width: 38.5rem) {
+  .recovery-diagram .mark-arrow { display: inline; }
+  .recovery-diagram .mark-fit { transform: none; }
+}
 /* The same four marks on the home page's featured paper (WP-S17), smaller and captioned by one word each: two
    rows of two on a phone, one row of four from 45rem up when the text column is at least 28rem wide (the
    desktop block; a container query, so that text set at 200% keeps the two rows). The marks are capped at 7rem (the
@@ -1032,6 +1055,10 @@ li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
    not a color-mix(), so the contrast test can read it back as an opaque rgb(); every text on the panel keeps
    4.5:1 in both themes. tests/test_browser.py measures all of this. */
 .entry:target { background: var(--target-tint); box-shadow: 0 0 0 0.625rem var(--target-tint); border-radius: 2px; }
+/* The list stands 1.75rem under the intro -- it collapses with the intro's own 1.5rem to 28px, the same step
+   as between two entries, the rhythm the 45rem block keeps at 2.25rem/36px (the phone missed it by 4px until
+   the review of 2026-10-05). */
+.reading { margin-top: 1.75rem; }
 /* and the step between two entries is larger again than any step inside one */
 .reading > .entry + .entry { margin-top: 1.75rem; }
 /* The work's title is the link to a free text of the work where site.yaml gives one (the three Doyle lines,
@@ -1263,7 +1290,8 @@ li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
   main { position: relative; margin-top: 4.5rem; --spine-top: 0.9375rem; --section-gap: 4.5rem; }
   section + section { margin-top: var(--section-gap); }
   /* A page headed by its own h1 starts the rule lower, because the rule starts on the first tick and the tick
-     sits at the middle of that heading's first line: half of 2rem at 1.2 rather than half of 1.5rem at 1.25. */
+     sits at the middle of that heading's first line: half of 2rem at 1.2 rather than half of 1.5rem at 1.25;
+     the 64rem block re-steps both constants with its type sizes. */
   main.opens-with-h1 { margin-top: 3.25rem; --spine-top: 1.2rem; }
 
   /* the margin rule: starts on the first section tick, ends on "Last updated" */
@@ -1386,6 +1414,10 @@ li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
      container query is the page root's, so it follows the root set larger. */
   @container (min-width: 28rem) {
     .recovery-diagram--small { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    /* one row again, so stage 3's entering arrow returns with it (the wrapped strip hides it; the rule
+       beside the card's 45-64rem block) */
+    .recovery-diagram--small .mark-arrow { display: inline; }
+    .recovery-diagram--small .mark-fit { transform: none; }
   }
 
   /* expander sits on the rule */
@@ -1497,9 +1529,16 @@ li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
   .lede__more, .page-intro { font-size: 1.25rem; }     /* the step under the lede's 1.5rem; the commonplace intro is exempt */
   main > section > h1 { font-size: 2.25rem; }
   h2.inset { font-size: 1.625rem; }
+  /* The type step above moves the first tick (tick mid = 0.5lh), so the rule's start steps with it: half of
+     2.25rem at 1.2 for a page that opens on its h1, half of 1.625rem at 1.25 where a ruled section starts
+     the rule on its own h2 tick (home's Now). Without these the rule kept the 45rem constants and overshot
+     its first tick by ~2.4px -- a bare pixel of spine above the tick on every interior page (review
+     2026-10-05). */
+  main { --spine-top: 1.015625rem; }
+  main.opens-with-h1 { --spine-top: 1.35rem; }
   h3 { font-size: 1.25rem; }
-  .paper h3 { font-size: 1.375rem; }
-  .log--kind h3 { font-size: 1.125rem; }
+  .paper h3, .feature h3 { font-size: 1.375rem; }   /* the featured title is the card's own title (home.html.j2: the front door must not drift from the research page), so it takes the card's step */
+  .log h3 { font-size: 1.125rem; }
   .quote blockquote { font-size: 1.375rem; }
   .quote__by { font-size: 1.0625rem; }   /* the three steps of the commonplace keep their order: 22 / 17 / 16 */
   .quote__note { font-size: 1rem; }
@@ -1512,15 +1551,18 @@ li.buttons__group { display: grid; gap: 0 0.75rem; align-items: baseline; }
      strip's foot (tests/test_browser.py measures it at 1280). 15px is not taken: it would put the strip
      above the dates. */
   .sitenav a:not(.btn) { font-size: 0.875rem; }
+  .sitenav__cv .btn { font-size: 0.875rem; }   /* the CV chip is a strip label too and steps with the links, not with the toggle */
   .toggle { font-size: 0.8125rem; }
   /* the featured paper's links, the captions under its four marks and the mark's caption are mono labels too,
      and take the same step: at 13px under an 18px line, and under the 14px "Last updated" row, each would be
-     the one label left behind */
+     the one label left behind. The card follows (review 2026-10-05): the Cite (BibTeX) expander steps with
+     the buttons it is set like, the Fig. 1D caption takes the badge step, one under the dates (R1 set its
+     alignment, not its size), and the card diagram's sentence captions step with the authors' register. */
   .when, .colophon .row, .colophon-nav, .feature__links, .recovery-diagram--small p, .mark-note { font-size: 0.875rem; }
-  .buttons .btn, .older > summary { font-size: 0.875rem; }
-  .tag { font-size: 0.8125rem; }
+  .buttons .btn, .older > summary, .cite > summary { font-size: 0.875rem; }
+  .tag, .paper__fig figcaption { font-size: 0.8125rem; }
   .log .kind .tag { font-size: 0.75rem; }
-  .authors, .venue, .note, .role, .links { font-size: 1.0625rem; }
+  .authors, .venue, .note, .role, .links, .paper .recovery-diagram p { font-size: 1.0625rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

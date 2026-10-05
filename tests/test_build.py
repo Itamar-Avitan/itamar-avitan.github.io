@@ -2020,13 +2020,15 @@ def test_the_figure_caption_is_set_once_and_turns_with_its_gutter():
     """It was styled twice: right in the base rule, and left again in the phone block under a comment about a
     caption this build does not print at all. The type is set once now and the alignment once, where the rest
     of the gutter is turned. Since 2026-09-27 the caption is two sentences, not a label, and is set flush left
-    under its plate at every width (final site review R1), so no block turns it."""
+    under its plate at every width (final site review R1), so no block turns it. Since 2026-10-05 the 64rem
+    block steps its size with the badges sharing the gutter; the alignment is still set once."""
     base, _, rest = _css().partition("Phone: the rule moves")
     phone, _, desktop = rest.partition("Desktop: the gutter")
     caption = re.search(r"\.paper__fig figcaption \{[^}]*\}", base)
     assert base.count(".paper__fig figcaption") == 1 and "text-align" not in caption.group(0)
     assert ".paper__fig figcaption" not in phone                            # the phone keeps the left edge
-    assert ".paper__fig figcaption" not in desktop                          # flush left at every width since 2026-09-27 (R1)
+    turned = re.search(r"[^{}]*\.paper__fig figcaption[^{]*\{[^}]*\}", desktop)
+    assert turned and "text-align" not in turned.group(0)                   # the 64rem step sizes it; R1 holds: no block turns it
     assert "hangs under the left edge" not in _css()                        # and the misleading comment is gone
 
 
