@@ -1179,12 +1179,12 @@ def test_optional_keys_may_be_absent():
 
 def test_dates_are_time_elements():
     pages = every_page()
-    for slug, needle in [("", '<time class="when" datetime="2026-09">Sep 2026</time>'),
+    for slug, needle in [("", '<time class="when" datetime="2026-10">Oct 2026</time>'),
                          ("research/", '<time datetime="2026-09-14">14</time>–<time datetime="2026-09-15">15 Sep 2026</time>'),
                          ("research/", '<time datetime="2025-12-05">5 Dec 2025</time>'),
                          ("research/", '<time datetime="2026-07-24">24 Jul</time>–<time datetime="2026-08-06">6 Aug 2026</time>'),
                          ("research/", '<time datetime="2022">2022</time>–<time datetime="2023">2023</time>'),
-                         ("", '<time class="what" datetime="2026-09">September 2026</time>')]:
+                         ("", '<time class="what" datetime="2026-10">October 2026</time>')]:
         assert needle in pages[slug], (slug, needle)
 
 
@@ -1209,7 +1209,7 @@ def test_the_now_block_is_dated_once_and_its_lines_are_not_events():
     question again. Two or more lines would be one dotted list there, with no dates of their own, because
     none of them is an event: the template keeps that branch, exercised here on a fixture."""
     section = html_of("").partition('<section id="now"')[2].partition("</section>")[0]
-    assert section.count('class="when"') == 1 and '<time class="when" datetime="2026-09">' in section
+    assert section.count('class="when"') == 1 and '<time class="when" datetime="2026-10">' in section
     assert len(SITE["now"]) == 1 and "<li>" not in section and '<ul class="what now"' not in section
     assert re.search(r'<p class="what">.*?</p>', section, re.S)
     text = _visible_text(section)
